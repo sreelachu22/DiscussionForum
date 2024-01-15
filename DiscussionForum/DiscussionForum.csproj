@@ -12,14 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Models\APIModels\" />
-    <Folder Include="Models\EntityModels\" />
-    <Folder Include="Data\" />
     <Folder Include="Middleware\" />
-    <Folder Include="UnitOfWork\" />
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
