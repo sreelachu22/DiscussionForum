@@ -12,8 +12,6 @@ namespace DiscussionForum.UnitOfWork
             // Initialize other repositories.
         }
 
-
-
         public int Complete()
         {
             return _context.SaveChanges();
