@@ -17,9 +17,9 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Models\APIModels\" />
-		<Folder Include="Middleware\" />
-	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Middleware\" />
+    <Folder Include="Models\APIModels\" />
+  </ItemGroup>
 
 </Project>

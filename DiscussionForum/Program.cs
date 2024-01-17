@@ -16,6 +16,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IForumCategoryService, ForumCategoryService>();
 builder.Services.AddScoped<IForumStatusService, ForumStatusService>();
+builder.Services.AddScoped<IThreadStatusService, ThreadStatusService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

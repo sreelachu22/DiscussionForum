@@ -1,5 +1,5 @@
-.using DiscussionForum.Models.EntityModels;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using DiscussionForum.Models.EntityModels;
 
 namespace DiscussionForum.Data
 {
@@ -12,6 +12,8 @@ namespace DiscussionForum.Data
         public DbSet<ForumStatus> ForumStatus { get; set; }
 
         public DbSet<ForumCategory> ForumCategories { get; set; }
+        
+        public DbSet<ThreadStatus> ThreadStatus { get; set; }
     }
 
 }

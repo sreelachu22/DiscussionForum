@@ -8,6 +8,7 @@ namespace DiscussionForum.UnitOfWork
         IRoleRepository Role { get; }    
         IForumCategoryRepository ForumCategory { get; }
         IForumStatusRepository ForumStatus { get; }
+        IThreadStatusRepository ThreadStatus { get; }
 
         int Complete();
     }
