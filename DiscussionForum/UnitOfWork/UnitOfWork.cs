@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Data;
+using DiscussionForum.Repositories;
 
 namespace DiscussionForum.UnitOfWork
 {
@@ -8,10 +9,11 @@ namespace DiscussionForum.UnitOfWork
 
         public UnitOfWork(AppDbContext context)
         {
-            _context = context;
-            // Initialize other repositories.
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            ForumStatus = new ForumStatusRepository(_context);
         }
 
+        public IForumStatusRepository ForumStatus { get; }
         public int Complete()
         {
             return _context.SaveChanges();

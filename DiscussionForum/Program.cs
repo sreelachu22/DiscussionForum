@@ -1,5 +1,15 @@
+using DiscussionForum.Data;
+using DiscussionForum.Services;
+using DiscussionForum.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DiscussionForum_API_CRUDContext")));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IForumStatusService, ForumStatusService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
