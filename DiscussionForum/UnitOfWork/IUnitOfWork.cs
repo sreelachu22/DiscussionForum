@@ -1,13 +1,15 @@
 ﻿using DiscussionForum.Repositories;
+using DiscussionForum.Services;
 
 namespace DiscussionForum.UnitOfWork
 {
-    //namespace ThreadStatusService.Infrastructure.UnitOfWork
-    //{
-        public interface IUnitOfWork
-        {
-            IThreadStatusRepository ThreadStatus { get; }
-            int Complete();
-        }
-    //}
+    public interface IUnitOfWork
+    {   
+        IRoleRepository Role { get; }    
+        IForumCategoryRepository ForumCategory { get; }
+        IForumStatusRepository ForumStatus { get; }
+        IThreadStatusRepository ThreadStatus { get; }
+
+        int Complete();
+    }
 }

@@ -1,21 +1,22 @@
+using DiscussionForum.Data;
 using DiscussionForum.Services;
-//using DiscussionForum.UnitOfWork.ThreadStatusService.Infrastructure.UnitOfWork;
 using DiscussionForum.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using DiscussionForum.Data;
-using DiscussionForum.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DiscussionForum_API")));
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IThreadStatusRepository, ThreadStatusRepository>();
-builder.Services.AddScoped<IThreadStatusService, ThreadStatusService>();
-
-
 // Add services to the container.
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IForumCategoryService, ForumCategoryService>();
+builder.Services.AddScoped<IForumStatusService, ForumStatusService>();
+builder.Services.AddScoped<IThreadStatusService, ThreadStatusService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
