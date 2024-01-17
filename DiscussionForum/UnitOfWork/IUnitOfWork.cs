@@ -1,7 +1,13 @@
-﻿namespace DiscussionForum.UnitOfWork
+﻿using DiscussionForum.Repositories;
+
+namespace DiscussionForum.UnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        int Complete();
-    }
+    //namespace ThreadStatusService.Infrastructure.UnitOfWork
+    //{
+        public interface IUnitOfWork
+        {
+            IThreadStatusRepository ThreadStatus { get; }
+            int Complete();
+        }
+    //}
 }
