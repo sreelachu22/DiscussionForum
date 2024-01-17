@@ -4,36 +4,18 @@ namespace DiscussionForum.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        protected readonly AppDbContext Context;
-
+        protected readonly AppDbContext _context;
         public Repository(AppDbContext context)
         {
-            Context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-
         public IEnumerable<T> GetAll()
         {
-            return Context.Set<T>().ToList();
+            return _context.Set<T>().ToList();
         }
-
         public T GetById(int id)
         {
-            return Context.Set<T>().Find(id);
-        }
-
-        public void Add(T entity)
-        {
-            Context.Set<T>().Add(entity);
-        }
-
-        public void Update(T entity)
-        {
-            Context.Set<T>().Update(entity);
-        }
-
-        public void Delete(T entity)
-        {
-            Context.Set<T>().Remove(entity);
+            return _context.Set<T>().Find(id);
         }
     }
 }
