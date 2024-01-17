@@ -1,4 +1,4 @@
-﻿using DiscussionForum.Models.EntityModels;
+using DiscussionForum.Models.EntityModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.Data
@@ -10,5 +10,9 @@ namespace DiscussionForum.Data
         }
 
         public DbSet<ForumStatus> ForumStatus { get; set; }
+
+        public DbSet<ForumCategory> ForumCategories { get; set; }
     }
+
 }
+
