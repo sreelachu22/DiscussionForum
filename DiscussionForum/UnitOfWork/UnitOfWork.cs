@@ -1,4 +1,6 @@
 ﻿using DiscussionForum.Data;
+using DiscussionForum.Repositories;
+using DiscussionForum.Models.EntityModels;
 
 namespace DiscussionForum.UnitOfWork
 {
@@ -9,8 +11,12 @@ namespace DiscussionForum.UnitOfWork
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
+            Role = new RoleRepository(_context);
             // Initialize other repositories.
         }
+
+        
+        public IRoleRepository Role { get; }
 
         public int Complete()
         {
@@ -22,5 +28,9 @@ namespace DiscussionForum.UnitOfWork
             _context.Dispose();
         }
 
+        int IUnitOfWork.Complete()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
