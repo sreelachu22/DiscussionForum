@@ -4,8 +4,11 @@ using DiscussionForum.Services;
 namespace DiscussionForum.UnitOfWork
 {
     public interface IUnitOfWork
-    {
-        IRoleRepository Role { get; }
+    {   
+        IRoleRepository Role { get; }    
+        IForumCategoryRepository ForumCategory { get; }
+        IForumStatusRepository ForumStatus { get; }
+
         int Complete();
     }
 }
