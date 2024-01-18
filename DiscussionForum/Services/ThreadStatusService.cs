@@ -1,6 +1,6 @@
 ﻿namespace DiscussionForum.Services
 {
-    public class ThreadStatus : IThreadStatus
+    public class ThreadStatusService : IThreadStatus
     {
     }
 }
