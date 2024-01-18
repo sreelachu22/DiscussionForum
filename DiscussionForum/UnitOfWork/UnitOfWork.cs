@@ -12,7 +12,7 @@ namespace DiscussionForum.UnitOfWork
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-
+        public IDesignationRepository Designations { get; }
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
@@ -22,6 +22,7 @@ namespace DiscussionForum.UnitOfWork
             ForumStatus = new ForumStatusRepository(_context);
             ThreadStatus = new ThreadStatusRepository(_context);
             // Initialize other repositories.
+            Designations = new DesignationRepository(_context);
         }
 
         public IRoleRepository Role { get; }
@@ -33,10 +34,12 @@ namespace DiscussionForum.UnitOfWork
         {
             return _context.SaveChanges();
         }
+        public void Dispose(){}
 
         /*int IUnitOfWork.Complete()
         {
             throw new NotImplementedException();
         }*/
     }
+
 }
