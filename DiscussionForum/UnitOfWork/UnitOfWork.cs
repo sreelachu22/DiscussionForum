@@ -12,7 +12,6 @@ namespace DiscussionForum.UnitOfWork
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-        public IDesignationRepository Designations { get; }
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
@@ -25,6 +24,7 @@ namespace DiscussionForum.UnitOfWork
             Designations = new DesignationRepository(_context);
         }
 
+        public IDesignationRepository Designations { get; }
         public IRoleRepository Role { get; }
         public IForumStatusRepository ForumStatus { get; }
         public IForumCategoryRepository ForumCategory { get; }
