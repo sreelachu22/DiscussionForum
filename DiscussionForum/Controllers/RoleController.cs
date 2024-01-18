@@ -1,12 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DiscussionForum.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
 {
-    public class RoleController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class RoleController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IRoleService _roleService;
+
+        public RoleController(IRoleService roleService)
         {
-            return View();
+            _roleService = roleService;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetRoles() {
+            var roles = await _roleService.GetAllRoles();
+            return Ok(roles);
+        }
+
+        [HttpGet("{RoleID}")]
+        public async Task<IActionResult> GetRoleByID(int RoleID)
+        {
+            var role= await _roleService.GetRoleByID(RoleID);
+            if (role == null) { 
+                return NotFound();
+            }
+            return Ok(role);
+        }
+
     }
 }
