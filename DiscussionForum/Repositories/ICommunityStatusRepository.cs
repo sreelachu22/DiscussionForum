@@ -2,7 +2,7 @@
 
 namespace DiscussionForum.Repositories
 {
-    public interface IForumCategoryRepository : IRepository<ForumCategory>
+    public interface ICommunityStatusRepository : IRepository<CommunityStatus>
     {
     }
 }

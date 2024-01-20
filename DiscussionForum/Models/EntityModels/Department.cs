@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DiscussionForum.Models.EntityModels
 {
-    public class ForumStatus
+    public class Department
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ForumStatusID { get; set; }
+        public int DepartmentID { get; set; }
+        public string DepartmentName { get; set;}
+        public virtual ICollection<User> Users { get; set; }
 
-        [Required]
-        [StringLength(20)]
-        public string ForumStatusName { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
