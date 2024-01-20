@@ -17,8 +17,8 @@ namespace DiscussionForum.UnitOfWork
             _context = context;
 
             Role = new RoleRepository(_context);
-            ForumCategory = new ForumCategoryRepository(_context);
-            ForumStatus = new ForumStatusRepository(_context);
+            CommunityCategory = new CommunityCategoryRepository(_context);
+            CommunityStatus = new CommunityStatusRepository(_context);
             ThreadStatus = new ThreadStatusRepository(_context);
             // Initialize other repositories.
             Designations = new DesignationRepository(_context);
@@ -26,8 +26,8 @@ namespace DiscussionForum.UnitOfWork
 
         public IDesignationRepository Designations { get; }
         public IRoleRepository Role { get; }
-        public IForumStatusRepository ForumStatus { get; }
-        public IForumCategoryRepository ForumCategory { get; }
+        public ICommunityStatusRepository CommunityStatus { get; }
+        public ICommunityCategoryRepository CommunityCategory { get; }
         public IThreadStatusRepository ThreadStatus { get; }
 
         public int Complete()

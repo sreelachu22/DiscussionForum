@@ -11,9 +11,9 @@ namespace DiscussionForum.Data
         
         public DbSet<Role> Roles { get; set; }
 
-        public DbSet<ForumStatus> ForumStatus { get; set; }
+        public DbSet<CommunityStatus> CommunityStatus { get; set; }
 
-        public DbSet<ForumCategory> ForumCategories { get; set; }
+        public DbSet<CommunityCategory> CommunityCategories { get; set; }
         
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
     }

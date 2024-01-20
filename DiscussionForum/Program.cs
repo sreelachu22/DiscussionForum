@@ -15,8 +15,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IDesignationService, DesignationService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IForumCategoryService, ForumCategoryService>();
-builder.Services.AddScoped<IForumStatusService, ForumStatusService>();
+builder.Services.AddScoped<ICommunityCategoryService, CommunityCategoryService>();
+builder.Services.AddScoped<ICommunityStatusService, CommunityStatusService>();
 builder.Services.AddScoped<IThreadStatusService, ThreadStatusService>();
 
 builder.Services.AddControllers();
