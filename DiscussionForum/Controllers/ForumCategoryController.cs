@@ -1,11 +1,13 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace DiscussionForum.Controllers
 {
     [ApiController]
+    [EnableCors("AllowAngularDev")]
     [Route("api/[controller]")]
     public class ForumCategoryController : ControllerBase
     {
