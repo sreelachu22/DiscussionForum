@@ -18,6 +18,43 @@ namespace DiscussionForum.Data
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
 
         public DbSet<User> Users { get; set; }
+
+        public DbSet<Community> Communities { get; set; }
+
+        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping {  get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure CreatedByUser relationship
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.CreatedByUser)
+                .WithOne()
+                .HasForeignKey<User>(u => u.CreatedBy)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.ModifiedByUser)
+                .WithOne()
+                .HasForeignKey<User>(u => u.ModifiedBy)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+          
+            modelBuilder.Entity<CommunityCategoryMapping>()
+                .HasOne(ccm => ccm.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(ccm => ccm.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CommunityCategoryMapping>()
+                .HasOne(ccm => ccm.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(ccm => ccm.ModifiedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 
 }
