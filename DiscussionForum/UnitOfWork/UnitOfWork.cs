@@ -22,6 +22,7 @@ namespace DiscussionForum.UnitOfWork
             ThreadStatus = new ThreadStatusRepository(_context);
             // Initialize other repositories.
             Designations = new DesignationRepository(_context);
+            User= new UserRepository(_context);
         }
 
         public IDesignationRepository Designations { get; }
@@ -29,6 +30,8 @@ namespace DiscussionForum.UnitOfWork
         public ICommunityStatusRepository CommunityStatus { get; }
         public ICommunityCategoryRepository CommunityCategory { get; }
         public IThreadStatusRepository ThreadStatus { get; }
+
+        public IUserRepository User { get; }
 
         public int Complete()
         {

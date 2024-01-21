@@ -16,6 +16,8 @@ namespace DiscussionForum.Data
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
         
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
+
+        public DbSet<User> Users { get; set; }
     }
 
 }
