@@ -18,6 +18,14 @@ namespace DiscussionForum.Data
         
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Threads> Threads { get; set; }
+
+        public DbSet<Community> Communities { get; set; }
+
+        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping {  get; set; }
+        
         public DbSet<Notice> Notices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,22 +34,32 @@ namespace DiscussionForum.Data
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
-                .HasForeignKey<User>(u => u.CreatedBy)
+                .HasForeignKey<User>(u => u.CreatedBy) // Configure ModifiedByUser relationship
                 .IsRequired(false)  // Assuming CreatedBy can be null
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure ModifiedByUser relationship
             modelBuilder.Entity<User>()
                 .HasOne(u => u.ModifiedByUser)
                 .WithOne()
                 .HasForeignKey<User>(u => u.ModifiedBy)
-                .IsRequired(false)  // Assuming ModifiedBy can be null
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+          
+            modelBuilder.Entity<CommunityCategoryMapping>()
+                .HasOne(ccm => ccm.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(ccm => ccm.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CommunityCategoryMapping>()
+                .HasOne(ccm => ccm.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(ccm => ccm.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }
-
-
     }
 
 }

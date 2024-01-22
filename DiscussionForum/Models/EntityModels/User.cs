@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -18,19 +19,23 @@ namespace DiscussionForum.Models.EntityModels
         public long? Score { get; set; }
 
         public int DepartmentID { get; set; }
+        [JsonIgnore]
         public virtual Department Department { get; set; }
 
         public long DesignationID { get; set; }
+        [JsonIgnore]
         public virtual Designation Designation { get; set; }
 
         public bool IsDeleted { get; set; }
 
         public Guid? CreatedBy { get; set; }
+        [JsonIgnore]
         public virtual User CreatedByUser { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public Guid? ModifiedBy { get; set; }
+        [JsonIgnore]
         public virtual User ModifiedByUser { get; set; }
 
         public DateTime? ModifiedAt { get; set; }
