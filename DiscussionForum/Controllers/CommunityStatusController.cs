@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
 {
+    [EnableCors("AllowAngularDev")]
     [ApiController]
     [Route("api/[controller]")]
     [EnableCors("AllowAngularDev")]
