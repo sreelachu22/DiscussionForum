@@ -26,7 +26,6 @@ namespace DiscussionForum.Services
             try
             {
                 var user= await Task.FromResult(_context.Users.Find(Userid));
-                var a = user;
                 return user; 
             }
             catch (Exception ex)
