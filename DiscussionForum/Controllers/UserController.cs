@@ -27,6 +27,16 @@ namespace DiscussionForum.Controllers
             Response.Headers.Add("X-Total-Count", userResult.TotalCount.ToString());
             Response.Headers.Add("X-Total-Pages", userResult.TotalPages.ToString());
             return Ok(userResult.Users);
+         }
+        [HttpGet("{UserId}")]
+        public async Task<IActionResult> GetUserById(Guid UserId)
+        {
+            var userExists = await _userService.GetUserByIDAsync(UserId);
+
+            if (userExists == null)
+                return NotFound();
+
+            return Ok(userExists);
         }
     }
 }
