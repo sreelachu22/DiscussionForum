@@ -1,11 +1,13 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowAngularDev")]
     public class CommunityStatusController : ControllerBase
     {
         private readonly ICommunityStatusService _communityStatusService;
