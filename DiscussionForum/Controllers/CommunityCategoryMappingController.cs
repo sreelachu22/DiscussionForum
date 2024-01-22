@@ -96,13 +96,13 @@ namespace DiscussionForum.Controllers
 
 
 
-        [HttpPost("CreateWithCategoryName/{communityID}/{communityCategoryName}")]
-        public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(int communityID,[FromBody] string communityCategoryName, string description)
+        [HttpPost("CreateWithCategoryName/{communityID}")]
+        public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
             try
             {
-                var communityCategoryMappingID = await _communityCategoryMappingService.CreateCommunityCategoryMappingAsync(communityID, communityCategoryName, description);
-                return Ok(communityCategoryMappingID);
+                var communityCategoryMapping = await _communityCategoryMappingService.CreateCommunityCategoryMappingAsync(communityID,model);
+                return Ok(communityCategoryMapping);
             }
             catch (Exception ex)
             {
@@ -111,12 +111,12 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        [HttpPut("{communityCategoryMappingID}")]
-        public async Task<ActionResult<CommunityCategoryMapping>> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, string description)
+        [HttpPut("UpdateCategoryDescription/{communityCategoryMappingID}")]
+        public async Task<ActionResult<CommunityCategoryMapping>> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model)
         {
             try
             {
-                var result = await _communityCategoryMappingService.UpdateCommunityCategoryMappingAsync(communityCategoryMappingID, description);
+                var result = await _communityCategoryMappingService.UpdateCommunityCategoryMappingAsync(communityCategoryMappingID, model);
                 return Ok(result);
             }
             catch (Exception ex)

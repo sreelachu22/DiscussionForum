@@ -18,7 +18,7 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation properties
-        public virtual Thread Thread { get; set; }
+        public virtual Threads Thread { get; set; }
         public virtual Reply ParentReply { get; set; }
         public virtual User CreatedByUser { get; set; }
         public virtual User ModifiedByUser { get; set; }

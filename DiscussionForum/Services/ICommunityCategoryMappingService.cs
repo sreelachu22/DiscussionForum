@@ -9,8 +9,8 @@ namespace DiscussionForum.Services
         Task<IEnumerable<CommunityCategoryMappingAPI>> GetAllCategoriesInCommunityAsync(int communityID);
         Task<IEnumerable<CommunityCategory>> GetCategoriesNotInCommunityAsync(int communityID);
         Task<CommunityCategoryMapping> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID);
-        Task<CommunityCategoryMapping> CreateCommunityCategoryMappingAsync(int communityID, string communityCategoryName,string description);
-        Task<CommunityCategoryMapping> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, string description);
+        Task<CommunityCategoryMapping> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model);
+        Task<CommunityCategoryMapping> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model);
         Task<CommunityCategoryMapping> DeleteCommunityCategoryMappingAsync(int communityCategoryMappingID);
     }
 }

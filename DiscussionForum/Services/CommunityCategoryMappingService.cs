@@ -40,6 +40,7 @@ namespace DiscussionForum.Services
                 from ccm in _context.CommunityCategoryMapping
                 join c in _context.Communities on ccm.CommunityID equals c.CommunityID
                 join cc in _context.CommunityCategories on ccm.CommunityCategoryID equals cc.CommunityCategoryID
+                join t in _context.Threads on ccm.CommunityCategoryMappingID equals t.CommunityCategoryMappingID into threadGroup
                 where ccm.CommunityID == communityID && !ccm.IsDeleted
                 select new CommunityCategoryMappingAPI
                 {
@@ -49,16 +50,15 @@ namespace DiscussionForum.Services
                     CommunityCategoryName = cc.CommunityCategoryName,
                     Description = ccm.Description,
                     IsDeleted = ccm.IsDeleted,
-                    //CreatedBy = ccm.CreatedBy,
-                    CreatedAt = ccm.CreatedAt,
-                    //ModifiedBy = ccm.ModifiedBy,
-                    ModifiedAt = ccm.ModifiedAt
-
+                    CreatedBy = ccm.CreatedBy,
+                    // Add the count of threads
+                    ThreadCount = threadGroup.Count()
                 })
                 .ToListAsync();
 
             return result;
         }
+
 
         public async Task<IEnumerable<CommunityCategory>> GetCategoriesNotInCommunityAsync(int communityID)
         {
@@ -116,18 +116,21 @@ namespace DiscussionForum.Services
             };
         }
 
-        public async Task<CommunityCategoryMapping> CreateCommunityCategoryMappingAsync(int communityID, string communityCategoryName, string description)
+        public async Task<CommunityCategoryMapping> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
             var communityCategory = await _context.CommunityCategories
-                .FirstOrDefaultAsync(cc => cc.CommunityCategoryName == communityCategoryName && !cc.IsDeleted);
-           
+                .FirstOrDefaultAsync(cc => cc.CommunityCategoryID == model.CommunityCategoryID && !cc.IsDeleted);
+
             var entity = new CommunityCategoryMapping
             {
 
                 CommunityID = communityID,
                 CommunityCategoryID = communityCategory.CommunityCategoryID,
-                Description = description,
+                Description = model.Description,
+                ModifiedBy = null,
+                ModifiedAt = null,
                 IsDeleted = false,
+                CreatedBy = model.CreatedBy,
                 CreatedAt = DateTime.Now
             };
 
@@ -137,7 +140,7 @@ namespace DiscussionForum.Services
             return entity;
         }
 
-        public async Task<CommunityCategoryMapping> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, string description)
+        public async Task<CommunityCategoryMapping> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model)
         {
             var entity = await _context.CommunityCategoryMapping
                 .FirstOrDefaultAsync(ccm => ccm.CommunityCategoryMappingID == communityCategoryMappingID && !ccm.IsDeleted);
@@ -145,8 +148,9 @@ namespace DiscussionForum.Services
             /*if (entity == null)
                 return false;*/
 
-            entity.Description = description;
-            //entity.ModifiedBy = model.ModifiedBy;
+            entity.Description = model.Description;
+            entity.ModifiedBy = model.ModifiedBy;
+            entity.IsDeleted = false;
             entity.ModifiedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
