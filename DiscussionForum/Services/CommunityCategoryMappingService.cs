@@ -145,9 +145,6 @@ namespace DiscussionForum.Services
             var entity = await _context.CommunityCategoryMapping
                 .FirstOrDefaultAsync(ccm => ccm.CommunityCategoryMappingID == communityCategoryMappingID && !ccm.IsDeleted);
 
-            /*if (entity == null)
-                return false;*/
-
             entity.Description = model.Description;
             entity.ModifiedBy = model.ModifiedBy;
             entity.IsDeleted = false;
