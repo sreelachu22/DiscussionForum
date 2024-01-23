@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DiscussionForum.Models.EntityModels
 {
-    public class Thread
+    public class Threads
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ThreadID { get; set; }
-        public long CommunityCategoryID { get; set; }
+        public long CommunityCategoryMappingID { get; set; }
         public string Content { get; set; }
         public int ThreadStatusID { get; set; }
         public bool IsAnswered { get; set; }

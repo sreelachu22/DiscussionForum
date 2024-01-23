@@ -1,69 +1,143 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using DiscussionForum.Models.APIModels;
+using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DiscussionForum.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowAngularDev")]
-    [Route("api/[controller]")]
-    public class CommunityCategoryController : ControllerBase
+    public class CommunityCategoryMappingController : ControllerBase
     {
-        private readonly ICommunityCategoryService _communityCategoryService;
+        private readonly ICommunityCategoryMappingService _communityCategoryMappingService;
 
-        public CommunityCategoryController(ICommunityCategoryService communityCategoryService)
+        public CommunityCategoryMappingController(ICommunityCategoryMappingService communityCategoryMappingService)
         {
-            _communityCategoryService = communityCategoryService;
+            _communityCategoryMappingService = communityCategoryMappingService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetCommunityCategories()
+        /*[HttpPost]
+        public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(CommunityCategoryMappingAPI model)
         {
-            var communityCategories = await _communityCategoryService.GetCommunityCategoriesAsync();
-            return Ok(communityCategories);
+            try
+            {
+                var communityCategoryMappingID = await _communityCategoryMappingService.CreateCommunityCategoryMappingAsync(model);
+                return Ok(communityCategoryMappingID);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }*/
+
+        [HttpGet("ById/{communityCategoryMappingID}")] // Specify a unique route for GetCommunityCategoryMappingByIdAsync
+        public async Task<ActionResult<CommunityCategoryMappingAPI>> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID)
+        {
+            try
+            {
+                var result = await _communityCategoryMappingService.GetCommunityCategoryMappingByIdAsync(communityCategoryMappingID);
+
+                if (result == null)
+                    return NotFound();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
 
-        [HttpGet("{communityCategoryId}")]
-        public async Task<IActionResult> GetCommunityCategoryById(long communityCategoryId)
+        [HttpGet("InCommunity/{communityID}")] // Specify a unique route for GetAllCategoriesInCommunityAsync
+        public async Task<ActionResult<IEnumerable<CommunityCategoryMappingAPI>>> GetAllCategoriesInCommunityAsync(int communityID)
         {
-            var communityCategory = await _communityCategoryService.GetCommunityCategoryByIdAsync(communityCategoryId);
-
-            if (communityCategory == null)
-                return NotFound();
-
-            return Ok(communityCategory);
+            try
+            {
+                var result = await _communityCategoryMappingService.GetAllCategoriesInCommunityAsync(communityID);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
 
-        [HttpPost("{communityCategoryName}")]
-        public async Task<IActionResult> CreateCommunityCategory(string communityCategoryName)
+        [HttpGet("GetCategoriesNotInCommunity/{communityID}")]
+        public async Task<ActionResult<IEnumerable<CommunityCategoryMappingAPI>>> GetCategoriesNotInCommunityAsync(int communityID)
         {
-            var communityCategory = await _communityCategoryService.CreateCommunityCategoryAsync(communityCategoryName);
-            return Ok(communityCategory);
+            try
+            {
+                var result = await _communityCategoryMappingService.GetCategoriesNotInCommunityAsync(communityID);
+
+                if (result != null && result.Any())
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound("No categories found for the specified community.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it based on your application's needs
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCommunityCategory(long id, [FromBody] CommunityCategory communityCategoryDto)
+
+
+        [HttpPost("CreateWithCategoryName/{communityID}")]
+        public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
-            var updatedCommunityCategory = await _communityCategoryService.UpdateCommunityCategoryAsync(id, communityCategoryDto);
-
-            if (updatedCommunityCategory == null)
-                return NotFound();
-
-            return Ok(updatedCommunityCategory);
+            try
+            {
+                var communityCategoryMapping = await _communityCategoryMappingService.CreateCommunityCategoryMappingAsync(communityID, model);
+                return Ok(communityCategoryMapping);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
 
-        [HttpDelete("{communityCategoryId}")]
-        public async Task<IActionResult> DeleteCommunityCategory(long communityCategoryId)
+        [HttpPut("UpdateCategoryDescription/{communityCategoryMappingID}")]
+        public async Task<ActionResult<CommunityCategoryMapping>> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model)
         {
-            var deletedCommunityCategory = await _communityCategoryService.DeleteCommunityCategoryAsync(communityCategoryId);
+            try
+            {
+                var result = await _communityCategoryMappingService.UpdateCommunityCategoryMappingAsync(communityCategoryMappingID, model);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            if (deletedCommunityCategory == null)
-                return NotFound();
-
-            return NoContent();
+        [HttpDelete("{communityCategoryMappingID}")]
+        public async Task<ActionResult<CommunityCategoryMapping>> DeleteCommunityCategoryMappingAsync(int communityCategoryMappingID)
+        {
+            try
+            {
+                var result = await _communityCategoryMappingService.DeleteCommunityCategoryMappingAsync(communityCategoryMappingID);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ namespace DiscussionForum.Models.EntityModels
 
         // Navigation properties
         public virtual User User { get; set; }
-        public virtual Thread Thread { get; set; }
+        public virtual Threads Thread { get; set; }
         public virtual User CreatedByUser { get; set; }
         public virtual User ModifiedByUser { get; set; }
     }
