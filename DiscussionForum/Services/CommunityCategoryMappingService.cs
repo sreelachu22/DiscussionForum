@@ -51,10 +51,7 @@ namespace DiscussionForum.Services
                     Description = ccm.Description,
                     IsDeleted = ccm.IsDeleted,
                     CreatedBy = ccm.CreatedBy,
-<<<<<<< HEAD
                     CreatedAt = (DateTime)ccm.CreatedAt,
-=======
->>>>>>> 7cb0af06a8e5d0a7d8105c7bf3260d2f57a356d6
                     // Add the count of threads
                     ThreadCount = threadGroup.Count()
                 })
@@ -165,13 +162,6 @@ namespace DiscussionForum.Services
             var entity = await _context.CommunityCategoryMapping
                 .FirstOrDefaultAsync(ccm => ccm.CommunityCategoryMappingID == communityCategoryMappingID && !ccm.IsDeleted);
 
-<<<<<<< HEAD
-            /* if (entity == null)
-                 return false;*/
-=======
-           /* if (entity == null)
-                return false;*/
->>>>>>> 7cb0af06a8e5d0a7d8105c7bf3260d2f57a356d6
 
             entity.IsDeleted = true;
             entity.ModifiedAt = DateTime.Now;
