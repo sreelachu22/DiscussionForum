@@ -5,19 +5,31 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
 {
+
+    [Route("api/users")]
     [ApiController]
     [EnableCors("AllowAngularDev")]
-    [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService) { 
+        public UsersController(IUserService userService)
+        {
             _userService = userService;
         }
 
-        [HttpPost("{UserId}")]
-        public async Task<IActionResult> GetCommunityCategoryById(Guid UserId)
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers(string term, string sort, int page = 1, int limit = 10)
+        {
+            var userResult = await _userService.GetUsers(term, sort, page, limit);
+
+            // Add pagination headers to the response
+            Response.Headers.Add("X-Total-Count", userResult.TotalCount.ToString());
+            Response.Headers.Add("X-Total-Pages", userResult.TotalPages.ToString());
+            return Ok(userResult.Users);
+         }
+        [HttpGet("{UserId}")]
+        public async Task<IActionResult> GetUserById(Guid UserId)
         {
             var userExists = await _userService.GetUserByIDAsync(UserId);
 

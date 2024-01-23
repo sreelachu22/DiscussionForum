@@ -27,6 +27,7 @@ namespace DiscussionForum.Data
         public DbSet<CommunityCategoryMapping> CommunityCategoryMapping {  get; set; }
         
         public DbSet<Notice> Notices { get; set; }
+        public DbSet<Reply> Replies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
