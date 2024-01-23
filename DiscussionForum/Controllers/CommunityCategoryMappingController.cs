@@ -101,7 +101,7 @@ namespace DiscussionForum.Controllers
         {
             try
             {
-                var communityCategoryMapping = await _communityCategoryMappingService.CreateCommunityCategoryMappingAsync(communityID,model);
+                var communityCategoryMapping = await _communityCategoryMappingService.CreateCommunityCategoryMappingAsync(communityID, model);
                 return Ok(communityCategoryMapping);
             }
             catch (Exception ex)
