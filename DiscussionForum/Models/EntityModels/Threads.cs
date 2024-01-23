@@ -19,7 +19,7 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation properties
-        public virtual CommunityCategory CommunityCategory { get; set; }
+        public virtual CommunityCategoryMapping CommunityCategoryMapping { get; set; }
         public virtual ThreadStatus ThreadStatus { get; set; }
         public virtual User CreatedByUser { get; set; }
         public virtual User ModifiedByUser { get; set; }

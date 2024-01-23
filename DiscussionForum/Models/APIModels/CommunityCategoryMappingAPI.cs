@@ -14,10 +14,15 @@ namespace DiscussionForum.Models.APIModels
 
         public bool IsDeleted { get; set; }
 
+<<<<<<< HEAD
         public Guid? CreatedBy { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
+=======
+        public Guid? CreatedBy { get; set; }    
+        
+>>>>>>> 7cb0af06a8e5d0a7d8105c7bf3260d2f57a356d6
         public Guid? ModifiedBy { get; set; }
         public int? ThreadCount { get; set; }
     }

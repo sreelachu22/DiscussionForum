@@ -1,6 +1,10 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
 using System.Threading;
+=======
+using System.ComponentModel.DataAnnotations.Schema;
+>>>>>>> 7cb0af06a8e5d0a7d8105c7bf3260d2f57a356d6
 
 namespace DiscussionForum.Data
 {
@@ -24,7 +28,14 @@ namespace DiscussionForum.Data
 
         public DbSet<Community> Communities { get; set; }
 
+<<<<<<< HEAD
         public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }
+=======
+        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping {  get; set; }
+        
+        public DbSet<Notice> Notices { get; set; }
+        public DbSet<Reply> Replies { get; set; }
+>>>>>>> 7cb0af06a8e5d0a7d8105c7bf3260d2f57a356d6
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,8 +43,13 @@ namespace DiscussionForum.Data
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
+<<<<<<< HEAD
                 .HasForeignKey<User>(u => u.CreatedBy)
                 .IsRequired(false)
+=======
+                .HasForeignKey<User>(u => u.CreatedBy) // Configure ModifiedByUser relationship
+                .IsRequired(false)  // Assuming CreatedBy can be null
+>>>>>>> 7cb0af06a8e5d0a7d8105c7bf3260d2f57a356d6
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
@@ -43,7 +59,11 @@ namespace DiscussionForum.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
+<<<<<<< HEAD
 
+=======
+          
+>>>>>>> 7cb0af06a8e5d0a7d8105c7bf3260d2f57a356d6
             modelBuilder.Entity<CommunityCategoryMapping>()
                 .HasOne(ccm => ccm.CreatedByUser)
                 .WithMany()

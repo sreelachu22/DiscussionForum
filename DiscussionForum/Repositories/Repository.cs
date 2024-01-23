@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.Repositories
 {
@@ -32,5 +33,11 @@ namespace DiscussionForum.Repositories
         {
             _context.Set<T>().Remove(entity);
         }
+
+        public IEnumerable<T> GetAll(Func<T, bool> predicate)
+        {
+            return _context.Set<T>().Where(predicate).ToList();
+        }
+
     }
 }
