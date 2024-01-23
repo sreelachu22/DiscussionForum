@@ -31,6 +31,34 @@ namespace DiscussionForum.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Threads>()
+                .HasOne(t => t.CommunityCategoryMapping)
+                .WithOne()
+                .HasForeignKey<Threads>(u => u.CommunityCategoryMappingID)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Threads>()
+                .HasOne(t => t.ThreadStatus)
+                .WithOne()
+                .HasForeignKey<Threads>(u => u.ThreadStatusID)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Threads>()
+                .HasOne(t => t.CreatedByUser)
+                .WithOne()
+                .HasForeignKey<Threads>(u => u.CreatedBy)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Threads>()
+                .HasOne(t => t.ModifiedByUser)
+                .WithOne()
+                .HasForeignKey<Threads>(u => u.ModifiedBy)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Configure CreatedByUser relationship
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)

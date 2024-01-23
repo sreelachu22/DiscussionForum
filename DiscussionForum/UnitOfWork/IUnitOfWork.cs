@@ -12,6 +12,7 @@ namespace DiscussionForum.UnitOfWork
         IThreadStatusRepository ThreadStatus { get; }
         INoticeRepository Notice { get; }
         IUserRepository User { get; }
+        IThreadRepository Thread { get; }
         IReplyRepository Reply { get; }
         int Complete();
 

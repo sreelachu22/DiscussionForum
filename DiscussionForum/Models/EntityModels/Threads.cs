@@ -8,9 +8,9 @@ namespace DiscussionForum.Models.EntityModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ThreadID { get; set; }
-        public long CommunityCategoryMappingID { get; set; }
+        public int? CommunityCategoryMappingID { get; set; }
         public string Content { get; set; }
-        public int ThreadStatusID { get; set; }
+        public int? ThreadStatusID { get; set; }
         public bool IsAnswered { get; set; }
         public bool IsDeleted { get; set; }
         public Guid? CreatedBy { get; set; }
