@@ -1,9 +1,10 @@
 ﻿using DiscussionForum.Models.EntityModels;
+using DiscussionForum.Models.APIModels;
 
 namespace DiscussionForum.Services
 {
     public interface IThreadService
     {
-        Task<IEnumerable<Threads>> GetAllThreads(int CommunityCategoryMappingID);
+        Task<IEnumerable<CategoryThreadDto>> GetAllThreads(int CommunityCategoryMappingID);
     }
 }

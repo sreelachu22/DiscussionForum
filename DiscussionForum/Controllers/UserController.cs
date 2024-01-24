@@ -16,7 +16,7 @@ namespace DiscussionForum.Controllers
             _userService = userService;
         }
 
-        [HttpPost("{UserId}")]
+        [HttpGet("{UserId}")]
         public async Task<IActionResult> GetCommunityCategoryById(Guid UserId)
         {
             var userExists = await _userService.GetUserByIDAsync(UserId);

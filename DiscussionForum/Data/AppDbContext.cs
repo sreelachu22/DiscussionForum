@@ -58,7 +58,7 @@ namespace DiscussionForum.Data
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
-                .HasForeignKey<User>(u => u.CreatedBy) // Configure ModifiedByUser relationship
+                .HasForeignKey<User>(u => u.CreatedBy) 
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
