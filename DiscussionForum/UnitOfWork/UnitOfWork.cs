@@ -25,6 +25,7 @@ namespace DiscussionForum.UnitOfWork
             Notice = new NoticeRepository(_context);
             User= new UserRepository(_context);
             Thread=new ThreadRepository(_context);
+            Reply = new ReplyRepository(_context);
         }
 
         public IDesignationRepository Designations { get; }
@@ -35,7 +36,7 @@ namespace DiscussionForum.UnitOfWork
         public INoticeRepository Notice { get; }
         public IUserRepository User { get; }
         public IThreadRepository Thread { get; }
-
+        public IReplyRepository Reply { get; }
 
         public int Complete()
         {

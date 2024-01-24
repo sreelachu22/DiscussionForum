@@ -10,5 +10,7 @@
         public DateTime ModifiedAt { get; set; }
         public string CategoryName { get; set; }
         public string ThreadStatusName { get; set; }
+
+        public Boolean IsAnswered { get; set; }
     }
 }

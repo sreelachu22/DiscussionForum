@@ -43,7 +43,8 @@ namespace DiscussionForum.Services
                         ModifiedBy = t.ModifiedByUser.Name,
                         ModifiedAt = t.ModifiedAt,
                         CategoryName = t.CommunityCategoryMapping.CommunityCategory.CommunityCategoryName, 
-                        ThreadStatusName = t.ThreadStatus.ThreadStatusName 
+                        ThreadStatusName = t.ThreadStatus.ThreadStatusName,
+                        IsAnswered=t.IsAnswered
                     })
                     .ToListAsync();
                 return threads;
