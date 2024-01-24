@@ -21,6 +21,11 @@ namespace DiscussionForum.Controllers
         }
 
         [HttpGet]
+        /*public async Task<IActionResult> GetNotices()
+        {
+            var notices = await _noticeService.GetNoticesAsync();
+            return Ok(notices);
+        }*/
         public async Task<IActionResult> GetNotices()
         {
             var notices = await _noticeService.GetNoticesAsync();
