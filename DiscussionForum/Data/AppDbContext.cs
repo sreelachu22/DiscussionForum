@@ -1,21 +1,21 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace DiscussionForum.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options){}
-        
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
         public DbSet<Designation> Designations { get; set; }
-        
+
         public DbSet<Role> Roles { get; set; }
 
         public DbSet<CommunityStatus> CommunityStatus { get; set; }
 
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
-        
+
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
 
         public DbSet<User> Users { get; set; }
@@ -24,8 +24,7 @@ namespace DiscussionForum.Data
 
         public DbSet<Community> Communities { get; set; }
 
-        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping {  get; set; }
-        
+        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }    
         public DbSet<Notice> Notices { get; set; }
         public DbSet<Reply> Replies { get; set; }
 
@@ -68,7 +67,6 @@ namespace DiscussionForum.Data
                 .HasForeignKey<User>(u => u.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade);
 
-          
             modelBuilder.Entity<CommunityCategoryMapping>()
                 .HasOne(ccm => ccm.CreatedByUser)
                 .WithMany()
@@ -79,6 +77,18 @@ namespace DiscussionForum.Data
                 .HasOne(ccm => ccm.ModifiedByUser)
                 .WithMany()
                 .HasForeignKey(ccm => ccm.ModifiedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Community>()
+                .HasOne(c => c.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Community>()
+                .HasOne(c => c.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
