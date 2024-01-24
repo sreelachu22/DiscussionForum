@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using DiscussionForum.Services;
+using Microsoft.AspNetCore.Cors;
 
 namespace DiscussionForum.Controllers
     {
         [ApiController]
         [Route("api/[controller]")]
-        public class ThreadStatusController : ControllerBase
+        [EnableCors("AllowAngularDev")]
+    public class ThreadStatusController : ControllerBase
         {
             private readonly IThreadStatusService _threadStatusService;
 

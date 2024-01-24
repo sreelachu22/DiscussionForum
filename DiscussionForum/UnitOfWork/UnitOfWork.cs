@@ -23,6 +23,10 @@ namespace DiscussionForum.UnitOfWork
             // Initialize other repositories.
             Designations = new DesignationRepository(_context);
             Notice = new NoticeRepository(_context);
+            User= new UserRepository(_context);
+            Community = new CommunityRepository(_context);
+            Thread=new ThreadRepository(_context);
+            Reply = new ReplyRepository(_context);
         }
 
         public IDesignationRepository Designations { get; }
@@ -31,7 +35,12 @@ namespace DiscussionForum.UnitOfWork
         public ICommunityCategoryRepository CommunityCategory { get; }
         public IThreadStatusRepository ThreadStatus { get; }
 
+        public ICommunityRepository Community { get; }
         public INoticeRepository Notice { get; }
+        public IUserRepository User { get; }
+        public IThreadRepository Thread { get; }
+        public IReplyRepository Reply { get; }
+
 
         public int Complete()
         {
