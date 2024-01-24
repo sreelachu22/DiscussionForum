@@ -85,6 +85,18 @@ namespace DiscussionForum.Data
                 .HasForeignKey(ccm => ccm.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Community>()
+                .HasOne(c => c.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Community>()
+                .HasOne(c => c.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.ModifiedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
             base.OnModelCreating(modelBuilder);
         }
     }
