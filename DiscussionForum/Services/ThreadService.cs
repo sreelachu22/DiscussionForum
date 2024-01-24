@@ -27,8 +27,11 @@ namespace DiscussionForum.Services
             {
                 var threads = await _context.Threads
                     .Include(t => t.CommunityCategoryMapping)
+                    .Include(t => t.ThreadStatus)
                     .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID)
                     .ToListAsync();
+
+                var a = await _context.CommunityCategoryMapping.Where(x => x.CommunityCategoryMappingID == 1).ToListAsync();
 
                 return threads;
             }
