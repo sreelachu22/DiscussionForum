@@ -5,6 +5,6 @@ namespace DiscussionForum.Services
 {
     public interface IThreadService
     {
-        Task<IEnumerable<CategoryThreadDto>> GetAllThreads(int CommunityCategoryMappingID);
+        Task<IEnumerable<CategoryThreadDto>> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize);
     }
 }

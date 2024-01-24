@@ -23,7 +23,7 @@ namespace DiscussionForum.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<CategoryThreadDto>> GetAllThreads(int CommunityCategoryMappingID)
+        public async Task<IEnumerable<CategoryThreadDto>> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {
             try
             {
@@ -34,6 +34,9 @@ namespace DiscussionForum.Services
                     .Include(t => t.CreatedByUser)
                     .Include(t => t.ModifiedByUser)
                     .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID)
+                    .OrderByDescending(t => t.CreatedAt) 
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
