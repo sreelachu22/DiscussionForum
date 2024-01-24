@@ -54,7 +54,7 @@ namespace DiscussionForum.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Error  while fetching threads", ex);
+                throw new Exception("Error  while fetching threads.", ex);
             }
         }
     }
