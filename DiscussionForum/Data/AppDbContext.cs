@@ -34,44 +34,38 @@ namespace DiscussionForum.Data
                 .HasOne(t => t.CommunityCategoryMapping)
                 .WithOne()
                 .HasForeignKey<Threads>(u => u.CommunityCategoryMappingID)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Threads>()
                 .HasOne(t => t.ThreadStatus)
                 .WithOne()
                 .HasForeignKey<Threads>(u => u.ThreadStatusID)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Threads>()
                 .HasOne(t => t.CreatedByUser)
                 .WithOne()
                 .HasForeignKey<Threads>(u => u.CreatedBy)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Threads>()
                 .HasOne(t => t.ModifiedByUser)
                 .WithOne()
                 .HasForeignKey<Threads>(u => u.ModifiedBy)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure CreatedByUser relationship
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
-                .HasForeignKey<User>(u => u.CreatedBy)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey<User>(u => u.CreatedBy) 
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.ModifiedByUser)
                 .WithOne()
                 .HasForeignKey<User>(u => u.ModifiedBy)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CommunityCategoryMapping>()
                 .HasOne(ccm => ccm.CreatedByUser)
