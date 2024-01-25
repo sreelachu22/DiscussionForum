@@ -5,16 +5,19 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text;
 using System.Linq.Dynamic.Core;
+using DiscussionForum.Repositories;
 
 namespace DiscussionForum.Services
 {
     public class UserService : IUserService
     {
         private readonly AppDbContext _userContext;
+        private readonly IUserRepository _userRepository;
 
         public UserService(AppDbContext userContext)
         {
             _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
+
         }
 
         public async Task<PagedUserResult> GetUsers(string? term, string? sort, int page, int limit)
@@ -82,4 +85,7 @@ namespace DiscussionForum.Services
             }
         }
     }
+
+
 }
+

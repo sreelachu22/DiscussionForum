@@ -19,11 +19,11 @@ namespace DiscussionForum.Models.EntityModels
         public long? Score { get; set; }
 
         public int DepartmentID { get; set; }
-        [JsonIgnore]
+
         public virtual Department Department { get; set; }
 
         public long DesignationID { get; set; }
-        [JsonIgnore]
+
         public virtual Designation Designation { get; set; }
 
         public bool IsDeleted { get; set; }

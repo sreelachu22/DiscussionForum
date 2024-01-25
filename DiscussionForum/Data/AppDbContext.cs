@@ -6,16 +6,16 @@ namespace DiscussionForum.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options){}
-        
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
         public DbSet<Designation> Designations { get; set; }
-        
+
         public DbSet<Role> Roles { get; set; }
 
         public DbSet<CommunityStatus> CommunityStatus { get; set; }
 
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
-        
+
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
 
         public DbSet<User> Users { get; set; }
@@ -24,8 +24,8 @@ namespace DiscussionForum.Data
 
         public DbSet<Community> Communities { get; set; }
 
-        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping {  get; set; }
-        
+        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }
+
         public DbSet<Notice> Notices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,7 +45,6 @@ namespace DiscussionForum.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
-          
             modelBuilder.Entity<CommunityCategoryMapping>()
                 .HasOne(ccm => ccm.CreatedByUser)
                 .WithMany()

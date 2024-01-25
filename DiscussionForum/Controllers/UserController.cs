@@ -26,7 +26,7 @@ namespace DiscussionForum.Controllers
             // Add pagination headers to the response
             Response.Headers.Add("X-Total-Count", userResult.TotalCount.ToString());
             Response.Headers.Add("X-Total-Pages", userResult.TotalPages.ToString());
-            return Ok(userResult.Users);
+            return Ok(userResult);
         }
     }
 }
