@@ -26,8 +26,11 @@ builder.Services.AddScoped<ICommunityCategoryService, CommunityCategoryService>(
 builder.Services.AddScoped<ICommunityStatusService, CommunityStatusService>();
 builder.Services.AddScoped<IThreadStatusService, ThreadStatusService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<ICommunityCategoryMappingService, CommunityCategoryMappingService>();
 builder.Services.AddScoped<INoticeService, NoticeService>();
+builder.Services.AddScoped<IThreadService, ThreadService>();
+builder.Services.AddScoped<IReplyService, ReplyService>();
 
 builder.Services.AddControllers();
 
