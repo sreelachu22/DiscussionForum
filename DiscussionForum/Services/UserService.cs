@@ -5,30 +5,25 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text;
 using System.Linq.Dynamic.Core;
-<<<<<<< HEAD
+
 using DiscussionForum.Repositories;
-=======
-﻿using DiscussionForum.UnitOfWork;
+
+using DiscussionForum.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
->>>>>>> 4fbc01fc4431f5ad929ba1fce437940319103abb
+
 
 namespace DiscussionForum.Services
 {
     public class UserService : IUserService
     {
         private readonly AppDbContext _userContext;
-<<<<<<< HEAD
-        private readonly IUserRepository _userRepository;
-=======
-        private readonly IUnitOfWork _unitOfWork;
->>>>>>> 4fbc01fc4431f5ad929ba1fce437940319103abb
 
-        public UserService(AppDbContext userContext,IUnitOfWork unitOfWork)
+
+        public UserService(AppDbContext userContext)
         {
-             _unitOfWork = unitOfWork;
             _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
 
         }
@@ -102,9 +97,9 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var user= await Task.FromResult(_context.Users.Find(Userid));
+                var user = await Task.FromResult(_userContext.Users.Find(Userid));
                 var a = user;
-                return user; 
+                return user;
             }
             catch (Exception ex)
             {
