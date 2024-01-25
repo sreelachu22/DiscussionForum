@@ -26,8 +26,9 @@ namespace DiscussionForum.Controllers
             // Add pagination headers to the response
             Response.Headers.Add("X-Total-Count", userResult.TotalCount.ToString());
             Response.Headers.Add("X-Total-Pages", userResult.TotalPages.ToString());
+
             return Ok(userResult.Users);
-         }
+        }
         [HttpGet("{UserId}")]
         public async Task<IActionResult> GetUserById(Guid UserId)
         {
@@ -37,6 +38,7 @@ namespace DiscussionForum.Controllers
                 return NotFound();
 
             return Ok(userExists);
+
         }
     }
 }

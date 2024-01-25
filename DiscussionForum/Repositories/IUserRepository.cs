@@ -2,7 +2,7 @@
 
 namespace DiscussionForum.Repositories
 {
-    public interface IUserRepository:IRepository<User>
+    public interface IUserRepository : IRepository<User>
     {
     }
 }

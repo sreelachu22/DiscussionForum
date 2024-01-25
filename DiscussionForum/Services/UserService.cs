@@ -5,10 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text;
 using System.Linq.Dynamic.Core;
-﻿using DiscussionForum.UnitOfWork;
+
+using DiscussionForum.Repositories;
+
+using DiscussionForum.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 
 
 namespace DiscussionForum.Services
@@ -16,12 +20,12 @@ namespace DiscussionForum.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _userContext;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(AppDbContext userContext,IUnitOfWork unitOfWork)
+
+        public UserService(AppDbContext userContext)
         {
-             _unitOfWork = unitOfWork;
             _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
+
         }
 
         public async Task<PagedUserResult> GetUsers(string? term, string? sort, int page, int limit)
@@ -93,8 +97,9 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var user= await Task.FromResult(_userContext.Users.Find(Userid));
-                return user; 
+                var user = await Task.FromResult(_userContext.Users.Find(Userid));
+                var a = user;
+                return user;
             }
             catch (Exception ex)
             {
@@ -103,4 +108,7 @@ namespace DiscussionForum.Services
         }
 
     }
+
+
 }
+
