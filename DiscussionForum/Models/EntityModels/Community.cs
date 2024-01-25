@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -17,8 +18,11 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation properties
+        [JsonIgnore]
         public virtual User CreatedByUser { get; set; }
+        [JsonIgnore]
         public virtual User ModifiedByUser { get; set; }
+        [JsonIgnore]
         public virtual CommunityStatus CommunityStatus { get; set; }
     }
 }

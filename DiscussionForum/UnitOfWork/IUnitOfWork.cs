@@ -10,8 +10,11 @@ namespace DiscussionForum.UnitOfWork
         ICommunityCategoryRepository CommunityCategory { get; }
         ICommunityStatusRepository CommunityStatus { get; }
         IThreadStatusRepository ThreadStatus { get; }
+        ICommunityRepository Community { get; }
         INoticeRepository Notice { get; }
         IUserRepository User { get; }
+        IThreadRepository Thread { get; }
+        IReplyRepository Reply { get; }
         int Complete();
 
     }

@@ -20,9 +20,19 @@ namespace DiscussionForum.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Notice>> GetNoticesAsync()
+        /*public async Task<IEnumerable<Notice>> GetNoticesAsync()
         {
             return await Task.FromResult(_unitOfWork.Notice.GetAll(notice => !notice.IsDeleted));
+        }*/
+
+        public async Task<IEnumerable<Notice>> GetNoticesAsync()
+        {
+            DateTime currentDate = DateTime.Now;
+
+            return await Task.FromResult(_unitOfWork.Notice.GetAll(notice =>
+                !notice.IsDeleted &&
+                (notice.ExpiresAt == null || notice.ExpiresAt > currentDate)
+            ));
         }
 
 
