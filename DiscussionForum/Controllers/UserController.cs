@@ -27,7 +27,7 @@ namespace DiscussionForum.Controllers
             Response.Headers.Add("X-Total-Count", userResult.TotalCount.ToString());
             Response.Headers.Add("X-Total-Pages", userResult.TotalPages.ToString());
 
-            return Ok(userResult.Users);
+            return Ok(userResult);
         }
         [HttpGet("{UserId}")]
         public async Task<IActionResult> GetUserById(Guid UserId)
