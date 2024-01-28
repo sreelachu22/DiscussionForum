@@ -23,8 +23,7 @@ namespace DiscussionForum.Data
         public DbSet<Threads> Threads { get; set; }
 
         public DbSet<Community> Communities { get; set; }
-
-        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }    
+        public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }
         public DbSet<Notice> Notices { get; set; }
         public DbSet<Reply> Replies { get; set; }
 

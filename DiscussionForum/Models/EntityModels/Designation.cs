@@ -11,7 +11,7 @@ namespace DiscussionForum.Models.EntityModels
         public long DesignationID { get; set; }
         public string DesignationName { get; set; }
         public bool IsDeleted { get; set; }
-
+        
     }
 
 }
