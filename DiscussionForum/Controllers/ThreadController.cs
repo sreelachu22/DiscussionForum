@@ -20,8 +20,17 @@ namespace DiscussionForum.Controllers
         [HttpGet]
         public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {
-            var threads = await _threadService.GetAllThreads(CommunityCategoryMappingID, pageNumber, pageSize);
-            return Ok(threads);
+            var result = await _threadService.GetAllThreads(CommunityCategoryMappingID, pageNumber, pageSize);
+
+            var response = new
+            {
+                Threads = result.Threads,
+                TotalCount = result.TotalCount,
+                CategoryName=result.CategoryName,
+                CategoryDescription=result.CategoryDescription
+            };
+
+            return Ok(response);
         }
     }
 }

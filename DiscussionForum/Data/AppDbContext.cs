@@ -53,6 +53,24 @@ namespace DiscussionForum.Data
                 .HasForeignKey<Threads>(u => u.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Threads>()
+                .HasMany(t => t.ThreadVotes) 
+                .WithOne(tv => tv.Thread)
+                .HasForeignKey(tv => tv.ThreadID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ThreadVote>()
+                .HasOne(tv => tv.CreatedByUser)
+                .WithMany(tv => tv.ThreadVotesCreatedBy)
+                .HasForeignKey(tv => tv.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ThreadVote>()
+                .HasOne(tv => tv.ModifiedByUser)
+                .WithMany(tv => tv.ThreadVotesModifiedBy)
+                .HasForeignKey(tv => tv.ModifiedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Configure CreatedByUser relationship
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
