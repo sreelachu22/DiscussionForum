@@ -37,6 +37,20 @@ namespace DiscussionForum.Controllers
             }
         }*/
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCategories(int communityID, string term, string sort, int page = 1, int limit = 10)
+        {
+            var categoryResult = await _communityCategoryMappingService.GetCategories(communityID, term, sort, page, limit);
+
+            // Add pagination headers to the response
+            Response.Headers.Add("X-Total-Count", categoryResult.TotalCount.ToString());
+            Response.Headers.Add("X-Total-Pages", categoryResult.TotalPages.ToString());
+
+            return Ok(categoryResult);
+        }
+
+
         [HttpGet("ById/{communityCategoryMappingID}")] // Specify a unique route for GetCommunityCategoryMappingByIdAsync
         public async Task<ActionResult<CommunityCategoryMappingAPI>> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID)
         {

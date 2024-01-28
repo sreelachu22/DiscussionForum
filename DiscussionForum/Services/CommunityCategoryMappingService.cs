@@ -3,6 +3,9 @@ using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.Text;
+using System.Linq.Dynamic.Core;
 
 namespace DiscussionForum.Services
 {
@@ -13,7 +16,7 @@ namespace DiscussionForum.Services
 
         public CommunityCategoryMappingService(AppDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(_context));
         }
 
         /*public async Task<CommunityCategoryMapping> CreateCommunityCategoryMappingAsync(CommunityCategoryMappingAPI model)
@@ -33,6 +36,84 @@ namespace DiscussionForum.Services
 
             return entity;
         }*/
+
+
+        public async Task<PagedCategoryResult> GetCategories(int communityID, string? term, string? sort, int page, int limit)
+        {
+            try
+            {
+                term = string.IsNullOrWhiteSpace(term) ? null : term.Trim().ToLower();
+
+                var query = (
+                    from ccm in _context.CommunityCategoryMapping
+                    join c in _context.Communities on ccm.CommunityID equals c.CommunityID
+                    join cc in _context.CommunityCategories on ccm.CommunityCategoryID equals cc.CommunityCategoryID
+                    join t in _context.Threads on ccm.CommunityCategoryMappingID equals t.CommunityCategoryMappingID into threadGroup
+                    where ccm.CommunityID == communityID && !ccm.IsDeleted
+                    select new CommunityCategoryMappingAPI
+                    {
+                        CommunityCategoryMappingID = ccm.CommunityCategoryMappingID,
+                        CommunityID = ccm.CommunityID,
+                        CommunityCategoryID = ccm.CommunityCategoryID,
+                        CommunityCategoryName = cc.CommunityCategoryName,
+                        Description = ccm.Description,
+                        IsDeleted = ccm.IsDeleted,
+                        CreatedBy = ccm.CreatedBy,
+                        CreatedAt = (DateTime)ccm.CreatedAt,
+                        ModifiedAt = ccm.ModifiedAt,
+                        // Add the count of threads
+                        ThreadCount = threadGroup.Count()
+                    }
+                );
+
+                // Apply filtering
+                if (!string.IsNullOrWhiteSpace(term))
+                {
+                    query = query.Where(c => c.Description.ToLower().Contains(term) || c.CommunityCategoryName.ToLower().Contains(term));
+                }
+
+                // Apply sorting
+                if (!string.IsNullOrWhiteSpace(sort))
+                {
+                    var sortFields = sort.Split(',');
+                    var orderByString = string.Join(", ", sortFields.Select(field =>
+                    {
+                        var trimmedField = field.Trim();
+                        var sortOrder = trimmedField.StartsWith("-") ? "descending" : "ascending";
+                        var propertyName = trimmedField.TrimStart('-');
+
+                        return $"{propertyName} {sortOrder}";
+                    }));
+
+                    query = query.OrderBy(orderByString);
+                }
+                else
+                {
+                    query = query.OrderBy(c => c.CommunityCategoryMappingID);
+                }
+
+                var totalCount = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling((double)totalCount / limit);
+
+                var pagedCategories = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
+
+                var pagedCategoryData = new PagedCategoryResult
+                {
+                    Categories = pagedCategories,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages
+                };
+
+                return pagedCategoryData;
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception appropriately
+                throw;
+            }
+        }
+
+
 
         public async Task<IEnumerable<CommunityCategoryMappingAPI>> GetAllCategoriesInCommunityAsync(int communityID)
         {
