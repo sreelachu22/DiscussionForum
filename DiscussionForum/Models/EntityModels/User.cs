@@ -39,5 +39,12 @@ namespace DiscussionForum.Models.EntityModels
         public virtual User ModifiedByUser { get; set; }
 
         public DateTime? ModifiedAt { get; set; }
+
+        public virtual ICollection<ThreadVote> ThreadVotesCreatedBy { get; set; }
+
+        public virtual ICollection<ThreadVote> ThreadVotesModifiedBy { get; set; }
+
     }
+
+
 }
