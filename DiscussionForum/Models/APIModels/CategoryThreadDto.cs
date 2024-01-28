@@ -8,9 +8,8 @@
         public DateTime CreatedAt { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime ModifiedAt { get; set; }
-        public string CategoryName { get; set; }
         public string ThreadStatusName { get; set; }
-
         public Boolean IsAnswered { get; set; }
+        public int VoteCount { get; set; }
     }
 }

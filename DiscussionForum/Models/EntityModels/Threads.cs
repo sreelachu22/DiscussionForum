@@ -23,7 +23,7 @@ namespace DiscussionForum.Models.EntityModels
         public virtual ThreadStatus ThreadStatus { get; set; }
         public virtual User CreatedByUser { get; set; }
         public virtual User ModifiedByUser { get; set; }
+        public virtual ICollection<ThreadVote> ThreadVotes { get; set; }
 
-        
     }
 }
