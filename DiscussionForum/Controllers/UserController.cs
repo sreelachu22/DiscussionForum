@@ -29,6 +29,9 @@ namespace DiscussionForum.Controllers
 
             return Ok(userResult);
         }
+
+
+
         [HttpGet("{UserId}")]
         public async Task<IActionResult> GetUserById(Guid UserId)
         {
