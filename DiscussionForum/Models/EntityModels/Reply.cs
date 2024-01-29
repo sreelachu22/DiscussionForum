@@ -10,7 +10,7 @@ namespace DiscussionForum.Models.EntityModels
         public long ReplyID { get; set; }
         public long ThreadID { get; set; }
         public string Content { get; set; }
-        public long ParentReplyID { get; set; }
+        public long? ParentReplyID { get; set; }
         public bool IsDeleted { get; set; }
         [ForeignKey("CreatedBy")]
         public Guid? CreatedBy { get; set; }
