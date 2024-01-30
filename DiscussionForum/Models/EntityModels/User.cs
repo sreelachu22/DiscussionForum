@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
@@ -28,14 +29,14 @@ namespace DiscussionForum.Models.EntityModels
 
         public bool IsDeleted { get; set; }
 
-        public Guid? CreatedBy { get; set; }
-        [JsonIgnore]
+        public Guid CreatedBy { get; set; }
+
         public virtual User CreatedByUser { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public Guid? ModifiedBy { get; set; }
-        [JsonIgnore]
+        public Guid ModifiedBy { get; set; }
+
         public virtual User ModifiedByUser { get; set; }
 
         public DateTime? ModifiedAt { get; set; }
@@ -43,6 +44,8 @@ namespace DiscussionForum.Models.EntityModels
         public virtual ICollection<ThreadVote> ThreadVotesCreatedBy { get; set; }
 
         public virtual ICollection<ThreadVote> ThreadVotesModifiedBy { get; set; }
+
+       /* public UserRoleMapping UserRole { get; set; }*/
 
     }
 

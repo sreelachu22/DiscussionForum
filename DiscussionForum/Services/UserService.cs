@@ -93,13 +93,45 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<User> GetUserByIDAsync(Guid Userid)
+        public async Task<SingleUserDTO> GetUserByIDAsync(Guid UserId)
         {
             try
             {
-                var user = await Task.FromResult(_userContext.Users.Find(Userid));
-                var a = user;
-                return user;
+                
+
+                var user = await _userContext.Users
+                    .Include(u => u.Department)
+                    .Include(u => u.Designation)
+                    .FirstOrDefaultAsync(u => u.UserID == UserId);
+
+                if (user == null)
+                {
+                    return null;
+                }
+
+               /* var roleName = (from rm in _userContext.UserRoleMapping
+                                join r in _userContext.Roles on rm.RoleID equals r.RoleID
+                                where rm.UserID == UserId
+                                select r.RoleName)
+                                .FirstOrDefault();*/
+
+                var roleName = _userContext.UserRoleMapping
+                                .Where(rm => rm.UserID == UserId)
+                                .Join(_userContext.Roles, rm => rm.RoleID, r => r.RoleID, (rm, r) => r.RoleName)
+                                .FirstOrDefault();
+
+                var userDto = new SingleUserDTO
+                {
+                    UserID = user.UserID,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Score = user.Score,
+                    DepartmentName = user.Department.DepartmentName,
+                    DesignationName = user.Designation.DesignationName,
+                    RoleName = roleName
+                };
+
+                return userDto;
             }
             catch (Exception ex)
             {

@@ -10,7 +10,7 @@ namespace DiscussionForum.Services
     {
         Task<PagedUserResult> GetUsers(string? term, string? sort, int page, int limit);
 
-        Task<User> GetUserByIDAsync(Guid UserID);
+        Task<SingleUserDTO> GetUserByIDAsync(Guid UserID);
 
     }
 }
