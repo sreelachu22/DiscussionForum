@@ -32,5 +32,37 @@ namespace DiscussionForum.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("{threadId}")]
+        public async Task<IActionResult> GetThreadById(long threadId)
+        {
+            var thread = await _threadService.GetThreadByIdAsync(threadId);
+
+            if (thread == null)
+                return NotFound();
+
+            return Ok(thread);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateThread(int CommunityCategoryMappingId, Guid CreatorId, [FromBody] string content)
+        {
+            var thread = await _threadService.CreateThreadAsync(CommunityCategoryMappingId, CreatorId, content);
+            return Ok(thread);
+        }
+
+        [HttpPut("{threadId}")]
+        public async Task<IActionResult> UpdateThread(long threadId, Guid ModifierId, [FromBody] string content)
+        {
+            var thread = await _threadService.UpdateThreadAsync(threadId, ModifierId, content);
+            return Ok(thread);
+        }
+
+        [HttpDelete("{threadId}")]
+        public async Task<IActionResult> DeleteThread(long threadId, Guid ModifierId)
+        {
+            await _threadService.DeleteThreadAsync(threadId, ModifierId);
+            return Ok();
+        }
     }
 }
