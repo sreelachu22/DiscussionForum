@@ -51,7 +51,7 @@ namespace DiscussionForum.Controllers
         }
 
 
-        [HttpGet("ById/{communityCategoryMappingID}")] // Specify a unique route for GetCommunityCategoryMappingByIdAsync
+        [HttpGet("/{communityCategoryMappingID}")] // Specify a unique route for GetCommunityCategoryMappingByIdAsync
         public async Task<ActionResult<CommunityCategoryMappingAPI>> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID)
         {
             try
@@ -110,7 +110,7 @@ namespace DiscussionForum.Controllers
 
 
 
-        [HttpPost("CreateWithCategoryName/{communityID}")]
+        [HttpPost("CreateCategoryMapping/{communityID}")]
         public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
             try

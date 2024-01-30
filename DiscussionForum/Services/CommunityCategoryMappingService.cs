@@ -201,7 +201,19 @@ namespace DiscussionForum.Services
         public async Task<CommunityCategoryMapping> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
             var communityCategory = await _context.CommunityCategories
-                .FirstOrDefaultAsync(cc => cc.CommunityCategoryID == model.CommunityCategoryID && !cc.IsDeleted);
+                .FirstOrDefaultAsync(cc => cc.CommunityCategoryName == model.CommunityCategoryName && !cc.IsDeleted);
+
+            if (communityCategory == null)
+            {
+                communityCategory = new CommunityCategory
+                {
+                    CommunityCategoryName = model.CommunityCategoryName,
+                    IsDeleted = false
+                };
+
+                _context.CommunityCategories.Add(communityCategory);
+                await _context.SaveChangesAsync();
+            }
 
             var entity = new CommunityCategoryMapping
             {
