@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DiscussionForum.Models.APIModels;
+using System.Threading;
 
 namespace DiscussionForum.Services
 {
@@ -38,6 +39,7 @@ namespace DiscussionForum.Services
                     .Select(ccm => new { CategoryName = ccm.CommunityCategory.CommunityCategoryName, CategoryDescription = ccm.Description })
                     .FirstOrDefaultAsync();
 
+
                 var threads = await _context.Threads
                     .Include(t => t.CommunityCategoryMapping)
                         .ThenInclude(c => c.CommunityCategory)
@@ -59,9 +61,13 @@ namespace DiscussionForum.Services
                         ModifiedAt = t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
-                        VoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0
+                        VoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == t.ThreadID
+                                    select tg.TagName).ToList()
 
-                    })
+            })
                     .ToListAsync();
 
 

@@ -11,5 +11,6 @@
         public string ThreadStatusName { get; set; }
         public Boolean IsAnswered { get; set; }
         public int VoteCount { get; set; }
+        public List<String> TagNames { get; set; }
     }
 }
