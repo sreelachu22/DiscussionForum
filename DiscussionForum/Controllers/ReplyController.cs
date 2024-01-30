@@ -56,7 +56,7 @@ namespace DiscussionForum.Controllers
             return Ok(replies);
         }
 
-        [HttpPost("{threadId},{parentReplyID}")]
+        [HttpPost("{threadId},{parentReplyId}")]
         public async Task<IActionResult> CreateReply(long threadId, long parentReplyId,[FromBody] string content)
         {
             var reply = await _replyService.CreateReplyAsync(threadId, parentReplyId, content);
