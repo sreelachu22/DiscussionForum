@@ -34,6 +34,10 @@ namespace DiscussionForum.Data
 
         public DbSet<UserRoleMapping> UserRoleMapping { get; set; }
 
+        public DbSet<Tag> Tags { get; set; }
+
+        public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Threads>()
