@@ -15,8 +15,10 @@ using System.Threading.Tasks;
 
 
 
+
 namespace DiscussionForum.Services
 {
+    using Microsoft.AspNetCore.Mvc;
     public class UserService : IUserService
     {
         private readonly AppDbContext _userContext;
@@ -138,6 +140,75 @@ namespace DiscussionForum.Services
                 throw new Exception("Error occurred while fetching User.", ex);
             }
         }
+
+
+        public async Task<String> PutUserByIDAsync(Guid userId, int roleID, Guid adminId)
+        {
+            try
+            {
+                // Check if the user exists
+                var userExists = await _userContext.Users.AnyAsync(u => u.UserID == userId);
+                if (!userExists)
+                {
+                    return ("User not found");
+                }
+
+                // Check if the admin user exists
+                var adminExists = await _userContext.Users.AnyAsync(u => u.UserID == adminId);
+
+                if (!adminExists)
+                {
+                    return ("Admin User not found or doesn't have the privilege");
+                }
+
+                // Check if the admin user has the privilege (role ID is 1 or 2)
+                var isAdminUser = await _userContext.UserRoleMapping
+                    .Where(ur => ur.UserID == adminId)
+                    .Select(ur => ur.RoleID)
+                    .AnyAsync(roleId => roleId == 1 || roleId == 2);
+
+                if (!isAdminUser)
+                {
+                    return ("Admin user doesn't have the privilege");
+                }
+
+
+                //Admin cant change his role
+                if (adminId == userId) {
+                    return ("Not allowed");
+                }
+
+                // Check if the provided role ID exists in the Roles table and is either 1 or 2
+                var roleExists = await _userContext.Roles.AnyAsync(r => r.RoleID == roleID && (r.RoleID == 1 || r.RoleID == 2));
+
+                if (!roleExists)
+                {
+                    return "Invalid role ID or not allowed to change to the specified role";
+                }
+
+                // Get the user role mapping
+                var userRoleMapping = await _userContext.UserRoleMapping
+                                    .Where(ur => ur.UserID == userId)
+                                    .FirstOrDefaultAsync();
+
+                // Update the user role mapping
+                userRoleMapping.RoleID = roleID;
+                userRoleMapping.ModifiedBy = adminId;
+                userRoleMapping.ModifiedAt = DateTime.UtcNow;
+
+                // Save changes to the database
+                await _userContext.SaveChangesAsync();
+
+                // Return success response
+                return ("Success");
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and return an error response
+                return (ex.Message);
+            }
+        }
+
 
     }
 
