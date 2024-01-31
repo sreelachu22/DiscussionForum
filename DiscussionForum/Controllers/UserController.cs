@@ -43,5 +43,20 @@ namespace DiscussionForum.Controllers
             return Ok(userExists);
 
         }
+
+        [HttpPut("{UserId}")]
+        public async Task<IActionResult> PutUserByIDAsync(Guid UserId,int RoleID,Guid AdminID)
+        {
+            try
+            {
+                await _userService.PutUserByIDAsync(UserId, RoleID, AdminID);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating user role");
+            }
+        }
     }
 }
