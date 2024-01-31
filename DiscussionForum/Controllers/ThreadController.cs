@@ -67,19 +67,44 @@ namespace DiscussionForum.Controllers
             return Ok();
             
         }
-        
+
         [HttpGet("SearchThreads")]
         public async Task<IActionResult> SearchThread(string searchTerm)
         {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                return BadRequest("Search term cannot be empty");
+            }
+
             IEnumerable<Threads> sampleData = await _threadService.GetThreadsFromDatabaseAsync();
 
+            // Split the search term into individual words
+            var searchTermsArray = searchTerm.Split(' ');
 
+            // Create a list to store the filtered threads
+            var filteredThreads = new List<Threads>();
 
-            // filtering based on a search term:
-            var filteredData = sampleData.Where(thread => thread.Content.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            // Iterate through each search term
+            foreach (var term in searchTermsArray)
+            {
+                // Filtering based on a search term
+                var termFilteredData = sampleData
+                    .Where(thread => thread.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .ToList();
+
+                // Add the filtered threads to the result list
+                filteredThreads.AddRange(termFilteredData);
+            }
+
+            // Remove duplicate threads based on threadID
+            var uniqueThreads = filteredThreads
+                .GroupBy(thread => thread.ThreadID)
+                .Select(group => group.First())
+                .ToList();
 
             // Further processing or returning the filtered data.
-            return Ok(filteredData);
+            return Ok(uniqueThreads);
         }
+
     }
 }

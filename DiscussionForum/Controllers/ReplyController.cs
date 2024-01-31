@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Models.EntityModels;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,45 @@ namespace DiscussionForum.Controllers
         {
             _replyService = replyService;
         }
+
+        [HttpGet("SearchReplies")]
+        public async Task<IActionResult> SearchReplies(string searchTerm)
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                return BadRequest("Search term cannot be empty");
+            }
+
+            IEnumerable<Reply> sampleData = await _replyService.GetRepliesFromDatabaseAsync();
+
+            // Split the search term into individual words
+            var searchTermsArray = searchTerm.Split(' ');
+
+            // Create a list to store the filtered replies
+            var filteredReplies = new List<Reply>();
+
+            // Iterate through each search term
+            foreach (var term in searchTermsArray)
+            {
+                // Filtering based on a search term
+                var termFilteredData = sampleData
+                    .Where(reply => reply.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .ToList();
+
+                // Add the filtered replies to the result list
+                filteredReplies.AddRange(termFilteredData);
+            }
+
+            // Remove duplicate replies based on ReplyID
+            var uniqueReplies = filteredReplies
+                .GroupBy(reply => reply.ReplyID)
+                .Select(group => group.First())
+                .ToList();
+
+            // Further processing or returning the filtered data.
+            return Ok(uniqueReplies);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetReplies()

@@ -163,7 +163,7 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var d = _context.Threads.ToList();
+                /*var d = _context.Threads.ToList();*/
                 return await _context.Threads.ToListAsync();
             }
             catch (Exception ex)
