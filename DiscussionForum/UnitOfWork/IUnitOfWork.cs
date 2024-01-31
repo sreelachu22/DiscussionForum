@@ -13,7 +13,7 @@ namespace DiscussionForum.UnitOfWork
         ICommunityRepository Community { get; }
         INoticeRepository Notice { get; }
         IUserRepository User { get; }
-        IThreadRepository Thread { get; }
+        IThreadRepository Threads { get; }
         IReplyRepository Reply { get; }
         int Complete();
 

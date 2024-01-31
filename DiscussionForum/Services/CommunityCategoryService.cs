@@ -20,7 +20,12 @@ namespace DiscussionForum.Services
 
         public async Task<IEnumerable<CommunityCategory>> GetCommunityCategoriesAsync()
         {
-            return await Task.FromResult(_unitOfWork.CommunityCategory.GetAll());
+            var communityCategories = _unitOfWork.CommunityCategory
+        .GetAll()
+        .Where(cc => !cc.IsDeleted)
+        .ToList();
+
+            return await Task.FromResult(communityCategories);
         }
 
         public async Task<CommunityCategory> GetCommunityCategoryByIdAsync(long id)

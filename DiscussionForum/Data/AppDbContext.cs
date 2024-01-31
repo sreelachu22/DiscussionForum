@@ -10,6 +10,8 @@ namespace DiscussionForum.Data
 
         public DbSet<Designation> Designations { get; set; }
 
+        public DbSet<Department> Departments { get; set; }
+
         public DbSet<Role> Roles { get; set; }
 
         public DbSet<CommunityStatus> CommunityStatus { get; set; }
@@ -23,9 +25,18 @@ namespace DiscussionForum.Data
         public DbSet<Threads> Threads { get; set; }
 
         public DbSet<Community> Communities { get; set; }
+
         public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }
+
         public DbSet<Notice> Notices { get; set; }
+
         public DbSet<Reply> Replies { get; set; }
+
+        public DbSet<UserRoleMapping> UserRoleMapping { get; set; }
+
+        public DbSet<Tag> Tags { get; set; }
+
+        public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,6 +81,25 @@ namespace DiscussionForum.Data
                 .WithMany(tv => tv.ThreadVotesModifiedBy)
                 .HasForeignKey(tv => tv.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            modelBuilder.Entity<UserRoleMapping>()
+                .HasOne(ur => ur.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(ur => ur.CreatedBy)  
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserRoleMapping>()
+                .HasOne(ur => ur.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(ur => ur.ModifiedBy)  
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
 
             // Configure CreatedByUser relationship
             modelBuilder.Entity<User>()

@@ -1,5 +1,6 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Models.APIModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.Services
 {
@@ -10,5 +11,7 @@ namespace DiscussionForum.Services
         Task<Threads> CreateThreadAsync(int communityCategoryMappingId, Guid creatorId, string content);
         Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string content);
         Task DeleteThreadAsync(long threadId, Guid modifierId);
+        Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync();
     }
+
 }

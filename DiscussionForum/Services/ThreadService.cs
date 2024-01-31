@@ -33,6 +33,7 @@ namespace DiscussionForum.Services
                     .Select(ccm => new { CategoryName = ccm.CommunityCategory.CommunityCategoryName, CategoryDescription = ccm.Description })
                     .FirstOrDefaultAsync();
 
+
                 var threads = await _context.Threads
                     .Include(t => t.CommunityCategoryMapping)
                         .ThenInclude(c => c.CommunityCategory)
@@ -54,9 +55,13 @@ namespace DiscussionForum.Services
                         ModifiedAt = (DateTime)t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
-                        VoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0
+                        VoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == t.ThreadID
+                                    select tg.TagName).ToList()
 
-                    })
+            })
                     .ToListAsync();
 
 
@@ -153,5 +158,20 @@ namespace DiscussionForum.Services
                 _context.SaveChanges();
             }
         }
+
+        public async Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync()
+        {
+            try
+            {
+                var d = _context.Threads.ToList();
+                return await _context.Threads.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetThreadsFromDatabaseAsync: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }
