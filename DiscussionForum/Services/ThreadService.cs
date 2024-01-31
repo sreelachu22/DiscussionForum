@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using DiscussionForum.Models.APIModels;
 using System.Threading;
 
 namespace DiscussionForum.Services
@@ -79,5 +78,23 @@ namespace DiscussionForum.Services
                 throw new Exception("Error  while fetching threads.", ex);
             }
         }
+
+
+        public async Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync()
+        {
+            try
+            {
+                var d = _context.Threads.ToList();
+                return await _context.Threads.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetThreadsFromDatabaseAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+
+
     }
 }
