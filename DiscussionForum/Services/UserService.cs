@@ -209,6 +209,31 @@ namespace DiscussionForum.Services
             }
         }
 
+
+        //Leaderboard
+
+        public async Task<List<SingleUserDTO>> GetTopUsersByScoreAsync(int limit)
+        {
+            var topUsers = await _userContext.Users
+                .Where(u => !u.IsDeleted)
+                .OrderByDescending(u => u.Score)
+                .Take(limit)
+                .Join(_userContext.Departments, u => u.DepartmentID, d => d.DepartmentID, (u, d) => new { User = u, Department = d })
+                .Join(_userContext.Designations, u => u.User.DesignationID, des => des.DesignationID, (ud, des) => new { User = ud, Designation = des })
+                .Select(ud => new SingleUserDTO
+                {
+                    UserID = ud.User.User.UserID,
+                    Name = ud.User.User.Name,
+                    Email = ud.User.User.Email,
+                    Score = ud.User.User.Score,
+                    DepartmentName = ud.User.Department.DepartmentName,
+                    DesignationName = ud.Designation.DesignationName // Assuming you have a navigation property to UserRole
+                })
+                .ToListAsync();
+
+            return topUsers;
+        }
+
     }
 
 
