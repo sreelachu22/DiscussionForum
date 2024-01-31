@@ -4,6 +4,7 @@ namespace DiscussionForum.Services
 {
     public interface IReplyService
     {
+        Task<IEnumerable<Reply>> GetRepliesFromDatabaseAsync();
         Task<IEnumerable<Reply>> GetAllRepliesAsync();
         Task<Reply> GetReplyByIdAsync(long _replyID);
         Task<IEnumerable<Reply>> GetRepliesByThreadIdAsync(long _threadID);

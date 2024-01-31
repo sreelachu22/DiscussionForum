@@ -17,6 +17,20 @@ namespace DiscussionForum.Services
             _context = context;
         }
 
+        public async Task<IEnumerable<Reply>> GetRepliesFromDatabaseAsync()
+        {
+            try
+            {
+                /*var d = _context.Threads.ToList();*/
+                return await _context.Replies.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetRepliesFromDatabaseAsync: {ex.Message}");
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<Reply>> GetAllRepliesAsync()
         {
             try
