@@ -29,7 +29,7 @@ namespace DiscussionForum.Models.EntityModels
 
         public bool IsDeleted { get; set; }
 
-        public Guid CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
 
         public virtual User CreatedByUser { get; set; }
 
