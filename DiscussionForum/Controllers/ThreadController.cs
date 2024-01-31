@@ -1,7 +1,9 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Models.EntityModels;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace DiscussionForum.Controllers
 {
@@ -31,6 +33,20 @@ namespace DiscussionForum.Controllers
             };
 
             return Ok(response);
+        }
+
+        [HttpGet("SearchThreads")]
+        public async Task<IActionResult> SearchThread(string searchTerm)
+        {
+            IEnumerable<Threads> sampleData = await _threadService.GetThreadsFromDatabaseAsync();
+
+
+
+            // filtering based on a search term:
+            var filteredData = sampleData.Where(thread => thread.Content.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+
+            // Further processing or returning the filtered data.
+            return Ok(filteredData);
         }
     }
 }
