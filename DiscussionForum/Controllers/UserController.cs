@@ -58,6 +58,23 @@ namespace DiscussionForum.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating user role");
             }
-        }   
+        }
+
+        //leaderboard
+
+        [HttpGet("TopUsersByScore/{limit}")]
+        public async Task<ActionResult<List<SingleUserDTO>>> GetTop5UsersByScore(int limit)
+        {
+            try
+            {
+                var topUsers = await _userService.GetTopUsersByScoreAsync(limit);
+                return Ok(topUsers);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 }
