@@ -58,6 +58,11 @@ namespace DiscussionForum.Services
                     );
                 }
 
+
+                
+                // Build the initial query based on search term
+               
+
                 // Apply sorting if specified
                 if (!string.IsNullOrWhiteSpace(sort))
                 {
