@@ -41,9 +41,9 @@ namespace DiscussionForum.Controllers
         }
 
         /// <summary>
-        /// Retrieves a designation based on the given designationId.
+        /// Retrieves a designation based on the given designation ID.
         /// </summary>
-        /// <param name="designationId">The ID to search for in designations.</param>
+        /// <param name="designationId">The ID of the designation to search for in designations.</param>
         [HttpGet("{designationId}")]
         public async Task<IActionResult> GetDesignationById(long designationId)
         {
@@ -108,7 +108,7 @@ namespace DiscussionForum.Controllers
         }
 
         /// <summary>
-        /// Deletes a designation based on the given designationId.
+        /// Deletes a designation based on the given designation ID.
         /// </summary>
         /// <param name="designationId">The ID of the designation to delete.</param>
         [HttpDelete("{designationId}")]

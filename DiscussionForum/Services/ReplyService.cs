@@ -4,6 +4,7 @@ using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace DiscussionForum.Services
 {
@@ -26,28 +27,32 @@ namespace DiscussionForum.Services
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
                 throw new ApplicationException("Error occurred while retrieving all replies.", ex);
             }
         }
-        public async Task<Reply> GetReplyByIdAsync(long _replyID)
+        public async Task<Reply> GetReplyByIdAsync(long replyID)
         {
             try
             {
-                return await Task.FromResult(_context.Replies.Find(_replyID));
+                return await Task.FromResult(_context.Replies.Find(replyID));
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                throw new ApplicationException($"Error occurred while retrieving reply with ID {_replyID}.", ex);
+                throw new ApplicationException($"Error occurred while retrieving reply with ID {replyID}.", ex);
             }
         }
-        public async Task<IEnumerable<Reply>> GetRepliesByThreadIdAsync(long _threadID)
+        public async Task<IEnumerable<Reply>> GetRepliesByThreadIdAsync(long threadID)
         {
             try
             {
-                var result = await (from reply in _context.Replies
-                                    where reply.ThreadID == _threadID
+                var _thread = await Task.FromResult(_context.Threads.Find(threadID));
+                //Checks if the thread is valid
+                if(_thread == null)
+                {
+                    throw new Exception("Thread not found");
+                }
+                return await (from reply in _context.Replies
+                                    where reply.ThreadID == _thread.ThreadID
                                     select new Reply
                                     {
                                         ReplyID = reply.ReplyID,
@@ -58,21 +63,25 @@ namespace DiscussionForum.Services
                                         CreatedBy = reply.CreatedBy,
                                         CreatedAt = reply.CreatedAt
                                     }).ToListAsync();
-                return result;
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                throw new ApplicationException($"Error occurred while retrieving replies for thread ID {_threadID}.", ex);
+                throw new ApplicationException($"Error occurred while retrieving replies for thread ID {threadID}.", ex);
             }
         }
 
-        public async Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long _parentReplyID)
+        public async Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long parentReplyID)
         {
             try
             {
-                var result = await (from reply in _context.Replies
-                                    where reply.ParentReplyID == _parentReplyID
+                var _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyID));
+                //Checks if the parent reply is valid
+                if (_parentReply == null)
+                {
+                    throw new Exception("Parent reply not found");
+                }
+                return await (from reply in _context.Replies
+                                    where reply.ParentReplyID == _parentReply.ReplyID
                                     select new Reply
                                     {
                                         ReplyID = reply.ReplyID,
@@ -83,77 +92,128 @@ namespace DiscussionForum.Services
                                         CreatedBy = reply.CreatedBy,
                                         CreatedAt = reply.CreatedAt
                                     }).ToListAsync();
-                return result;
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                throw new ApplicationException($"Error occurred while retrieving replies for parent reply ID {_parentReplyID}.", ex);
+                throw new ApplicationException($"Error occurred while retrieving replies for parent reply ID {parentReplyID}.", ex);
             }
         }
 
-        public async Task<Reply> CreateReplyAsync(long _threadID, long _parentReplyId, string _content)
+        public async Task<Reply> CreateReplyAsync(long threadID, Guid creatorID, string content, long? parentReplyId)
         {
             try
             {
-                return await Task.FromResult(CreateReply(_threadID, _parentReplyId, _content));
+                var _thread = await Task.FromResult(_context.Threads.Find(threadID));
+                var _creator = await Task.FromResult(_context.Users.Find(creatorID));
+                //Checks if the thread is valid
+                if (_thread == null)
+                {
+                    throw new Exception("Thread not found");
+                }
+                //Checks if the creator is valid
+                else if(_creator == null)
+                {
+                    throw new Exception("Creator not found");
+                }
+                //Checks if the parent reply is valid
+                else if(parentReplyId != null)
+                {
+                    var _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
+                    if (_parentReply == null)
+                    {
+                        throw new Exception("Parent reply not found");
+                    }
+                }
+                return await Task.FromResult(CreateReply(threadID, creatorID, content, parentReplyId));
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
                 throw new ApplicationException($"Error occurred while creating a reply.", ex);
             }
         }
-        private Reply CreateReply(long _threadID, long _parentReplyId, string _content)
+        private Reply CreateReply(long threadID, Guid creatorID, string content, long? parentReplyId)
         {
-            Reply reply = new Reply { ThreadID = _threadID, Content = _content, ParentReplyID = _parentReplyId, IsDeleted = false };
-            _unitOfWork.Reply.Add(reply);
-            _unitOfWork.Complete();
-            return reply;
-        }
-        public async Task<Reply> UpdateReplyAsync(long _replyID, string _content)
-        {
+            //Creates a new reply and saves it to the database
             try
             {
-                return await Task.FromResult(UpdateReply(_replyID, _content));
+                Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
+                _unitOfWork.Reply.Add(_reply);
+                _unitOfWork.Complete();
+                return _reply;
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                throw new ApplicationException($"Error occurred while updating a reply with ID {_replyID}.", ex);
+                throw new ApplicationException($"Error occurred while creating a reply.", ex);
             }
         }
-        private Reply UpdateReply(long _replyID, string _content)
-        {
-            var reply = _context.Replies.Find(_replyID);
-
-            if (reply != null)
-            {
-                reply.Content = _content;
-                _context.SaveChanges();
-            }
-            return reply;
-        }
-        public async Task DeleteReplyAsync(long _replyID)
+        public async Task<Reply> UpdateReplyAsync(long replyID, Guid modifierID, string content)
         {
             try
             {
-                await Task.Run(() => DeleteReply(_replyID));
+                var _reply = await Task.FromResult(_context.Replies.Find(replyID));
+                var _modifier = await Task.FromResult(_context.Users.Find(modifierID));
+                //Checks if modifier is valid
+                if (_modifier == null)
+                {
+                    throw new Exception("Modifier not found");
+                }
+                //Checks if reply is valid and not deleted
+                else if (_reply != null && !_reply.IsDeleted)
+                {
+                    _reply.Content = content;
+                    _reply.ModifiedBy = modifierID;
+                    _reply.ModifiedAt = DateTime.Now;
+                    _context.SaveChanges();
+                    return _reply;
+                }
+                //Checks if the designation is valid but deleted
+                else if (_reply != null && _reply.IsDeleted)
+                {
+                    throw new Exception("Reply has been deleted.");
+                }
+                else
+                {
+                    throw new Exception("Reply not found.");
+                }
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                throw new ApplicationException($"Error occurred while deleting reply with ID {_replyID}.", ex);
+                throw new ApplicationException($"Error occurred while updating a reply with ID {replyID}.", ex);
             }
         }
-        private void DeleteReply(long _replyID)
+        public async Task<Reply> DeleteReplyAsync(long replyID, Guid modifierID)
         {
-            var reply = _context.Replies.Find(_replyID);
-
-            if (reply != null)
+            try
             {
-                reply.IsDeleted = true;
-                _context.SaveChanges();
+                var _reply = await Task.FromResult(_context.Replies.Find(replyID));
+                var _modifier = await Task.FromResult(_context.Users.Find(modifierID));
+                //Checks if modifier is valid
+                if (_modifier == null)
+                {
+                    throw new Exception("Modifier not found");
+                }
+                //Checks if reply is valid and not deleted
+                else if(_reply != null && !_reply.IsDeleted)
+                {
+                    _reply.IsDeleted = true;
+                    _reply.ModifiedBy = modifierID;
+                    _reply.ModifiedAt = DateTime.Now;
+                    _context.SaveChanges();
+                    return _reply;
+                }
+                //Checks if the designation is valid but deleted
+                else if (_reply != null && _reply.IsDeleted)
+                {
+                    throw new Exception("Reply already deleted.");
+                }
+                else
+                {
+                    throw new Exception("Reply not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while deleting a reply with ID {replyID}.", ex);
             }
         }
 
@@ -219,22 +279,6 @@ namespace DiscussionForum.Services
             catch (Exception ex)
             {                
                 Console.WriteLine($"An error occurred while getting nested replies: {ex.Message}");
-                throw;
-            }
-        }
-
-
-
-        //fetch replies from database
-        public async Task<IEnumerable<Reply>> GetRepliesFromDatabaseAsync()
-        {
-            try
-            {
-                return await _context.Replies.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetRepliesFromDatabaseAsync: {ex.Message}");
                 throw;
             }
         }

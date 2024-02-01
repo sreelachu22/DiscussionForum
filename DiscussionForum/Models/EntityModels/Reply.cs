@@ -16,8 +16,8 @@ namespace DiscussionForum.Models.EntityModels
         public long? ParentReplyID { get; set; }
         public bool IsDeleted { get; set; }
         [ForeignKey("CreatedBy")]
-        public Guid? CreatedBy { get; set; }
-        public DateTime? CreatedAt { get; set; }
+        public Guid CreatedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
         [ForeignKey("ModifiedBy")]
         public Guid? ModifiedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }              

@@ -71,11 +71,11 @@ namespace DiscussionForum.Services
                 //Checks if the designation is valid but deleted
                 else if(_designation != null && _designation.IsDeleted)
                 {
-                    throw new Exception($"Designation already deleted.");
+                    throw new Exception("Designation already deleted.");
                 }
                 else
                 {
-                    throw new Exception($"Designation not found.");
+                    throw new Exception("Designation not found.");
                 }
             }
             catch (Exception ex)
