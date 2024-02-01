@@ -1,5 +1,9 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
+using System.ComponentModel.DataAnnotations.Schema;
+using DiscussionForum.Models.APIModels;
+
 namespace DiscussionForum.Data
 {
     public class AppDbContext : DbContext
