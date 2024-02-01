@@ -15,6 +15,8 @@ namespace DiscussionForum.Services
 
         Task<String> PutUserByIDAsync(Guid userId, int roleID, Guid adminId);
 
+        Task<List<SingleUserDTO>> GetTopUsersByScoreAsync(int limit);
+
     }
 }
 

@@ -18,22 +18,26 @@ namespace DiscussionForum.Services
             _context = context;
         }
 
+        /* get all threads related to a category with limits to number of threads*/
         public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {
             try
             {
+                /* get total count based on query*/
                 var query = _context.Threads
                     .Include(t => t.CommunityCategoryMapping)
                     .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID);
 
                 var totalCount = await query.CountAsync();
 
+                /* to get category related info*/
+
                 var categoryInfo = await _context.CommunityCategoryMapping
                     .Where(ccm => ccm.CommunityCategoryMappingID == CommunityCategoryMappingID)
                     .Select(ccm => new { CategoryName = ccm.CommunityCategory.CommunityCategoryName, CategoryDescription = ccm.Description })
                     .FirstOrDefaultAsync();
 
-
+                /* get threads with limit(pagination)*/
                 var threads = await _context.Threads
                     .Include(t => t.CommunityCategoryMapping)
                         .ThenInclude(c => c.CommunityCategory)

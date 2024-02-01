@@ -19,6 +19,8 @@ namespace DiscussionForum.Controllers
             _threadService = threadService;
         }
 
+
+        /* get all threads related to a category*/
         [HttpGet]
         public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {

@@ -17,10 +17,14 @@ namespace DiscussionForum.Services
         }
 
 
+        /* get all user roles*/
         public Task<IEnumerable<Role>> GetAllRoles()
         {
             try {
                 var roles = _unitOfWork.Role.GetAll();
+
+                // Filter out the "SuperAdmin" role
+                roles = roles.Where(role => role.RoleID!= 1);
                 return Task.FromResult(roles);
             }
             catch (Exception ex)
@@ -31,7 +35,8 @@ namespace DiscussionForum.Services
             
         }
 
-        public  Task<Role> GetRoleByID(int id)
+        /* get single user role*/
+        public Task<Role> GetRoleByID(int id)
         {
             try
             {
