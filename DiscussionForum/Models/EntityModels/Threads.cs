@@ -8,9 +8,17 @@ namespace DiscussionForum.Models.EntityModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ThreadID { get; set; }
+
+        [Required(ErrorMessage = "Community Category Mapping ID is required.")]
         public int CommunityCategoryMappingID { get; set; }
+
+        [Required(ErrorMessage = "Post Content is required.")]
         public string Content { get; set; }
+
+        [Required(ErrorMessage = "Thread Status ID is required.")]
         public int ThreadStatusID { get; set; }
+
+        [Required(ErrorMessage = "IsAnswered required.")]
         public bool IsAnswered { get; set; }
         public bool IsDeleted { get; set; }
         public Guid CreatedBy { get; set; }
