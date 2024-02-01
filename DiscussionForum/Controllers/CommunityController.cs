@@ -16,11 +16,27 @@ namespace DiscussionForum.Controllers
             _communityService = communityService;
         }
 
+        /// <summary>
+        /// Retrieves all communities.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
-            var communities = await _communityService.GetAllCommunitiesAsync();
-            return Ok(communities);
+            try
+            {
+                var _communities = await _communityService.GetAllCommunitiesAsync();
+                return Ok(_communities);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while retrieving all communities \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while retrieving all communities \nError: {ex.Message}");
+            }
         }
 
     }
