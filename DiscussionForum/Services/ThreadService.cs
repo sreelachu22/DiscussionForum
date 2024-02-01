@@ -170,11 +170,12 @@ namespace DiscussionForum.Services
             }
         }
 
+        //fetch threads from database
+
         public async Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync()
         {
             try
             {
-                /*var d = _context.Threads.ToList();*/
                 return await _context.Threads.ToListAsync();
             }
             catch (Exception ex)

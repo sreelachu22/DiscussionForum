@@ -17,43 +17,54 @@ namespace DiscussionForum.Controllers
             _replyService = replyService;
         }
 
+        /// <summary>
+        /// Searches for replies based on the entered search term in the "Content" column.
+        /// </summary>
+        /// <param name="searchTerm">The term to search for in reply content.</param>
         [HttpGet("SearchReplies")]
         public async Task<IActionResult> SearchReplies(string searchTerm)
         {
-            if (string.IsNullOrEmpty(searchTerm))
+            try
             {
-                return BadRequest("Search term cannot be empty");
-            }
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return BadRequest("Search term cannot be empty");
+                }
 
-            IEnumerable<Reply> sampleData = await _replyService.GetRepliesFromDatabaseAsync();
+                IEnumerable<Reply> sampleData = await _replyService.GetRepliesFromDatabaseAsync();
 
-            // Split the search term into individual words
-            var searchTermsArray = searchTerm.Split(' ');
+                var searchTermsArray = searchTerm.Split(' ');
 
-            // Create a list to store the filtered replies
-            var filteredReplies = new List<Reply>();
+                // Create a list to store the filtered replies
+                var filteredReplies = new List<Reply>();
 
-            // Iterate through each search term
-            foreach (var term in searchTermsArray)
-            {
-                // Filtering based on a search term
-                var termFilteredData = sampleData
-                    .Where(reply => reply.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                foreach (var term in searchTermsArray)
+                {
+                    // Filtering based on a search term in content with ignore case 
+                    var termFilteredData = sampleData
+                        .Where(reply => reply.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                        .ToList();
+
+                    // Add the filtered replies to the result list
+                    filteredReplies.AddRange(termFilteredData);
+                }
+
+                // Remove duplicate replies based on ReplyID
+                var uniqueReplies = filteredReplies
+                    .GroupBy(reply => reply.ReplyID)
+                    .Select(group => group.First())
                     .ToList();
 
-                // Add the filtered replies to the result list
-                filteredReplies.AddRange(termFilteredData);
+                // Return the filtered data.
+                return Ok(uniqueReplies);
             }
-
-            // Remove duplicate replies based on ReplyID
-            var uniqueReplies = filteredReplies
-                .GroupBy(reply => reply.ReplyID)
-                .Select(group => group.First())
-                .ToList();
-
-            // Further processing or returning the filtered data.
-            return Ok(uniqueReplies);
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
+
 
 
         [HttpGet]

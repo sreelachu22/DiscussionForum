@@ -17,8 +17,8 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod()
                           .AllowAnyHeader());
 });
-// Add services to the container.
 
+// Add services to the container.
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDesignationService, DesignationService>();
@@ -40,8 +40,6 @@ builder.Services.AddControllers();
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     });*/
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
