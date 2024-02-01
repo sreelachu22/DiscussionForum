@@ -34,7 +34,6 @@ namespace DiscussionForum.UnitOfWork
         public ICommunityStatusRepository CommunityStatus { get; }
         public ICommunityCategoryRepository CommunityCategory { get; }
         public IThreadStatusRepository ThreadStatus { get; }
-
         public ICommunityRepository Community { get; }
         public INoticeRepository Notice { get; }
         public IUserRepository User { get; }

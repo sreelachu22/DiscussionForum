@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -19,23 +17,27 @@ namespace DiscussionForum.Models.EntityModels
 
         public long? Score { get; set; }
 
+        [Required(ErrorMessage = "Department ID required.")]
         public int DepartmentID { get; set; }
 
         public virtual Department Department { get; set; }
 
+        [Required(ErrorMessage = "Designation ID required.")]
         public long DesignationID { get; set; }
 
         public virtual Designation Designation { get; set; }
 
         public bool IsDeleted { get; set; }
 
-        public Guid CreatedBy { get; set; }
+        [Required(ErrorMessage = "Created User is required.")]
+        public Guid? CreatedBy { get; set; }
 
         public virtual User CreatedByUser { get; set; }
 
+        [Required(ErrorMessage = "Created User date is required.")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public Guid ModifiedBy { get; set; }
+        public Guid? ModifiedBy { get; set; }
 
         public virtual User ModifiedByUser { get; set; }
 
@@ -44,8 +46,6 @@ namespace DiscussionForum.Models.EntityModels
         public virtual ICollection<ThreadVote> ThreadVotesCreatedBy { get; set; }
 
         public virtual ICollection<ThreadVote> ThreadVotesModifiedBy { get; set; }
-
-       /* public UserRoleMapping UserRole { get; set; }*/
 
     }
 

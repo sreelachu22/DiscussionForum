@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Data;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -46,17 +47,17 @@ namespace DiscussionForum.Services
             try
             {
                 var result = await (from reply in _context.Replies
-                              where reply.ThreadID == _threadID
-                              select new Reply
-                              {
-                                  ReplyID = reply.ReplyID,
-                                  ThreadID = reply.ThreadID,
-                                   Content = reply.Content,
-                                  ParentReplyID = reply.ParentReplyID,
-                                  IsDeleted = reply.IsDeleted,
-                                  CreatedBy = reply.CreatedBy,
-                                  CreatedAt = reply.CreatedAt
-                              }).ToListAsync();
+                                    where reply.ThreadID == _threadID
+                                    select new Reply
+                                    {
+                                        ReplyID = reply.ReplyID,
+                                        ThreadID = reply.ThreadID,
+                                        Content = reply.Content,
+                                        ParentReplyID = reply.ParentReplyID,
+                                        IsDeleted = reply.IsDeleted,
+                                        CreatedBy = reply.CreatedBy,
+                                        CreatedAt = reply.CreatedAt
+                                    }).ToListAsync();
                 return result;
             }
             catch (Exception ex)
@@ -105,7 +106,7 @@ namespace DiscussionForum.Services
         }
         private Reply CreateReply(long _threadID, long _parentReplyId, string _content)
         {
-            Reply reply = new Reply{ ThreadID = _threadID, Content = _content, ParentReplyID = _parentReplyId, IsDeleted = false };
+            Reply reply = new Reply { ThreadID = _threadID, Content = _content, ParentReplyID = _parentReplyId, IsDeleted = false };
             _unitOfWork.Reply.Add(reply);
             _unitOfWork.Complete();
             return reply;
@@ -153,6 +154,88 @@ namespace DiscussionForum.Services
             {
                 reply.IsDeleted = true;
                 _context.SaveChanges();
+            }
+        }
+
+        //Returns the all the replies of a post with the option to paginate
+        //The nested replies of a reply is recursively added into the NestedReplies list of the ReplyDTO object
+        //It take the threadId of the post to fetch replies. The replies will be starting from the parentReplyId provided
+        public IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10)
+        {
+            try
+            {
+                // Ensure page and pageSize are valid
+                page = Math.Max(1, page);
+                pageSize = Math.Max(1, pageSize);
+
+                var query = _context.Replies
+                    .Include(r => r.Thread)
+                    .Include(r => r.ParentReply)
+                    .Where(r => r.ThreadID == threadId && r.ParentReplyID == parentReplyId);
+
+                // Perform pagination on the retrieved replies
+                var replies = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+                // Map the Reply entities to ReplyDTO objects
+                var replyDTOs = replies.Select(r => new ReplyDTO
+                {
+                    ReplyID = r.ReplyID,
+                    ThreadID = r.ThreadID,
+                    ParentReplyID = r.ParentReplyID,
+                    Content = r.Content,
+                    NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
+                });
+
+                return replyDTOs.AsQueryable();
+            }
+            catch (Exception ex)
+            {                
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw;
+            }
+        }
+
+        // Recursive method to retrieve nested replies for a given replyId
+        static List<ReplyDTO> GetNestedReplies(List<Reply> replies, long replyId)
+        {
+            try
+            {
+                // Filter the list of replies to find those with the specified replyId as ParentReplyID
+                var nestedReplies = replies
+                    .Where(r => r.ParentReplyID == replyId)
+                    .Select(reply => new ReplyDTO
+                    {
+                        // Map each nested reply to a new ReplyDTO object
+                        ReplyID = reply.ReplyID,
+                        ThreadID = reply.ThreadID,
+                        ParentReplyID = reply.ParentReplyID,
+                        Content = reply.Content,
+                        // Recursively call GetNestedReplies to retrieve nested replies of the current reply
+                        NestedReplies = GetNestedReplies(replies, reply.ReplyID)
+                    })
+                    .ToList();                
+                return nestedReplies;
+            }
+            catch (Exception ex)
+            {                
+                Console.WriteLine($"An error occurred while getting nested replies: {ex.Message}");
+                throw;
+            }
+        }
+
+
+
+        //fetch replies from database
+        public async Task<IEnumerable<Reply>> GetRepliesFromDatabaseAsync()
+        {
+            try
+            {
+                return await _context.Replies.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetRepliesFromDatabaseAsync: {ex.Message}");
+                throw;
             }
         }
 

@@ -9,30 +9,20 @@ namespace DiscussionForum.Controllers
     [EnableCors("AllowAngularDev")]
     public class CommunityController : ControllerBase
     {
-        private readonly ICommunityService _communityservice;
+        private readonly ICommunityService _communityService;
 
         public CommunityController(ICommunityService communityService)
         {
-            _communityservice = communityService;
+            _communityService = communityService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
-            var roles = await _communityservice.GetAllCommunities();
-            return Ok(roles);
+            var communities = await _communityService.GetAllCommunitiesAsync();
+            return Ok(communities);
         }
 
-        /*[HttpGet("{RoleID}")]
-        public async Task<IActionResult> GetRoleByID(int RoleID)
-        {
-            var role = await _roleService.GetRoleByID(RoleID);
-            if (role == null)
-            {
-                return NotFound();
-            }
-            return Ok(role);
-        }*/
-
     }
+
 }

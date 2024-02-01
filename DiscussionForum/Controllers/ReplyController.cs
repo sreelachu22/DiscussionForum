@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Models.EntityModels;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,56 @@ namespace DiscussionForum.Controllers
         {
             _replyService = replyService;
         }
+
+        /// <summary>
+        /// Searches for replies based on the entered search term in the "Content" column.
+        /// </summary>
+        /// <param name="searchTerm">The term to search for in reply content.</param>
+        [HttpGet("SearchReplies")]
+        public async Task<IActionResult> SearchReplies(string searchTerm)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return BadRequest("Search term cannot be empty");
+                }
+
+                IEnumerable<Reply> sampleData = await _replyService.GetRepliesFromDatabaseAsync();
+
+                var searchTermsArray = searchTerm.Split(' ');
+
+                // Create a list to store the filtered replies
+                var filteredReplies = new List<Reply>();
+
+                foreach (var term in searchTermsArray)
+                {
+                    // Filtering based on a search term in content with ignore case 
+                    var termFilteredData = sampleData
+                        .Where(reply => reply.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                        .ToList();
+
+                    // Add the filtered replies to the result list
+                    filteredReplies.AddRange(termFilteredData);
+                }
+
+                // Remove duplicate replies based on ReplyID
+                var uniqueReplies = filteredReplies
+                    .GroupBy(reply => reply.ReplyID)
+                    .Select(group => group.First())
+                    .ToList();
+
+                // Return the filtered data.
+                return Ok(uniqueReplies);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+
 
         [HttpGet]
         public async Task<IActionResult> GetReplies()
@@ -57,14 +108,14 @@ namespace DiscussionForum.Controllers
         }
 
         [HttpPost("{threadId},{parentReplyId}")]
-        public async Task<IActionResult> CreateReply(long threadId, long parentReplyId,[FromBody] string content)
+        public async Task<IActionResult> CreateReply(long threadId, long parentReplyId, [FromBody] string content)
         {
             var reply = await _replyService.CreateReplyAsync(threadId, parentReplyId, content);
             return Ok(reply);
         }
 
         [HttpPut("{replyId}")]
-        public async Task<IActionResult> UpdateReply(long replyId,[FromBody] string content)
+        public async Task<IActionResult> UpdateReply(long replyId, [FromBody] string content)
         {
             var reply = await _replyService.UpdateReplyAsync(replyId, content);
             return Ok(reply);
@@ -76,5 +127,36 @@ namespace DiscussionForum.Controllers
             await _replyService.DeleteReplyAsync(replyId);
             return NoContent();
         }
+
+
+        //Http Get Method to get all the replies of a post in a nested manner
+        //We can get all the replies from a specific parent by providing the parentReplyId.
+        //ParentReplyId of the first reply is null
+
+        [HttpGet("getAllNestedRepliesOfaPost/{threadId}/{parentReplyId?}")]
+        public IActionResult GetAllRepliesOfAPost(long threadId, long? parentReplyId = null, int page = 1, int pageSize = 10)
+        {
+            if (parentReplyId.HasValue && parentReplyId < 1)
+            {
+                return BadRequest("Invalid parentReplyId. It must be a positive integer or null.");
+            }
+
+            try
+            {
+                var replies = _replyService.GetAllRepliesOfAPost(threadId, parentReplyId, page, pageSize);
+
+                if (replies.Any())
+                {
+                    return Ok(replies);
+                }
+
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
     }
 }
