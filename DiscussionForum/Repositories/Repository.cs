@@ -37,6 +37,10 @@ namespace DiscussionForum.Repositories
         public IEnumerable<T> GetAll(Func<T, bool> predicate)
         {
             return _context.Set<T>().Where(predicate).ToList();
+            // Use the DbSet<T> to access entities of type T in the database.
+            // Apply the provided predicate- (function taking an entity of type T
+            // and returning a boolean (bool) value)- to filter entities.
+            // Convert the result to a List<T> and return.
         }
 
     }

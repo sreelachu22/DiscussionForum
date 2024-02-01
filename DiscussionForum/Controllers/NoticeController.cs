@@ -21,18 +21,13 @@ namespace DiscussionForum.Controllers
         }
 
         [HttpGet]
-        /*public async Task<IActionResult> GetNotices()
-        {
-            var notices = await _noticeService.GetNoticesAsync();
-            return Ok(notices);
-        }*/
         public async Task<IActionResult> GetNotices()
         {
             var notices = await _noticeService.GetNoticesAsync();
             return Ok(notices);
         }
 
-        [HttpPost]
+        [HttpPost] // Call the notice service to create a notice using the provided data from the NoticeDto.
         public async Task<IActionResult> CreateNotice([FromBody] NoticeDto NoticeDto)
         {
             var notice = await _noticeService.CreateNoticeAsync(NoticeDto.CommunityID, NoticeDto.Title, NoticeDto.Content, NoticeDto.ExpiresAt, NoticeDto.CreatedBy);
@@ -47,7 +42,7 @@ namespace DiscussionForum.Controllers
             if (result == null)
                 return NotFound();
 
-            return Ok(result);
+            return Ok(result); // Return an HTTP 200 OK response with the updated notice.
         }
 
 
