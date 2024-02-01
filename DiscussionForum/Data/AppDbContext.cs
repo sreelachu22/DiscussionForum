@@ -1,6 +1,12 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
 
+=======
+using System.Threading;
+using System.ComponentModel.DataAnnotations.Schema;
+using DiscussionForum.Models.APIModels;
+>>>>>>> 470915a7f6db5fa3ad84f0e22d895e8c44ab97a0
 namespace DiscussionForum.Data
 {
     public class AppDbContext : DbContext

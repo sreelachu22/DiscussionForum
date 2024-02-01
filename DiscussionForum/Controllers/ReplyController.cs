@@ -108,14 +108,14 @@ namespace DiscussionForum.Controllers
         }
 
         [HttpPost("{threadId},{parentReplyId}")]
-        public async Task<IActionResult> CreateReply(long threadId, long parentReplyId,[FromBody] string content)
+        public async Task<IActionResult> CreateReply(long threadId, long parentReplyId, [FromBody] string content)
         {
             var reply = await _replyService.CreateReplyAsync(threadId, parentReplyId, content);
             return Ok(reply);
         }
 
         [HttpPut("{replyId}")]
-        public async Task<IActionResult> UpdateReply(long replyId,[FromBody] string content)
+        public async Task<IActionResult> UpdateReply(long replyId, [FromBody] string content)
         {
             var reply = await _replyService.UpdateReplyAsync(replyId, content);
             return Ok(reply);
@@ -127,5 +127,36 @@ namespace DiscussionForum.Controllers
             await _replyService.DeleteReplyAsync(replyId);
             return NoContent();
         }
+
+
+        //Http Get Method to get all the replies of a post in a nested manner
+        //We can get all the replies from a specific parent by providing the parentReplyId.
+        //ParentReplyId of the first reply is null
+
+        [HttpGet("getAllNestedRepliesOfaPost/{threadId}/{parentReplyId?}")]
+        public IActionResult GetAllRepliesOfAPost(long threadId, long? parentReplyId = null, int page = 1, int pageSize = 10)
+        {
+            if (parentReplyId.HasValue && parentReplyId < 1)
+            {
+                return BadRequest("Invalid parentReplyId. It must be a positive integer or null.");
+            }
+
+            try
+            {
+                var replies = _replyService.GetAllRepliesOfAPost(threadId, parentReplyId, page, pageSize);
+
+                if (replies.Any())
+                {
+                    return Ok(replies);
+                }
+
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
     }
 }

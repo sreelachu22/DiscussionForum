@@ -4,6 +4,9 @@ using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Threading;
+using System;
 
 namespace DiscussionForum.Services
 {
@@ -18,29 +21,37 @@ namespace DiscussionForum.Services
             _context = context;
         }
 
+        
+        /*GetAllThreads retrieves paginated threads for a specific community category mapping.
+        It includes additional logic to obtain the total thread count, category name, and description.
+        The method takes CommunityCategoryMappingID, pageNumber, and pageSize as inputs, returning 
+        a tuple with threads, total count, category name, and description. If an error occurs,
+        a custom exception is thrown.*/
         public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {
             try
             {
+                /* get total count based on query*/
                 var query = _context.Threads
-                    .Include(t => t.CommunityCategoryMapping)
-                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID);
-
+                .Include(t => t.CommunityCategoryMapping)
+                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID);
                 var totalCount = await query.CountAsync();
 
+                /* to get category related info*/
+
                 var categoryInfo = await _context.CommunityCategoryMapping
-                    .Where(ccm => ccm.CommunityCategoryMappingID == CommunityCategoryMappingID)
-                    .Select(ccm => new { CategoryName = ccm.CommunityCategory.CommunityCategoryName, CategoryDescription = ccm.Description })
-                    .FirstOrDefaultAsync();
+                .Where(ccm => ccm.CommunityCategoryMappingID == CommunityCategoryMappingID)
+                .Select(ccm => new { CategoryName = ccm.CommunityCategory.CommunityCategoryName, CategoryDescription = ccm.Description })
+                .FirstOrDefaultAsync();
 
-
+                /* get threads with limit(pagination)*/
                 var threads = await _context.Threads
-                    .Include(t => t.CommunityCategoryMapping)
-                        .ThenInclude(c => c.CommunityCategory)
-                    .Include(t => t.ThreadStatus)
-                    .Include(t => t.CreatedByUser)
-                    .Include(t => t.ModifiedByUser)
-                    .Include(t => t.ThreadVotes)
+                .Include(t => t.CommunityCategoryMapping)
+                .ThenInclude(c => c.CommunityCategory)
+                .Include(t => t.ThreadStatus)
+                .Include(t => t.CreatedByUser)
+                .Include(t => t.ModifiedByUser)
+                .Include(t => t.ThreadVotes)
                     .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID)
                     .OrderByDescending(t => t.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)

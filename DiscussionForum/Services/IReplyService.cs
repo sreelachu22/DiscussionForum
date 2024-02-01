@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Models.APIModels;
+using DiscussionForum.Models.EntityModels;
 
 namespace DiscussionForum.Services
 {
@@ -12,6 +13,7 @@ namespace DiscussionForum.Services
         Task<Reply> CreateReplyAsync(long _threadID, long _parentReplyId, string _content);
         Task<Reply> UpdateReplyAsync(long _replyID, string _content);
         Task DeleteReplyAsync(long _replyID);
+        IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10);
 
     }
 }

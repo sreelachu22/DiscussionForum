@@ -17,10 +17,16 @@ namespace DiscussionForum.Services
         }
 
 
+        /* GetAllRoles retrieves all roles from the database, excluding the "SuperAdmin" role (RoleID=1).
+         * The method uses the Unit of Work pattern and returns a Task<IEnumerable<Role>>. In case of an exception,
+         * it logs the error message and throws an ApplicationException.*/
         public Task<IEnumerable<Role>> GetAllRoles()
         {
             try {
                 var roles = _unitOfWork.Role.GetAll();
+
+                // Filter out the "SuperAdmin" role
+                roles = roles.Where(role => role.RoleID!= 1);
                 return Task.FromResult(roles);
             }
             catch (Exception ex)
@@ -31,7 +37,12 @@ namespace DiscussionForum.Services
             
         }
 
-        public  Task<Role> GetRoleByID(int id)
+
+
+        /* GetRoleByID retrieves a role from the database based on the provided id. The method utilizes 
+         * the Unit of Work pattern to access the role by ID and returns a Task<Role>. In case of an exception, 
+         * it throws an ApplicationException with an informative error message*/
+        public Task<Role> GetRoleByID(int id)
         {
             try
             {

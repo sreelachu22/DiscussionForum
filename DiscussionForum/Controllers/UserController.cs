@@ -19,34 +19,57 @@ namespace DiscussionForum.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
+        //Get method to get all the users with the options to paginate.
+        //Can also sort the users according to its member variables.
+        //sort variable takes the member variable according to which sort is done
+        //term variable is used as a search term to filter users in a case-insensitive manner.
+        //page is for defining the page to return after pagination
+        //limit is to specify the number of users needed to show in a page
+
+        [HttpGet("GetAllUsersWithPagination")]
         public async Task<IActionResult> GetAllUsers(string term, string sort, int page = 1, int limit = 10)
         {
-            var userResult = await _userService.GetUsers(term, sort, page, limit);
+            try
+            {
+                var userResult = await _userService.GetUsers(term, sort, page, limit);
 
-            // Add pagination headers to the response
-            Response.Headers.Add("X-Total-Count", userResult.TotalCount.ToString());
-            Response.Headers.Add("X-Total-Pages", userResult.TotalPages.ToString());
+                // Add pagination headers to the response
+                Response.Headers.Add("X-Total-Count", userResult.TotalCount.ToString());
+                Response.Headers.Add("X-Total-Pages", userResult.TotalPages.ToString());
 
-            return Ok(userResult);
+                return Ok(userResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
 
-
+        /* get single user*/
         [HttpGet("{UserId}")]
         public async Task<IActionResult> GetUserById(Guid UserId)
         {
-            var userExists = await _userService.GetUserByIDAsync(UserId);
+            try
+            {
+                var userExists = await _userService.GetUserByIDAsync(UserId);
 
-            if (userExists == null)
-                return NotFound();
+                if (userExists == null)
+                    return NotFound();
 
-            return Ok(userExists);
-
+                return Ok(userExists);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
+
+
+        /* edit single user role*/
         [HttpPut("{UserId}")]
-        public async Task<IActionResult> PutUserByIDAsync(Guid UserId,int RoleID,Guid AdminID)
+        public async Task<IActionResult> PutUserByIDAsync(Guid UserId, int RoleID, Guid AdminID)
         {
             try
             {

@@ -18,11 +18,16 @@ using System.Threading.Tasks;
 
 namespace DiscussionForum.Services
 {
+    using Azure;
     using Microsoft.AspNetCore.Mvc;
+    using System.Data.Common;
+    using Microsoft.SqlServer.Server;
+    using System.Data;
+
+
     public class UserService : IUserService
     {
         private readonly AppDbContext _userContext;
-
 
         public UserService(AppDbContext userContext)
         {
@@ -30,92 +35,109 @@ namespace DiscussionForum.Services
 
         }
 
+        //this function is used to return all the users with the option to paginate and sort
+        //sort variable takes the member variable according to which sort is done
+        //term variable is used as a search term to filter users in a case-insensitive manner.
+        //page is for defining the page to return after pagination
+        //limit is to specify the number of users needed to show in a page
         public async Task<PagedUserResult> GetUsers(string? term, string? sort, int page, int limit)
         {
             try
             {
+                // Normalize and clean up the search term
                 term = string.IsNullOrWhiteSpace(term) ? null : term.Trim().ToLower();
 
-                var users = _userContext.Users
+                // Build the initial query based on search term
+                var usersQuery = _userContext.Users
                     .Where(u =>
                         string.IsNullOrWhiteSpace(term) ||
-                        u.Name.ToLower().Contains(term) ||
-                        u.Email.ToLower().Contains(term)
+                        u.Name.ToLower().Contains(term)
+                        /*u.Email.ToLower().Contains(term)*/
                     );
 
+                // Apply sorting if specified
                 if (!string.IsNullOrWhiteSpace(sort))
                 {
                     var sortFields = sort.Split(',');
-                    StringBuilder orderQueryBuilder = new StringBuilder();
-                    PropertyInfo[] propertyInfo = typeof(User).GetProperties();
+                    var orderQueryBuilder = new StringBuilder();
+                    var propertyInfo = typeof(User).GetProperties();
 
+                    // Construct the order-by clause based on sort fields
                     foreach (var field in sortFields)
                     {
-                        string sortOrder = "ascending";
-                        var sortField = field.Trim();
-                        if (sortField.StartsWith("-"))
-                        {
-                            sortField = sortField.TrimStart('-');
-                            sortOrder = "descending";
-                        }
+                        var sortOrder = field.StartsWith("-") ? "descending" : "ascending";
+                        var sortField = field.TrimStart('-');
                         var property = propertyInfo.FirstOrDefault(a => a.Name.Equals(sortField, StringComparison.OrdinalIgnoreCase));
-                        if (property == null)
-                            continue;
-                        orderQueryBuilder.Append($"{property.Name.ToString()} {sortOrder}, ");
+
+                        if (property != null)
+                            orderQueryBuilder.Append($"{property.Name} {sortOrder}, ");
                     }
 
+                    // Apply sorting to the query
                     if (orderQueryBuilder.Length > 0)
                     {
-                        orderQueryBuilder.Remove(orderQueryBuilder.Length - 2, 2);
-                        users = users.OrderBy(orderQueryBuilder.ToString());
+                        orderQueryBuilder.Length -= 2; // Remove the trailing comma and space
+                        usersQuery = usersQuery.OrderBy(orderQueryBuilder.ToString());
                     }
                     else
                     {
-                        users = users.OrderBy(u => u.UserID);
+                        usersQuery = usersQuery.OrderBy(u => u.UserID);
                     }
                 }
-
-                var totalCount = await users.CountAsync();
+                
+                var totalCount = await usersQuery.CountAsync();
+                
                 var totalPages = (int)Math.Ceiling((double)totalCount / limit);
-
-                var pagedUsers = await users.Skip((page - 1) * limit).Take(limit).ToListAsync();
-
-                var pagedUserData = new PagedUserResult
+                
+                var pagedUsers = await usersQuery.Skip((page - 1) * limit).Take(limit).ToListAsync();
+                
+                return new PagedUserResult
                 {
                     Users = pagedUsers,
                     TotalCount = totalCount,
                     TotalPages = totalPages
                 };
-                return pagedUserData;
+            }
+            catch (DbException ex)
+            {                
+                Console.WriteLine($"Database error occurred: {ex.Message}");
+                throw;
             }
             catch (Exception ex)
-            {
-                // Log or handle the exception appropriately
+            {                
+                Console.WriteLine($"An unexpected error occurred: {ex.Message}");
                 throw;
             }
         }
-
+        /*GetUserByIDAsync retrieves user details for a specified UserId, 
+          including associated department, designation, and role.The method uses 
+          a combination of LINQ operations and normal queries to fetch the user 
+          and determine their role. If the user doesn't exist, it returns null. 
+          The method takes UserId as an input parameter and returns a SingleUserDTO.
+          In case of an error, it throws a custom exception.*/
         public async Task<SingleUserDTO> GetUserByIDAsync(Guid UserId)
         {
             try
             {
-                
 
+                /* user exists?*/
                 var user = await _userContext.Users
-                    .Include(u => u.Department)
-                    .Include(u => u.Designation)
-                    .FirstOrDefaultAsync(u => u.UserID == UserId);
+                .Include(u => u.Department)
+                .Include(u => u.Designation)
+                .FirstOrDefaultAsync(u => u.UserID == UserId);
 
                 if (user == null)
                 {
                     return null;
                 }
 
-               /* var roleName = (from rm in _userContext.UserRoleMapping
-                                join r in _userContext.Roles on rm.RoleID equals r.RoleID
-                                where rm.UserID == UserId
-                                select r.RoleName)
-                                .FirstOrDefault();*/
+                /* linq operation and normal opertation for geting rolename*/
+
+                /* var roleName = (from rm in _userContext.UserRoleMapping
+                                 join r in _userContext.Roles on rm.RoleID equals r.RoleID
+                                 where rm.UserID == UserId
+                                 select r.RoleName)
+                                 .FirstOrDefault();*/
 
                 var roleName = _userContext.UserRoleMapping
                                 .Where(rm => rm.UserID == UserId)
@@ -142,6 +164,11 @@ namespace DiscussionForum.Services
         }
 
 
+
+        /*PutUserByIDAsync updates a user's role identified by userId, given that the admin user (adminId)
+         * has the necessary privileges. The method validates users, roles, and privileges before updating
+         * the role mapping. It returns success messages or error messages, such as "Success," "User not found,"
+         * "Invalid role ID," or "Insufficient privileges."*/
         public async Task<String> PutUserByIDAsync(Guid userId, int roleID, Guid adminId)
         {
             try
@@ -179,7 +206,7 @@ namespace DiscussionForum.Services
                 }
 
                 // Check if the provided role ID exists in the Roles table and is either 1 or 2
-                var roleExists = await _userContext.Roles.AnyAsync(r => r.RoleID == roleID && (r.RoleID == 1 || r.RoleID == 2));
+                var roleExists = await _userContext.Roles.AnyAsync(r => r.RoleID == roleID && (r.RoleID == 2 || r.RoleID == 3));
 
                 if (!roleExists)
                 {

@@ -1,9 +1,10 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Models.APIModels;
+using DiscussionForum.Models.EntityModels;
 
 namespace DiscussionForum.Services
 {
     public interface ICommunityService
     {
-        Task<IEnumerable<Community>> GetAllCommunities();
+        Task<IEnumerable<CommunityDTO>> GetAllCommunitiesAsync();
     }
 }
