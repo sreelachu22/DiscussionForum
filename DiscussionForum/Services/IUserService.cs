@@ -9,7 +9,7 @@ namespace DiscussionForum.Services
 
     public interface IUserService
     {
-        Task<PagedUserResult> GetUsers(string? term, string? sort, int page, int limit);
+        Task<PagedUserResult> GetUsers(string? sort, string? term, int page, int limit);
 
         Task<SingleUserDTO> GetUserByIDAsync(Guid UserID);
 
