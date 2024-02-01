@@ -19,20 +19,9 @@ namespace DiscussionForum.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
-            var roles = await _communityservice.GetAllCommunities();
-            return Ok(roles);
+            var communities = await _communityservice.GetAllCommunitiesAsync();
+            return Ok(communities);
         }
-
-        /*[HttpGet("{RoleID}")]
-        public async Task<IActionResult> GetRoleByID(int RoleID)
-        {
-            var role = await _roleService.GetRoleByID(RoleID);
-            if (role == null)
-            {
-                return NotFound();
-            }
-            return Ok(role);
-        }*/
 
     }
 }
