@@ -31,32 +31,32 @@ namespace DiscussionForum.Controllers
                     return BadRequest("Search term cannot be empty");
                 }
 
-                IEnumerable<Reply> sampleData = await _replyService.GetRepliesFromDatabaseAsync();
+                IEnumerable<Reply> _sampleData = await _replyService.GetAllRepliesAsync();
 
-                var searchTermsArray = searchTerm.Split(' ');
+                var _searchTermsArray = searchTerm.Split(' ');
 
                 // Create a list to store the filtered replies
-                var filteredReplies = new List<Reply>();
+                var _filteredReplies = new List<Reply>();
 
-                foreach (var term in searchTermsArray)
+                foreach (var _term in _searchTermsArray)
                 {
                     // Filtering based on a search term in content with ignore case 
-                    var termFilteredData = sampleData
-                        .Where(reply => reply.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                    var _termFilteredData = _sampleData
+                        .Where(reply => reply.Content.IndexOf(_term, StringComparison.OrdinalIgnoreCase) >= 0)
                         .ToList();
 
                     // Add the filtered replies to the result list
-                    filteredReplies.AddRange(termFilteredData);
+                    _filteredReplies.AddRange(_termFilteredData);
                 }
 
                 // Remove duplicate replies based on ReplyID
-                var uniqueReplies = filteredReplies
+                var _uniqueReplies = _filteredReplies
                     .GroupBy(reply => reply.ReplyID)
                     .Select(group => group.First())
                     .ToList();
 
                 // Return the filtered data.
-                return Ok(uniqueReplies);
+                return Ok(_uniqueReplies);
             }
             catch (Exception ex)
             {
@@ -65,75 +65,262 @@ namespace DiscussionForum.Controllers
             }
         }
 
-
-
+        /// <summary>
+        /// Retrieves all replies.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetReplies()
         {
-            var replies = await _replyService.GetAllRepliesAsync();
-            return Ok(replies);
+            try
+            {
+                var _replies = await _replyService.GetAllRepliesAsync();
+                return Ok(_replies);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while retrieving all replies \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while retrieving all replies \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Retrieves a reply based on the given reply ID.
+        /// </summary>
+        /// <param name="replyId">The ID of the reply to search for in replies.</param>
         [HttpGet("{replyId}")]
         public async Task<IActionResult> GetReplyById(long replyId)
         {
-            var reply = await _replyService.GetReplyByIdAsync(replyId);
+            try
+            {
+                //Validates the request data
+                if (replyId <= 0)
+                {
+                    throw new Exception("Invalid replyId. It should be greater than zero.");
+                }
 
-            if (reply == null)
-                return NotFound();
+                var _reply = await _replyService.GetReplyByIdAsync(replyId);
 
-            return Ok(reply);
+                //Checks if the retrieved reply is null
+                if (_reply == null)
+                {
+                    throw new Exception($"Reply with ID {replyId} not found.");
+                }
+
+                return Ok(_reply);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while retrieving reply with ID = {replyId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while retrieving reply with ID = {replyId} \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Retrieves a list of replies based on the given thread ID.
+        /// </summary>
+        /// <param name="threadId">The ID of the thread to search for in replies.</param>
         [HttpGet("ByThreadID/{threadId}")]
         public async Task<IActionResult> GetRepliesByThreadId(long threadId)
         {
-            var replies = await _replyService.GetRepliesByThreadIdAsync(threadId);
+            try
+            {
+                //Validates the request data
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
 
-            if (replies == null)
-                return NotFound();
+                var _replies = await _replyService.GetRepliesByThreadIdAsync(threadId);
 
-            return Ok(replies);
+                //Checks if the retrieved replies is/are null
+                if (_replies == null)
+                {
+                    throw new Exception($"Replies from thread with ID {threadId} not found.");
+                }
+
+                return Ok(_replies);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while retrieving replies from thread with ID = {threadId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while retrieving replies from thread with ID = {threadId} \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Retrieves a list of replies based on the given parent reply ID.
+        /// </summary>
+        /// <param name="parentReplyId">The ID of the parent reply to search for in replies.</param>
         [HttpGet("ByParentReplyID/{parentReplyId}")]
         public async Task<IActionResult> GetRepliesByParentReplyId(long parentReplyId)
         {
-            var replies = await _replyService.GetRepliesByParentReplyIdAsync(parentReplyId);
+            try
+            {
+                //Validates the request data
+                if (parentReplyId <= 0)
+                {
+                    throw new Exception("Invalid parentReplyId. It should be greater than zero.");
+                }
 
-            if (replies == null)
-                return NotFound();
+                var _replies = await _replyService.GetRepliesByParentReplyIdAsync(parentReplyId);
 
-            return Ok(replies);
+                //Checks if the retrieved replies is null
+                if (_replies == null)
+                {
+                    throw new Exception($"Replies from reply with ID {parentReplyId} not found.");
+                }
+
+                return Ok(_replies);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while retrieving replies from reply with ID = {parentReplyId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while retrieving replies from reply with ID = {parentReplyId} \nError: {ex.Message}");
+            }
         }
 
-        [HttpPost("{threadId},{parentReplyId}")]
-        public async Task<IActionResult> CreateReply(long threadId, long parentReplyId, [FromBody] string content)
+        /// <summary>
+        /// Creates a new reply with content from request body.
+        /// </summary>
+        /// <param name="threadId">The ID of the thread to which reply is posted.</param>
+        /// <param name="parentReplyId">The ID of the reply to which reply is posted. May be null if not applicable.</param>
+        /// <param name="creatorId">The ID of the user posting the reply.</param>
+        [HttpPost("{threadId}")]
+        public async Task<IActionResult> CreateReply(long threadId, Guid creatorId, [FromBody] string content, long? parentReplyId)
         {
-            var reply = await _replyService.CreateReplyAsync(threadId, parentReplyId, content);
-            return Ok(reply);
+            try
+            {
+                //Validates the request data
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
+                else if (parentReplyId != null && parentReplyId <= 0)
+                {
+                    throw new Exception("Invalid parentReplyId. It should be greater than zero.");
+                }
+                else if (string.IsNullOrWhiteSpace(content))
+                {
+                    throw new Exception("Invalid content. It cannot be null or empty.");
+                }
+                else if(creatorId == Guid.Empty)
+                {
+                    throw new Exception("Invalid creatorId. It cannot be null or empty.");
+                }
+
+                var _reply = await _replyService.CreateReplyAsync(threadId, creatorId, content, parentReplyId);
+                return Ok(_reply);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while creating reply \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while creating reply \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Updates a reply with content from request body based on the given reply ID.
+        /// </summary>
+        /// <param name="replyId">The ID of the reply to be updated.</param>
+        /// <param name="modifierId">The ID of the user editing the reply.</param>
         [HttpPut("{replyId}")]
-        public async Task<IActionResult> UpdateReply(long replyId, [FromBody] string content)
+        public async Task<IActionResult> UpdateReply(long replyId, Guid modifierId, [FromBody] string content)
         {
-            var reply = await _replyService.UpdateReplyAsync(replyId, content);
-            return Ok(reply);
+            try
+            {
+                //Validates the request data
+                if (replyId <= 0)
+                {
+                    throw new Exception("Invalid replyId. It should be greater than zero.");
+                }
+                else if (string.IsNullOrWhiteSpace(content))
+                {
+                    throw new Exception("Invalid content. It cannot be null or empty.");
+                }
+                else if (modifierId == Guid.Empty)
+                {
+                    throw new Exception("Invalid modifierId. It cannot be null or empty.");
+                }
+
+                var _reply = await _replyService.UpdateReplyAsync(replyId, modifierId, content);
+                return Ok(_reply);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while updating reply with ID = {replyId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while updating reply with ID = {replyId} \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Deletes a reply based on the given reply ID.
+        /// </summary>
+        /// <param name="replyId">The ID of the reply to be deleted.</param>
+        /// <param name="modifierId">The ID of the user deleting the reply.</param>
         [HttpDelete("{replyId}")]
-        public async Task<IActionResult> DeleteReply(long replyId)
+        public async Task<IActionResult> DeleteReply(long replyId, Guid modifierId)
         {
-            await _replyService.DeleteReplyAsync(replyId);
-            return NoContent();
+            try
+            {
+                //Validates the request data
+                if (replyId <= 0)
+                {
+                    throw new Exception("Invalid replyId. It should be greater than zero.");
+                }
+                else if (modifierId == Guid.Empty)
+                {
+                    throw new Exception("Invalid modifierId. It cannot be null or empty.");
+                }
+
+                var _reply = await _replyService.DeleteReplyAsync(replyId,modifierId);
+                return Ok(_reply);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while deleting reply with ID = {replyId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while deleting reply with ID = {replyId} \nError: {ex.Message}");
+            }
         }
 
-
-        //Http Get Method to get all the replies of a post in a nested manner
-        //We can get all the replies from a specific parent by providing the parentReplyId.
-        //ParentReplyId of the first reply is null
-
-        [HttpGet("getAllNestedRepliesOfaPost/{threadId}/{parentReplyId?}")]
+        // Http Get Method to get all the replies of a post in a nested manner.
+        // We can get all the replies from a specific parent by providing the parentReplyId.
+        // ParentReplyId of the first reply is null
+        [HttpGet("getAllNestedRepliesOfaPost/{threadId}")]
         public IActionResult GetAllRepliesOfAPost(long threadId, long? parentReplyId = null, int page = 1, int pageSize = 10)
         {
             if (parentReplyId.HasValue && parentReplyId < 1)

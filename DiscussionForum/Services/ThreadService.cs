@@ -113,7 +113,7 @@ namespace DiscussionForum.Services
 
         private Threads CreateThread(int communityCategoryMappingId, Guid creatorId, string content)
         {
-            Threads thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false , CreatedBy = creatorId, CreatedAt = DateTime.Now, ModifiedBy = creatorId, ModifiedAt = DateTime.Now};
+            Threads thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false , CreatedBy = creatorId, CreatedAt = DateTime.Now};
             _unitOfWork.Threads.Add(thread);
             _unitOfWork.Complete();
             return thread;

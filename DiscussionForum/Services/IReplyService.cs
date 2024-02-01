@@ -5,14 +5,46 @@ namespace DiscussionForum.Services
 {
     public interface IReplyService
     {
-        Task<IEnumerable<Reply>> GetRepliesFromDatabaseAsync();
+        /// <summary>
+        /// Retrieves all replies.
+        /// </summary>
         Task<IEnumerable<Reply>> GetAllRepliesAsync();
-        Task<Reply> GetReplyByIdAsync(long _replyID);
-        Task<IEnumerable<Reply>> GetRepliesByThreadIdAsync(long _threadID);
-        Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long _parentReplyID);
-        Task<Reply> CreateReplyAsync(long _threadID, long _parentReplyId, string _content);
-        Task<Reply> UpdateReplyAsync(long _replyID, string _content);
-        Task DeleteReplyAsync(long _replyID);
+        /// <summary>
+        /// Retrieves a reply based on the given reply ID.
+        /// </summary>
+        /// <param name="replyID">The ID to search for in replies.</param>
+        Task<Reply> GetReplyByIdAsync(long replyID);
+        /// <summary>
+        /// Retrieves a list of replies based on the given thread ID.
+        /// </summary>
+        /// <param name="threadID">The ID of the thread to search for in replies.</param>
+        Task<IEnumerable<Reply>> GetRepliesByThreadIdAsync(long threadID);
+        /// <summary>
+        /// Retrieves a list of replies based on the given parent reply ID.
+        /// </summary>
+        /// <param name="parentReplyID">The ID of the parent reply to search for in replies.</param>
+        Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long parentReplyID);
+        /// <summary>
+        /// Creates a new reply with content from request body.
+        /// </summary>
+        /// <param name="threadID">The ID of the thread to which reply is posted.</param>
+        /// <param name="parentReplyID">The ID of the reply to which reply is posted. May be null if not applicable.</param>
+        /// <param name="creatorID">The ID of the user posting the reply.</param>
+        /// <param name="content">The content of the reply.</param>
+        Task<Reply> CreateReplyAsync(long threadID, Guid creatorID, string content, long? parentReplyID);
+        /// <summary>
+        /// Updates a reply with content from request body based on the given reply ID.
+        /// </summary>
+        /// <param name="replyID">The ID of the reply to be updated.</param>
+        /// <param name="modifierID">The ID of the user editing the reply.</param>
+        /// <param name="content">The edited content of the reply.</param>
+        Task<Reply> UpdateReplyAsync(long replyID, Guid modifierID, string content);
+        /// <summary>
+        /// Deletes a reply based on the given reply ID.
+        /// </summary>
+        /// <param name="replyID">The ID of the reply to be deleted.</param>
+        /// <param name="modifierID">The ID of the user deleting the reply.</param>
+        Task<Reply> DeleteReplyAsync(long replyID, Guid modifierID);
         IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10);
 
     }
