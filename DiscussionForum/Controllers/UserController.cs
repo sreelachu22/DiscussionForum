@@ -50,14 +50,21 @@ namespace DiscussionForum.Controllers
         [HttpGet("{UserId}")]
         public async Task<IActionResult> GetUserById(Guid UserId)
         {
-            var userExists = await _userService.GetUserByIDAsync(UserId);
+            try
+            {
+                var userExists = await _userService.GetUserByIDAsync(UserId);
 
-            if (userExists == null)
-                return NotFound();
+                if (userExists == null)
+                    return NotFound();
 
-            return Ok(userExists);
-
+                return Ok(userExists);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
+
 
 
         /* edit single user role*/

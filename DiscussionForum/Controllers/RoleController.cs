@@ -18,21 +18,40 @@ namespace DiscussionForum.Controllers
 
         /* get all roles*/
         [HttpGet]
-        public async Task<IActionResult> GetRoles() {
-            var roles = await _roleService.GetAllRoles();
-            return Ok(roles);
+        public async Task<IActionResult> GetRoles()
+        {
+            try
+            {
+                var roles = await _roleService.GetAllRoles();
+                return Ok(roles);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in GetRoles: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         /* get single role*/
         [HttpGet("{RoleID}")]
         public async Task<IActionResult> GetRoleByID(int RoleID)
         {
-            var role= await _roleService.GetRoleByID(RoleID);
-            if (role == null) { 
-                return NotFound();
+            try
+            {
+                var role = await _roleService.GetRoleByID(RoleID);
+                if (role == null)
+                {
+                    return NotFound();
+                }
+                return Ok(role);
             }
-            return Ok(role);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in GetRoleByID: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
+
 
     }
 }
