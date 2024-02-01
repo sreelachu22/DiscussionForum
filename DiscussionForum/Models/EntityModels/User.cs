@@ -29,13 +29,13 @@ namespace DiscussionForum.Models.EntityModels
 
         public bool IsDeleted { get; set; }
 
-        public Guid CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
 
         public virtual User CreatedByUser { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public Guid ModifiedBy { get; set; }
+        public Guid? ModifiedBy { get; set; }
 
         public virtual User ModifiedByUser { get; set; }
 
