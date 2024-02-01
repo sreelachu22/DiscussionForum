@@ -18,7 +18,12 @@ using System.Threading.Tasks;
 
 namespace DiscussionForum.Services
 {
+    using Azure;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.SqlServer.Server;
+
+    using System.Data;
+
     public class UserService : IUserService
     {
         private readonly AppDbContext _userContext;
@@ -94,10 +99,15 @@ namespace DiscussionForum.Services
                 throw;
             }
         }
-
-
-
-        /* get single user details*/
+        
+        
+        
+        /*GetUserByIDAsync retrieves user details for a specified UserId, 
+          including associated department, designation, and role.The method uses 
+          a combination of LINQ operations and normal queries to fetch the user 
+          and determine their role. If the user doesn't exist, it returns null. 
+          The method takes UserId as an input parameter and returns a SingleUserDTO.
+          In case of an error, it throws a custom exception.*/
         public async Task<SingleUserDTO> GetUserByIDAsync(Guid UserId)
         {
             try
@@ -105,9 +115,9 @@ namespace DiscussionForum.Services
 
                 /* user exists?*/
                 var user = await _userContext.Users
-                    .Include(u => u.Department)
-                    .Include(u => u.Designation)
-                    .FirstOrDefaultAsync(u => u.UserID == UserId);
+                .Include(u => u.Department)
+                .Include(u => u.Designation)
+                .FirstOrDefaultAsync(u => u.UserID == UserId);
 
                 if (user == null)
                 {
@@ -147,8 +157,11 @@ namespace DiscussionForum.Services
         }
 
 
-        /* edit single user role*/
 
+        /*PutUserByIDAsync updates a user's role identified by userId, given that the admin user (adminId)
+         * has the necessary privileges. The method validates users, roles, and privileges before updating
+         * the role mapping. It returns success messages or error messages, such as "Success," "User not found,"
+         * "Invalid role ID," or "Insufficient privileges."*/
         public async Task<String> PutUserByIDAsync(Guid userId, int roleID, Guid adminId)
         {
             try
