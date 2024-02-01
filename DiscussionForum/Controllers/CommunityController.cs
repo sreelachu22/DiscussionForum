@@ -16,23 +16,13 @@ namespace DiscussionForum.Controllers
             _communityservice = communityService;
         }
 
+        //Get all communities
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
             var roles = await _communityservice.GetAllCommunities();
             return Ok(roles);
-        }
-
-        /*[HttpGet("{RoleID}")]
-        public async Task<IActionResult> GetRoleByID(int RoleID)
-        {
-            var role = await _roleService.GetRoleByID(RoleID);
-            if (role == null)
-            {
-                return NotFound();
-            }
-            return Ok(role);
-        }*/
+        } 
 
     }
 }

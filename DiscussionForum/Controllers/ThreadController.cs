@@ -68,42 +68,54 @@ namespace DiscussionForum.Controllers
             
         }
 
+
+        /// <summary>
+        /// Searches for threads based on the entered search term in the "Content" column.
+        /// </summary>
+        /// <param name="searchTerm">The term to search for in reply content.</param>
         [HttpGet("SearchThreads")]
         public async Task<IActionResult> SearchThread(string searchTerm)
         {
-            if (string.IsNullOrEmpty(searchTerm))
+            try
             {
-                return BadRequest("Search term cannot be empty");
-            }
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return BadRequest("Search term cannot be empty");
+                }
 
-            IEnumerable<Threads> sampleData = await _threadService.GetThreadsFromDatabaseAsync();
+                IEnumerable<Threads> sampleData = await _threadService.GetThreadsFromDatabaseAsync();
 
-            // Split the search term into individual words
-            var searchTermsArray = searchTerm.Split(' ');
+                // Split the search term into individual words
+                var searchTermsArray = searchTerm.Split(' ');
 
-            // Create a list to store the filtered threads
-            var filteredThreads = new List<Threads>();
+                // Create a list to store the filtered threads
+                var filteredThreads = new List<Threads>();
 
-            // Iterate through each search term
-            foreach (var term in searchTermsArray)
-            {
-                // Filtering based on a search term
-                var termFilteredData = sampleData
-                    .Where(thread => thread.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                foreach (var term in searchTermsArray)
+                {
+                    // Filtering based on a search term
+                    var termFilteredData = sampleData
+                        .Where(thread => thread.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                        .ToList();
+
+                    // Add the filtered threads to the result list
+                    filteredThreads.AddRange(termFilteredData);
+                }
+
+                // Remove duplicate threads based on threadID
+                var uniqueThreads = filteredThreads
+                    .GroupBy(thread => thread.ThreadID)
+                    .Select(group => group.First())
                     .ToList();
 
-                // Add the filtered threads to the result list
-                filteredThreads.AddRange(termFilteredData);
+                // Return the filtered data.
+                return Ok(uniqueThreads);
             }
-
-            // Remove duplicate threads based on threadID
-            var uniqueThreads = filteredThreads
-                .GroupBy(thread => thread.ThreadID)
-                .Select(group => group.First())
-                .ToList();
-
-            // Further processing or returning the filtered data.
-            return Ok(uniqueThreads);
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
 
     }
