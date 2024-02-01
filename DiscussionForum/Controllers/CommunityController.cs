@@ -9,11 +9,11 @@ namespace DiscussionForum.Controllers
     [EnableCors("AllowAngularDev")]
     public class CommunityController : ControllerBase
     {
-        private readonly ICommunityService _communityservice;
+        private readonly ICommunityService _communityService;
 
         public CommunityController(ICommunityService communityService)
         {
-            _communityservice = communityService;
+            _communityService = communityService;
         }
 
         [HttpGet]
@@ -24,4 +24,5 @@ namespace DiscussionForum.Controllers
         }
 
     }
+
 }

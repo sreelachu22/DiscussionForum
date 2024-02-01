@@ -20,12 +20,19 @@ namespace DiscussionForum.Services
 
         public async Task<IEnumerable<CommunityCategory>> GetCommunityCategoriesAsync()
         {
-            var communityCategories = _unitOfWork.CommunityCategory
-        .GetAll()
-        .Where(cc => !cc.IsDeleted)
-        .ToList();
+            try
+            {
+                var communityCategories = _unitOfWork.CommunityCategory
+            .GetAll()
+            .Where(cc => !cc.IsDeleted)
+            .ToList();
 
-            return await Task.FromResult(communityCategories);
+                return await Task.FromResult(communityCategories);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in GetCommunityCategoriesAsync: {ex.Message}", ex);
+            }
         }
 
         public async Task<CommunityCategory> GetCommunityCategoryByIdAsync(long id)
@@ -97,6 +104,7 @@ namespace DiscussionForum.Services
             }
         }
 
+        //Soft delete - update the isDeleted to true.
         private CommunityCategory DeleteCategory(long communityCategoryId)
         {
             var communityCategory = _context.CommunityCategories.Find(communityCategoryId);

@@ -14,9 +14,9 @@ namespace DiscussionForum.Models.EntityModels
         public string CommunityCategoryName { get; set; }
         public bool IsDeleted { get; set; }
 
+        // Constructor set default value as false for isDeleted.
         public CommunityCategory()
         {
-            // Set default values in the constructor
             IsDeleted = false;
         }
     }

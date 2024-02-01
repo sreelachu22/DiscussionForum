@@ -3,46 +3,36 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.ComponentModel.DataAnnotations.Schema;
 using DiscussionForum.Models.APIModels;
+
 namespace DiscussionForum.Data
 {
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+        // Define DbSet for each entity
         public DbSet<Designation> Designations { get; set; }
-
         public DbSet<Department> Departments { get; set; }
-
         public DbSet<Role> Roles { get; set; }
-
         public DbSet<CommunityStatus> CommunityStatus { get; set; }
-
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
-
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
-
         public DbSet<User> Users { get; set; }
-
         public DbSet<Threads> Threads { get; set; }
-
         public DbSet<ThreadVote> ThreadVotes { get; set; }
-
         public DbSet<Community> Communities { get; set; }
-
         public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }
-
         public DbSet<Notice> Notices { get; set; }
-
         public DbSet<Reply> Replies { get; set; }
-
         public DbSet<UserRoleMapping> UserRoleMapping { get; set; }
-
         public DbSet<Tag> Tags { get; set; }
-
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure relationships and delete behaviors
+
+            // Relationships for Threads entity
             modelBuilder.Entity<Threads>()
                 .HasOne(t => t.CommunityCategoryMapping)
                 .WithOne()
@@ -73,6 +63,7 @@ namespace DiscussionForum.Data
                 .HasForeignKey(tv => tv.ThreadID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Relationships for ThreadVote entity
             modelBuilder.Entity<ThreadVote>()
                 .HasOne(tv => tv.CreatedByUser)
                 .WithMany(tv => tv.ThreadVotesCreatedBy)
@@ -85,10 +76,7 @@ namespace DiscussionForum.Data
                 .HasForeignKey(tv => tv.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
-
-
+            // Relationships for UserRoleMapping entity
             modelBuilder.Entity<UserRoleMapping>()
                 .HasOne(ur => ur.CreatedByUser)
                 .WithMany()
@@ -101,10 +89,7 @@ namespace DiscussionForum.Data
                 .HasForeignKey(ur => ur.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
-
-            // Configure CreatedByUser relationship
+            // Relationships for User entity
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
@@ -117,6 +102,7 @@ namespace DiscussionForum.Data
                 .HasForeignKey<User>(u => u.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Relationships for CommunityCategoryMapping entity
             modelBuilder.Entity<CommunityCategoryMapping>()
                 .HasOne(ccm => ccm.CreatedByUser)
                 .WithMany()
@@ -129,6 +115,7 @@ namespace DiscussionForum.Data
                 .HasForeignKey(ccm => ccm.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Relationships for Community entity
             modelBuilder.Entity<Community>()
                 .HasOne(c => c.CreatedByUser)
                 .WithMany()
@@ -144,6 +131,4 @@ namespace DiscussionForum.Data
             base.OnModelCreating(modelBuilder);
         }
     }
-
 }
-

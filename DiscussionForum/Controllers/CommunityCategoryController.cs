@@ -2,6 +2,7 @@
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,51 +20,100 @@ namespace DiscussionForum.Controllers
             _communityCategoryService = communityCategoryService;
         }
 
+        // Get all categories in the discussion forum (created by super admin.
+        // Community head will use these categories inside the community for community-category mapping.
+
         [HttpGet]
         public async Task<IActionResult> GetCommunityCategories()
         {
-            var communityCategories = await _communityCategoryService.GetCommunityCategoriesAsync();
-            return Ok(communityCategories);
+            try
+            {
+                var communityCategories = await _communityCategoryService.GetCommunityCategoriesAsync();
+                return Ok(communityCategories);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal Server Error");
+            }
         }
+
+        // GetByID
 
         [HttpGet("{communityCategoryId}")]
         public async Task<IActionResult> GetCommunityCategoryById(long communityCategoryId)
         {
-            var communityCategory = await _communityCategoryService.GetCommunityCategoryByIdAsync(communityCategoryId);
+            try
+            {
+                var communityCategory = await _communityCategoryService.GetCommunityCategoryByIdAsync(communityCategoryId);
 
-            if (communityCategory == null)
-                return NotFound();
+                if (communityCategory == null)
+                    return NotFound();
 
-            return Ok(communityCategory);
+                return Ok(communityCategory);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal Server Error");
+            }
         }
+
+        // Post
 
         [HttpPost("{communityCategoryName}")]
         public async Task<IActionResult> CreateCommunityCategory(string communityCategoryName)
         {
-            var communityCategory = await _communityCategoryService.CreateCommunityCategoryAsync(communityCategoryName);
-            return Ok(communityCategory);
+            try
+            {
+                var communityCategory = await _communityCategoryService.CreateCommunityCategoryAsync(communityCategoryName);
+                return Ok(communityCategory);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal Server Error");
+            }
         }
+
+        // Put
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCommunityCategory(long id, [FromBody] CommunityCategory communityCategoryDto)
         {
-            var updatedCommunityCategory = await _communityCategoryService.UpdateCommunityCategoryAsync(id, communityCategoryDto);
+            try
+            {
+                var updatedCommunityCategory = await _communityCategoryService.UpdateCommunityCategoryAsync(id, communityCategoryDto);
 
-            if (updatedCommunityCategory == null)
-                return NotFound();
+                if (updatedCommunityCategory == null)
+                    return NotFound();
 
-            return Ok(updatedCommunityCategory);
+                return Ok(updatedCommunityCategory);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         [HttpDelete("{communityCategoryId}")]
         public async Task<IActionResult> DeleteCommunityCategory(long communityCategoryId)
         {
-            var deletedCommunityCategory = await _communityCategoryService.DeleteCommunityCategoryAsync(communityCategoryId);
+            try
+            {
+                var deletedCommunityCategory = await _communityCategoryService.DeleteCommunityCategoryAsync(communityCategoryId);
 
-            if (deletedCommunityCategory == null)
-                return NotFound();
+                if (deletedCommunityCategory == null)
+                    return NotFound();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }
