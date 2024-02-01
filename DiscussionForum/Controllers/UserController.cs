@@ -27,7 +27,7 @@ namespace DiscussionForum.Controllers
         //limit is to specify the number of users needed to show in a page
 
         [HttpGet("GetAllUsersWithPagination")]
-        public async Task<IActionResult> GetAllUsers(string term, string sort, int page = 1, int limit = 10)
+        public async Task<IActionResult> GetAllUsers(string term = "", string sort = "name", int page = 1, int limit = 10)
         {
             try
             {

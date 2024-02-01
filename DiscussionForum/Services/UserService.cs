@@ -2,19 +2,8 @@
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using System.Text;
 using System.Linq.Dynamic.Core;
-
-using DiscussionForum.Repositories;
-
-using DiscussionForum.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-
-
 
 namespace DiscussionForum.Services
 {
@@ -46,14 +35,28 @@ namespace DiscussionForum.Services
             {
                 // Normalize and clean up the search term
                 term = string.IsNullOrWhiteSpace(term) ? null : term.Trim().ToLower();
-
                 // Build the initial query based on search term
-                var usersQuery = _userContext.Users
-                    .Where(u =>
-                        string.IsNullOrWhiteSpace(term) ||
-                        u.Name.ToLower().Contains(term)
-                        /*u.Email.ToLower().Contains(term)*/
+                /*var usersQuery = _userContext.Users
+                .Where(u =>
+                    (string.IsNullOrWhiteSpace(term) &&
+                    u.Name.ToLower() != "system user" || u.Name.ToLower().Contains(term))
+                );*/
+                IQueryable<User> usersQuery;
+
+                if (string.IsNullOrWhiteSpace(term))
+                {
+                    // Display all users if term is null or whitespace
+                    usersQuery = _userContext.Users.Where(u =>
+                         u.Name.ToLower() != "system user"
+                     );
+                }
+                else
+                {
+                    // Get users containing the value in term
+                    usersQuery = _userContext.Users.Where(u =>
+                        u.Name.ToLower() != "system user" && u.Name.ToLower().Contains(term)
                     );
+                }
 
                 // Apply sorting if specified
                 if (!string.IsNullOrWhiteSpace(sort))
@@ -84,13 +87,13 @@ namespace DiscussionForum.Services
                         usersQuery = usersQuery.OrderBy(u => u.UserID);
                     }
                 }
-                
+
                 var totalCount = await usersQuery.CountAsync();
-                
+
                 var totalPages = (int)Math.Ceiling((double)totalCount / limit);
-                
+
                 var pagedUsers = await usersQuery.Skip((page - 1) * limit).Take(limit).ToListAsync();
-                
+
                 return new PagedUserResult
                 {
                     Users = pagedUsers,
@@ -99,12 +102,12 @@ namespace DiscussionForum.Services
                 };
             }
             catch (DbException ex)
-            {                
+            {
                 Console.WriteLine($"Database error occurred: {ex.Message}");
                 throw;
             }
             catch (Exception ex)
-            {                
+            {
                 Console.WriteLine($"An unexpected error occurred: {ex.Message}");
                 throw;
             }
@@ -201,7 +204,8 @@ namespace DiscussionForum.Services
 
 
                 //Admin cant change his role
-                if (adminId == userId) {
+                if (adminId == userId)
+                {
                     return ("Not allowed");
                 }
 
@@ -265,4 +269,3 @@ namespace DiscussionForum.Services
 
 
 }
-
