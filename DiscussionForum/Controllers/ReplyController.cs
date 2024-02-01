@@ -206,7 +206,7 @@ namespace DiscussionForum.Controllers
         /// <param name="parentReplyId">The ID of the reply to which reply is posted. May be null if not applicable.</param>
         /// <param name="creatorId">The ID of the user posting the reply.</param>
         [HttpPost("{threadId}")]
-        public async Task<IActionResult> CreateReply(long threadId, Guid creatorId, [FromBody] string content, long? parentReplyId)
+        public async Task<IActionResult> CreateReply(long threadId, Guid creatorId, [FromBody] string content, long? parentReplyId = null)
         {
             try
             {
