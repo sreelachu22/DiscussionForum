@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.ComponentModel.DataAnnotations.Schema;
+using DiscussionForum.Models.APIModels;
 namespace DiscussionForum.Data
 {
     public class AppDbContext : DbContext
@@ -69,7 +70,7 @@ namespace DiscussionForum.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Threads>()
-                .HasMany(t => t.ThreadVotes) 
+                .HasMany(t => t.ThreadVotes)
                 .WithOne(tv => tv.Thread)
                 .HasForeignKey(tv => tv.ThreadID)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -93,13 +94,13 @@ namespace DiscussionForum.Data
             modelBuilder.Entity<UserRoleMapping>()
                 .HasOne(ur => ur.CreatedByUser)
                 .WithMany()
-                .HasForeignKey(ur => ur.CreatedBy)  
+                .HasForeignKey(ur => ur.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserRoleMapping>()
                 .HasOne(ur => ur.ModifiedByUser)
                 .WithMany()
-                .HasForeignKey(ur => ur.ModifiedBy)  
+                .HasForeignKey(ur => ur.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -109,7 +110,7 @@ namespace DiscussionForum.Data
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
-                .HasForeignKey<User>(u => u.CreatedBy) 
+                .HasForeignKey<User>(u => u.CreatedBy)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()

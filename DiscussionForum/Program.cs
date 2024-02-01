@@ -2,6 +2,7 @@ using DiscussionForum.Data;
 using DiscussionForum.Services;
 using DiscussionForum.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +35,11 @@ builder.Services.AddScoped<IReplyService, ReplyService>();
 
 builder.Services.AddControllers();
 
-
+/*builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    });*/
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
