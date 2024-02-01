@@ -19,7 +19,7 @@ namespace DiscussionForum.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
-            var communities = await _communityservice.GetAllCommunitiesAsync();
+            var communities = await _communityService.GetAllCommunitiesAsync();
             return Ok(communities);
         }
 
