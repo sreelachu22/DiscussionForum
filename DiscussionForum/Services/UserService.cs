@@ -95,12 +95,15 @@ namespace DiscussionForum.Services
             }
         }
 
+
+
+        /* get single user details*/
         public async Task<SingleUserDTO> GetUserByIDAsync(Guid UserId)
         {
             try
             {
-                
 
+                /* user exists?*/
                 var user = await _userContext.Users
                     .Include(u => u.Department)
                     .Include(u => u.Designation)
@@ -111,11 +114,13 @@ namespace DiscussionForum.Services
                     return null;
                 }
 
-               /* var roleName = (from rm in _userContext.UserRoleMapping
-                                join r in _userContext.Roles on rm.RoleID equals r.RoleID
-                                where rm.UserID == UserId
-                                select r.RoleName)
-                                .FirstOrDefault();*/
+                /* linq operation and normal opertation for geting rolename*/
+
+                /* var roleName = (from rm in _userContext.UserRoleMapping
+                                 join r in _userContext.Roles on rm.RoleID equals r.RoleID
+                                 where rm.UserID == UserId
+                                 select r.RoleName)
+                                 .FirstOrDefault();*/
 
                 var roleName = _userContext.UserRoleMapping
                                 .Where(rm => rm.UserID == UserId)
@@ -141,6 +146,8 @@ namespace DiscussionForum.Services
             }
         }
 
+
+        /* edit single user role*/
 
         public async Task<String> PutUserByIDAsync(Guid userId, int roleID, Guid adminId)
         {
@@ -179,7 +186,7 @@ namespace DiscussionForum.Services
                 }
 
                 // Check if the provided role ID exists in the Roles table and is either 1 or 2
-                var roleExists = await _userContext.Roles.AnyAsync(r => r.RoleID == roleID && (r.RoleID == 1 || r.RoleID == 2));
+                var roleExists = await _userContext.Roles.AnyAsync(r => r.RoleID == roleID && (r.RoleID == 2 || r.RoleID == 3));
 
                 if (!roleExists)
                 {

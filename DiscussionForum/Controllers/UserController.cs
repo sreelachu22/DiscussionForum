@@ -32,7 +32,7 @@ namespace DiscussionForum.Controllers
         }
 
 
-
+       /* get single user*/
         [HttpGet("{UserId}")]
         public async Task<IActionResult> GetUserById(Guid UserId)
         {
@@ -45,6 +45,8 @@ namespace DiscussionForum.Controllers
 
         }
 
+
+        /* edit single user role*/
         [HttpPut("{UserId}")]
         public async Task<IActionResult> PutUserByIDAsync(Guid UserId,int RoleID,Guid AdminID)
         {
