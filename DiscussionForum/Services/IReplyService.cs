@@ -13,7 +13,7 @@ namespace DiscussionForum.Services
         Task<Reply> CreateReplyAsync(long _threadID, long _parentReplyId, string _content);
         Task<Reply> UpdateReplyAsync(long _replyID, string _content);
         Task DeleteReplyAsync(long _replyID);
-        IQueryable<ReplyDTO> GetAllRepliesOfAPost(long postId, long? parentReplyId, int page = 1, int pageSize = 10);
+        IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10);
 
     }
 }

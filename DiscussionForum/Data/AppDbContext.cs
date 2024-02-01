@@ -41,8 +41,6 @@ namespace DiscussionForum.Data
 
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
 
-        public DbSet<ThreadVote> ThreadVotes { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Threads>()

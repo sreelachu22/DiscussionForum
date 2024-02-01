@@ -3,14 +3,14 @@ using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 
 namespace DiscussionForum.Services
-{
+{    
     public class CommunityStatusService : ICommunityStatusService
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CommunityStatusService(IUnitOfWork unitOfWork, AppDbContext context)
+        public CommunityStatusService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
         public async Task<IEnumerable<CommunityStatus>> GetCommunityStatusAsync()
@@ -23,4 +23,5 @@ namespace DiscussionForum.Services
             return await Task.FromResult(_unitOfWork.CommunityStatus.GetById(id));
         }
     }
+
 }
