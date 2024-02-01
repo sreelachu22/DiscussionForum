@@ -88,7 +88,6 @@ namespace DiscussionForum.Services
                 .Take(5)
                 .Select(kv => kv.Key)
                 .ToList();
-            Console.WriteLine(topCategoryIDs);
             foreach (var categoryID in topCategoryIDs)
             {
                 _topCategories.AddRange(_context.CommunityCategories
