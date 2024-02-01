@@ -29,8 +29,8 @@ namespace DiscussionForum.Controllers
                 var ThreadStatus = await _threadStatusService.GetThreadStatusByIdAsync(id);
                 if (ThreadStatus == null)
                 {
-                    return NotFound();
-                }
+                    return NotFound(); // If the retrieved thread status is null, return an HTTP 404 Not Found response.
+            }
                 return Ok(ThreadStatus);
             }
         }

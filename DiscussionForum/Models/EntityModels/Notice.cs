@@ -12,11 +12,14 @@ namespace DiscussionForum.Models.EntityModels
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int NoticeID { get; set; }
 
+        [Required(ErrorMessage = "CommunityID is required.")]
         public int CommunityID { get; set; }
 
         [Required(ErrorMessage = "Notice Title is required.")]
+        [StringLength(255, ErrorMessage = "Title cannot exceed 255 characters.")]
         public string Title { get; set; }
 
+        [Required(ErrorMessage = "Content is required.")]
         public string Content { get; set; }
 
         public DateTime? ExpiresAt { get; set; }

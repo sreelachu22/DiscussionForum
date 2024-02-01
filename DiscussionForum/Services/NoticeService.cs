@@ -14,17 +14,20 @@ namespace DiscussionForum.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDbContext _context;
 
+        // NoticeService: A service class for handling CRUD operations related to notices.
+
+        // Constructor: Initializes the NoticeService with the required dependencies.
+        // - _unitOfWork: Unit of work for managing database transactions.
+        // - _context: DbContext for database operations.
+
         public NoticeService(IUnitOfWork unitOfWork, AppDbContext context)
         {
             _unitOfWork = unitOfWork;
             _context = context;
         }
 
-        /*public async Task<IEnumerable<Notice>> GetNoticesAsync()
-        {
-            return await Task.FromResult(_unitOfWork.Notice.GetAll(notice => !notice.IsDeleted));
-        }*/
-
+        // GetNoticesAsync: Retrieves active notices asynchronously, filtering out deleted notices and those with expired dates.
+        // - Returns: A collection of active notices.
         public async Task<IEnumerable<Notice>> GetNoticesAsync()
         {
             DateTime currentDate = DateTime.Now;
@@ -35,7 +38,9 @@ namespace DiscussionForum.Services
             ));
         }
 
-
+        // CreateNoticeAsync: Creates a new notice asynchronously.
+        // - Parameters: Community ID, title, content, expiration date, creator ID.
+        // - Returns: The created notice.
         public async Task<Notice> CreateNoticeAsync(int communityId, string title, string content, DateTime? expiresAt, Guid createdBy)
         {
             try
@@ -48,6 +53,9 @@ namespace DiscussionForum.Services
             }
         }
 
+        // CreateNotice: Helper method to create a notice synchronously.
+        // - Parameters: Community ID, title, content, expiration date, creator ID.
+        // - Returns: The created notice.
         private Notice CreateNotice(int communityId, string title, string content, DateTime? expiresAt, Guid createdBy)
         {
             Notice notice = new Notice
@@ -66,10 +74,9 @@ namespace DiscussionForum.Services
             return notice;
         }
 
-
-
-
-
+        // UpdateNoticeAsync: Updates an existing notice asynchronously.
+        // - Parameters: Notice ID, community ID, title, content, expiration date, modifier ID.
+        // - Returns: The updated notice.
         public async Task<Notice> UpdateNoticeAsync(int id, int communityId, string title, string content, DateTime? expiresAt, Guid modifiedBy)
         {
             try
@@ -82,6 +89,10 @@ namespace DiscussionForum.Services
             }
         }
 
+        // UpdateNotice: Helper method to update a notice synchronously.
+        // - Parameters: Notice ID, community ID, title, content, expiration date, modifier ID.
+        // - Sets isDeleted as false and the current datetime as ModifiedAt
+        // Returns: The updated notice.
         private Notice UpdateNotice(int id, int communityId, string title, string content, DateTime? expiresAt, Guid modifiedBy)
         {
             var existingNotice = _context.Notices.Find(id);
@@ -106,9 +117,9 @@ namespace DiscussionForum.Services
             }
         }
 
-
-
-
+        // DeleteNoticeAsync: Deletes a notice asynchronously by marking it as deleted.
+        // - Parameters: Notice ID.
+        // - Returns: The deleted notice.
         public async Task<Notice> DeleteNoticeAsync(int id)
         {
             try
@@ -122,6 +133,9 @@ namespace DiscussionForum.Services
             }
         }
 
+        // DeleteNotice: Helper method to delete a notice synchronously by marking it as deleted.
+        // - Parameters: Notice ID.
+        // - Returns: The deleted notice.
         private Notice DeleteNotice(int id)
         {
             var notice = _context.Notices.Find(id);
