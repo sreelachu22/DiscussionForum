@@ -35,7 +35,7 @@ namespace DiscussionForum.Models.EntityModels
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public Guid ModifiedBy { get; set; }
+        public Guid? ModifiedBy { get; set; }
 
         public virtual User ModifiedByUser { get; set; }
 

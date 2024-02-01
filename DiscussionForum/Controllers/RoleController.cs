@@ -16,12 +16,14 @@ namespace DiscussionForum.Controllers
             _roleService = roleService;
         }
 
+        /* get all roles*/
         [HttpGet]
         public async Task<IActionResult> GetRoles() {
             var roles = await _roleService.GetAllRoles();
             return Ok(roles);
         }
 
+        /* get single role*/
         [HttpGet("{RoleID}")]
         public async Task<IActionResult> GetRoleByID(int RoleID)
         {
