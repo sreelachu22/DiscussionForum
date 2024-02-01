@@ -170,53 +170,74 @@ namespace DiscussionForum.Services
                 _context.SaveChanges();
             }
         }
-        public IQueryable<ReplyDTO> GetAllRepliesOfAPost(long postId, long? parentReplyId, int page = 1, int pageSize = 10)
+
+        //Returns the all the replies of a post with the option to paginate
+        //The nested replies of a reply is recursively added into the NestedReplies list of the ReplyDTO object
+        //It take the threadId of the post to fetch replies. The replies will be starting from the parentReplyId provided
+        public IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10)
         {
-            // to validate my pages
-            page = page < 1 ? 1 : page;
-            pageSize = pageSize < 1 ? 10 : pageSize;
-
-            // to get the replies from the database
-            var query = _context.Replies
-                .Include(r => r.Thread)
-                .Include(r => r.ParentReply)
-                .Where(r => r.ThreadID == postId && r.ParentReplyID == parentReplyId);
-
-            // for pagination
-            var replies = query.ToList().Skip((page - 1) * pageSize).Take(pageSize);
-
-            var replyDTOs = replies.Select(r => new ReplyDTO
+            try
             {
-                ReplyID = r.ReplyID,
-                ThreadID = r.ThreadID,
-                ParentReplyID = r.ParentReplyID,
-                Content = r.Content,
-                NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
-            });
+                // Ensure page and pageSize are valid
+                page = Math.Max(1, page);
+                pageSize = Math.Max(1, pageSize);
 
-            return replyDTOs.AsQueryable();
+                var query = _context.Replies
+                    .Include(r => r.Thread)
+                    .Include(r => r.ParentReply)
+                    .Where(r => r.ThreadID == threadId && r.ParentReplyID == parentReplyId);
+
+                // Perform pagination on the retrieved replies
+                var replies = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+                // Map the Reply entities to ReplyDTO objects
+                var replyDTOs = replies.Select(r => new ReplyDTO
+                {
+                    ReplyID = r.ReplyID,
+                    ThreadID = r.ThreadID,
+                    ParentReplyID = r.ParentReplyID,
+                    Content = r.Content,
+                    NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
+                });
+
+                return replyDTOs.AsQueryable();
+            }
+            catch (Exception ex)
+            {                
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw;
+            }
         }
 
+        // Recursive method to retrieve nested replies for a given replyId
         static List<ReplyDTO> GetNestedReplies(List<Reply> replies, long replyId)
         {
-            var nestedReplies = new List<ReplyDTO>();
-
-            foreach (var reply in replies.Where(r => r.ParentReplyID == replyId))
+            try
             {
-                var replyDTO = new ReplyDTO
-                {
-                    ReplyID = reply.ReplyID,
-                    ThreadID = reply.ThreadID,
-                    ParentReplyID = reply.ParentReplyID,
-                    Content = reply.Content,
-                    NestedReplies = GetNestedReplies(replies, reply.ReplyID)
-                };
-
-                nestedReplies.Add(replyDTO);
+                // Filter the list of replies to find those with the specified replyId as ParentReplyID
+                var nestedReplies = replies
+                    .Where(r => r.ParentReplyID == replyId)
+                    .Select(reply => new ReplyDTO
+                    {
+                        // Map each nested reply to a new ReplyDTO object
+                        ReplyID = reply.ReplyID,
+                        ThreadID = reply.ThreadID,
+                        ParentReplyID = reply.ParentReplyID,
+                        Content = reply.Content,
+                        // Recursively call GetNestedReplies to retrieve nested replies of the current reply
+                        NestedReplies = GetNestedReplies(replies, reply.ReplyID)
+                    })
+                    .ToList();                
+                return nestedReplies;
             }
-
-            return nestedReplies;
+            catch (Exception ex)
+            {                
+                Console.WriteLine($"An error occurred while getting nested replies: {ex.Message}");
+                throw;
+            }
         }
+
+
 
     }
 }

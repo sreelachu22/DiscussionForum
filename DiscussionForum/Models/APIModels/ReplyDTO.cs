@@ -6,6 +6,8 @@ using DiscussionForum.Models.EntityModels;
 
 namespace DiscussionForum.Models.APIModels
 {
+    //DTO for generating all the replies of a thread in a nested reply manner.
+    //Each reply will have its child replies stored in NestedReplies list.
     public class ReplyDTO
     {
         [Key]

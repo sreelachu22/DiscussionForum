@@ -117,8 +117,13 @@ namespace DiscussionForum.Controllers
             return NoContent();
         }
 
-        [HttpGet("getallrepliesofapost/{postId}/{parentReplyId?}")]
-        public IActionResult GetAllRepliesOfAPost(long postId, long? parentReplyId = null, int page = 1, int pageSize = 10)
+
+        //Http Get Method to get all the replies of a post in a nested manner
+        //We can get all the replies from a specific parent by providing the parentReplyId.
+        //ParentReplyId of the first reply is null
+
+        [HttpGet("getAllNestedRepliesOfaPost/{threadId}/{parentReplyId?}")]
+        public IActionResult GetAllRepliesOfAPost(long threadId, long? parentReplyId = null, int page = 1, int pageSize = 10)
         {
             if (parentReplyId.HasValue && parentReplyId < 1)
             {
@@ -127,18 +132,20 @@ namespace DiscussionForum.Controllers
 
             try
             {
-                var replies = _replyService.GetAllRepliesOfAPost(postId, parentReplyId, page, pageSize);
+                var replies = _replyService.GetAllRepliesOfAPost(threadId, parentReplyId, page, pageSize);
 
-                if (!replies.Any())
-                    return NotFound();
+                if (replies.Any())
+                {
+                    return Ok(replies);
+                }
 
-                return Ok(replies);
+                return NotFound();
             }
             catch (Exception ex)
             {
-                // Log the exception
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
+
     }
 }

@@ -43,7 +43,7 @@ namespace DiscussionForum.Controllers
 
                 if (communityStatus == null)
                 {
-                    return NotFound(); // Return 404 if the resource is not found.
+                    return NotFound();
                 }
 
                 return Ok(communityStatus);
