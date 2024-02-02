@@ -166,7 +166,7 @@ namespace DiscussionForum.Services
                     _context.SaveChanges();
                     return _reply;
                 }
-                //Checks if the designation is valid but deleted
+                //Checks if the reply is valid but deleted
                 else if (_reply != null && _reply.IsDeleted)
                 {
                     throw new Exception("Reply has been deleted.");
@@ -201,7 +201,7 @@ namespace DiscussionForum.Services
                     _context.SaveChanges();
                     return _reply;
                 }
-                //Checks if the designation is valid but deleted
+                //Checks if the reply is valid but deleted
                 else if (_reply != null && _reply.IsDeleted)
                 {
                     throw new Exception("Reply already deleted.");

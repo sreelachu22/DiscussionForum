@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Threading;
 using System;
+using System.Reflection.Metadata;
 
 namespace DiscussionForum.Services
 {
@@ -102,75 +103,113 @@ namespace DiscussionForum.Services
         {
             try
             {
+                var _communityCategoryMapping = await Task.FromResult(_context.CommunityCategoryMapping.Find(communityCategoryMappingId));
+                var _creator = await Task.FromResult(_context.Users.Find(creatorId));
+                //Checks if the community category is valid
+                if (_communityCategoryMapping == null)
+                {
+                    throw new Exception("Community category mapping not found");
+                }
+                //Checks if the creator is valid
+                else if (_creator == null)
+                {
+                    throw new Exception("Creator not found");
+                }
                 return await Task.FromResult(CreateThread(communityCategoryMappingId, creatorId, content));
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
                 throw new ApplicationException($"Error occurred while creating a thread.", ex);
             }
         }
 
         private Threads CreateThread(int communityCategoryMappingId, Guid creatorId, string content)
         {
-            Threads thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false , CreatedBy = creatorId, CreatedAt = DateTime.Now};
-            _unitOfWork.Threads.Add(thread);
-            _unitOfWork.Complete();
-            return thread;
+            //Creates a new thread and saves it to the database
+            try
+            {
+                Threads _thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = creatorId, CreatedAt = DateTime.Now };
+                _unitOfWork.Threads.Add(_thread);
+                _unitOfWork.Complete();
+                return _thread;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while creating a thread.", ex);
+            }
         }
 
         public async Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string content)
         {
             try
             {
-                return await Task.FromResult(UpdateThread(threadId, modifierId, content));
+                var _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                var _modifier = await Task.FromResult(_context.Users.Find(modifierId));
+                //Checks if modifier is valid
+                if (_modifier == null)
+                {
+                    throw new Exception("Modifier not found");
+                }
+                //Checks if thread is valid and not deleted
+                else if (_thread != null && !_thread.IsDeleted)
+                {
+                    _thread.Content = content;
+                    _thread.ModifiedBy = modifierId;
+                    _thread.ModifiedAt = DateTime.Now;
+                    _context.SaveChanges();
+                    return _thread;
+                }
+                //Checks if the thread is valid but deleted
+                else if (_thread != null && _thread.IsDeleted)
+                {
+                    throw new Exception("Thread has been deleted.");
+                }
+                else
+                {
+                    throw new Exception("Thread not found.");
+                }
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
                 throw new ApplicationException($"Error occurred while updating a thread with ID {threadId}.", ex);
             }
         }
-        private Threads UpdateThread(long threadId, Guid modifierId, string content)
-        {
-            var thread = _context.Threads.Find(threadId);
 
-            if (thread != null)
-            {
-                thread.Content = content;
-                thread.ModifiedBy = modifierId;
-                thread.ModifiedAt = DateTime.Now;
-                _context.SaveChanges();
-            }
-            return thread;
-        }
-
-        public async Task DeleteThreadAsync(long threadId, Guid modifierId)
+        public async Task<Threads> DeleteThreadAsync(long threadId, Guid modifierId)
         {
             try
             {
-                await Task.Run(() => DeleteThread(threadId, modifierId));
+                var _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                var _modifier = await Task.FromResult(_context.Users.Find(modifierId));
+                //Checks if modifier is valid
+                if (_modifier == null)
+                {
+                    throw new Exception("Modifier not found");
+                }
+                //Checks if thread is valid and not deleted
+                else if (_thread != null && !_thread.IsDeleted)
+                {
+                    _thread.IsDeleted = true;
+                    _thread.ModifiedBy = modifierId;
+                    _thread.ModifiedAt = DateTime.Now;
+                    _context.SaveChanges();
+                    return _thread;
+                }
+                //Checks if the thread is valid but deleted
+                else if (_thread != null && _thread.IsDeleted)
+                {
+                    throw new Exception("Thread has been deleted.");
+                }
+                else
+                {
+                    throw new Exception("Thread not found.");
+                }
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                throw new ApplicationException($"Error occurred while deleting thread with ID {threadId}.", ex);
+                throw new ApplicationException($"Error occurred while deleting a thread with ID {threadId}.", ex);
             }
         }
-        private void DeleteThread(long threadId, Guid modifierId)
-        {
-            var thread = _context.Threads.Find(threadId);
-
-            if (thread != null)
-            {
-                thread.IsDeleted = true;
-                thread.ModifiedBy = modifierId;
-                thread.ModifiedAt = DateTime.Now;
-                _context.SaveChanges();
-            }
-        }
-
-        //fetch threads from database
 
         public async Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync()
         {
