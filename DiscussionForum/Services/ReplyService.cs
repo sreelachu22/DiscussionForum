@@ -45,7 +45,7 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _thread = await Task.FromResult(_context.Threads.Find(threadID));
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
                 //Checks if the thread is valid
                 if(_thread == null)
                 {
@@ -74,7 +74,7 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyID));
+                Reply _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyID));
                 //Checks if the parent reply is valid
                 if (_parentReply == null)
                 {
@@ -103,8 +103,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _thread = await Task.FromResult(_context.Threads.Find(threadID));
-                var _creator = await Task.FromResult(_context.Users.Find(creatorID));
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
+                User _creator = await Task.FromResult(_context.Users.Find(creatorID));
                 //Checks if the thread is valid
                 if (_thread == null)
                 {
@@ -118,7 +118,7 @@ namespace DiscussionForum.Services
                 //Checks if the parent reply is valid
                 else if(parentReplyId != null)
                 {
-                    var _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
+                    Reply _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
                     if (_parentReply == null)
                     {
                         throw new Exception("Parent reply not found");
@@ -150,8 +150,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _reply = await Task.FromResult(_context.Replies.Find(replyID));
-                var _modifier = await Task.FromResult(_context.Users.Find(modifierID));
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyID));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierID));
                 //Checks if modifier is valid
                 if (_modifier == null)
                 {
@@ -185,8 +185,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _reply = await Task.FromResult(_context.Replies.Find(replyID));
-                var _modifier = await Task.FromResult(_context.Users.Find(modifierID));
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyID));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierID));
                 //Checks if modifier is valid
                 if (_modifier == null)
                 {

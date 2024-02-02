@@ -63,7 +63,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid threadId. It should be greater than zero.");
                 }
 
-                var _thread = await _threadService.GetThreadByIdAsync(threadId);
+                Threads _thread = await _threadService.GetThreadByIdAsync(threadId);
 
                 //Checks if the retrieved thread is null
                 if (_thread == null)
@@ -109,7 +109,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid creatorId. It cannot be null or empty.");
                 }
 
-                var _thread = await _threadService.CreateThreadAsync(CommunityCategoryMappingId, CreatorId, content);
+                Threads _thread = await _threadService.CreateThreadAsync(CommunityCategoryMappingId, CreatorId, content);
                 return Ok(_thread);
             }
             catch (Exception ex)
@@ -148,7 +148,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid modifierId. It cannot be null or empty.");
                 }
 
-                var _thread = await _threadService.UpdateThreadAsync(threadId, ModifierId, content);
+                Threads _thread = await _threadService.UpdateThreadAsync(threadId, ModifierId, content);
                 return Ok(_thread);
             }
             catch (Exception ex)
@@ -183,7 +183,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid modifierId. It cannot be null or empty.");
                 }
 
-                var _thread = await _threadService.DeleteThreadAsync(threadId, ModifierId);
+                Threads _thread = await _threadService.DeleteThreadAsync(threadId, ModifierId);
                 return Ok(_thread);
             }
             catch (Exception ex)

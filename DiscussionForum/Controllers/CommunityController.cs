@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Models.APIModels;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,7 @@ namespace DiscussionForum.Controllers
         {
             try
             {
-                var _communities = await _communityService.GetAllCommunitiesAsync();
+                IEnumerable<CommunityDTO> _communities = await _communityService.GetAllCommunitiesAsync();
                 return Ok(_communities);
             }
             catch (Exception ex)
@@ -54,7 +55,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid communityId. It should be greater than zero.");
                 }
 
-                var _community = await _communityService.GetCommunityByIdAsync(communityId);
+                CommunityDTO _community = await _communityService.GetCommunityByIdAsync(communityId);
 
                 //Checks if the retrieved community is null
                 if (_community == null)
