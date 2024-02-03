@@ -12,6 +12,9 @@ namespace DiscussionForum.Models.EntityModels
         [Required(ErrorMessage = "Community Category Mapping ID is required.")]
         public int CommunityCategoryMappingID { get; set; }
 
+        [Required(ErrorMessage = "Post title is required.")]
+        public string Title { get; set; }
+
         [Required(ErrorMessage = "Post Content is required.")]
         public string Content { get; set; }
 
