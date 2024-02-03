@@ -103,8 +103,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _communityCategoryMapping = await Task.FromResult(_context.CommunityCategoryMapping.Find(communityCategoryMappingId));
-                var _creator = await Task.FromResult(_context.Users.Find(creatorId));
+                CommunityCategoryMapping _communityCategoryMapping = await Task.FromResult(_context.CommunityCategoryMapping.Find(communityCategoryMappingId));
+                User _creator = await Task.FromResult(_context.Users.Find(creatorId));
                 //Checks if the community category is valid
                 if (_communityCategoryMapping == null)
                 {
@@ -143,8 +143,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _thread = await Task.FromResult(_context.Threads.Find(threadId));
-                var _modifier = await Task.FromResult(_context.Users.Find(modifierId));
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierId));
                 //Checks if modifier is valid
                 if (_modifier == null)
                 {
@@ -179,8 +179,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _thread = await Task.FromResult(_context.Threads.Find(threadId));
-                var _modifier = await Task.FromResult(_context.Users.Find(modifierId));
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierId));
                 //Checks if modifier is valid
                 if (_modifier == null)
                 {

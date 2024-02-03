@@ -59,7 +59,7 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _designation = await Task.FromResult(_context.Designations.Find(designationId));
+                Designation _designation = await Task.FromResult(_context.Designations.Find(designationId));
 
                 //Checks if the designation is valid and not deleted
                 if (_designation != null && !_designation.IsDeleted)
@@ -69,7 +69,7 @@ namespace DiscussionForum.Services
                     return _designation;
                 }
                 //Checks if the designation is valid but deleted
-                else if(_designation != null && _designation.IsDeleted)
+                else if (_designation != null && _designation.IsDeleted)
                 {
                     throw new Exception("Designation already deleted.");
                 }

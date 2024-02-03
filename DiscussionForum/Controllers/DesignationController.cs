@@ -25,7 +25,7 @@ namespace DiscussionForum.Controllers
         {
             try
             {
-                var _designations = await _designationService.GetAllDesignationsAsync();
+                IEnumerable<Designation> _designations = await _designationService.GetAllDesignationsAsync();
                 return Ok(_designations);
             }
             catch (Exception ex)
@@ -55,7 +55,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid designationId. It should be greater than zero.");
                 }
 
-                var _designation = await _designationService.GetDesignationByIdAsync(designationId);
+                Designation _designation = await _designationService.GetDesignationByIdAsync(designationId);
 
                 //Checks if the retrieved designation is null
                 if (_designation == null)
@@ -92,7 +92,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid designationName. It cannot be null or empty.");
                 }
 
-                var _designation = await _designationService.CreateDesignationAsync(designationName);
+                Designation _designation = await _designationService.CreateDesignationAsync(designationName);
                 return Ok(_designation);
             }
             catch (Exception ex)
@@ -122,7 +122,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid designationId. It should be greater than zero.");
                 }
 
-                var _designation = await _designationService.DeleteDesignationAsync(designationId);
+                Designation _designation = await _designationService.DeleteDesignationAsync(designationId);
                 return Ok(_designation);
             }
             catch (Exception ex)
