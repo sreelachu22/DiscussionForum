@@ -73,7 +73,7 @@ namespace DiscussionForum.Controllers
         {
             try
             {
-                var _replies = await _replyService.GetAllRepliesAsync();
+                IEnumerable<Reply> _replies = await _replyService.GetAllRepliesAsync();
                 return Ok(_replies);
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid replyId. It should be greater than zero.");
                 }
 
-                var _reply = await _replyService.GetReplyByIdAsync(replyId);
+                Reply _reply = await _replyService.GetReplyByIdAsync(replyId);
 
                 //Checks if the retrieved reply is null
                 if (_reply == null)
@@ -140,7 +140,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid threadId. It should be greater than zero.");
                 }
 
-                var _replies = await _replyService.GetRepliesByThreadIdAsync(threadId);
+                IEnumerable<Reply> _replies = await _replyService.GetRepliesByThreadIdAsync(threadId);
 
                 //Checks if the retrieved replies is/are null
                 if (_replies == null)
@@ -177,7 +177,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid parentReplyId. It should be greater than zero.");
                 }
 
-                var _replies = await _replyService.GetRepliesByParentReplyIdAsync(parentReplyId);
+                IEnumerable<Reply> _replies = await _replyService.GetRepliesByParentReplyIdAsync(parentReplyId);
 
                 //Checks if the retrieved replies is null
                 if (_replies == null)
@@ -206,7 +206,7 @@ namespace DiscussionForum.Controllers
         /// <param name="parentReplyId">The ID of the reply to which reply is posted. May be null if not applicable.</param>
         /// <param name="creatorId">The ID of the user posting the reply.</param>
         [HttpPost("{threadId}")]
-        public async Task<IActionResult> CreateReply(long threadId, Guid creatorId, [FromBody] string content, long? parentReplyId)
+        public async Task<IActionResult> CreateReply(long threadId, Guid creatorId, [FromBody] string content, long? parentReplyId = null)
         {
             try
             {
@@ -228,7 +228,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid creatorId. It cannot be null or empty.");
                 }
 
-                var _reply = await _replyService.CreateReplyAsync(threadId, creatorId, content, parentReplyId);
+                Reply _reply = await _replyService.CreateReplyAsync(threadId, creatorId, content, parentReplyId);
                 return Ok(_reply);
             }
             catch (Exception ex)
@@ -267,7 +267,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid modifierId. It cannot be null or empty.");
                 }
 
-                var _reply = await _replyService.UpdateReplyAsync(replyId, modifierId, content);
+                Reply _reply = await _replyService.UpdateReplyAsync(replyId, modifierId, content);
                 return Ok(_reply);
             }
             catch (Exception ex)
@@ -302,7 +302,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid modifierId. It cannot be null or empty.");
                 }
 
-                var _reply = await _replyService.DeleteReplyAsync(replyId,modifierId);
+                Reply _reply = await _replyService.DeleteReplyAsync(replyId,modifierId);
                 return Ok(_reply);
             }
             catch (Exception ex)

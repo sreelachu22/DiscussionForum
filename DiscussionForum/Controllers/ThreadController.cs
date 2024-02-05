@@ -3,6 +3,7 @@ using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 
 namespace DiscussionForum.Controllers
@@ -19,8 +20,10 @@ namespace DiscussionForum.Controllers
             _threadService = threadService;
         }
 
-
-        /* get all threads related to a category*/
+        /// <summary>
+        /// Retrieves all threads in a category.
+        /// </summary>
+        /// <param name="CommunityCategoryMappingID">The mapping ID of the category in a community whose threads must be fetched.</param>
         [HttpGet]
         public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {
@@ -45,38 +48,154 @@ namespace DiscussionForum.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Retrieves a thread based on the given thread ID.
+        /// </summary>
+        /// <param name="threadId">The ID of the thread to search for in threads.</param>
         [HttpGet("{threadId}")]
         public async Task<IActionResult> GetThreadById(long threadId)
         {
-            var thread = await _threadService.GetThreadByIdAsync(threadId);
+            try
+            {
+                //Validates the request data
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
 
-            if (thread == null)
-                return NotFound();
+                Threads _thread = await _threadService.GetThreadByIdAsync(threadId);
 
-            return Ok(thread);
+                //Checks if the retrieved thread is null
+                if (_thread == null)
+                {
+                    throw new Exception($"Thread with ID {threadId} not found.");
+                }
+
+                return Ok(_thread);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while retrieving thread with ID = {threadId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while retrieving thread with ID = {threadId} \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Creates a new thread with content from request body.
+        /// </summary>
+        /// <param name="CommunityCategoryMappingId">he mapping ID of the category in a community where threads must be posted.</param>
+        /// <param name="CreatorId">The ID of the user posting the thread.</param>
         [HttpPost]
         public async Task<IActionResult> CreateThread(int CommunityCategoryMappingId, Guid CreatorId, [FromBody] string content)
         {
-            var thread = await _threadService.CreateThreadAsync(CommunityCategoryMappingId, CreatorId, content);
-            return Ok(thread);
+            try
+            {
+                //Validates the request data
+                if (CommunityCategoryMappingId <= 0)
+                {
+                    throw new Exception("Invalid CommunityCategoryMappingId. It should be greater than zero.");
+                }
+                else if (string.IsNullOrWhiteSpace(content))
+                {
+                    throw new Exception("Invalid content. It cannot be null or empty.");
+                }
+                else if (CreatorId == Guid.Empty)
+                {
+                    throw new Exception("Invalid creatorId. It cannot be null or empty.");
+                }
+
+                Threads _thread = await _threadService.CreateThreadAsync(CommunityCategoryMappingId, CreatorId, content);
+                return Ok(_thread);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while creating thread. \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while creating thread. \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Updates a thread with content from request body based on the given thread ID.
+        /// </summary>
+        /// <param name="threadId">The ID of the thread to be updated.</param>
+        /// <param name="ModifierId">The ID of the user editing the thread.</param>
         [HttpPut("{threadId}")]
         public async Task<IActionResult> UpdateThread(long threadId, Guid ModifierId, [FromBody] string content)
         {
-            var thread = await _threadService.UpdateThreadAsync(threadId, ModifierId, content);
-            return Ok(thread);
+            try
+            {
+                //Validates the request data
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
+                else if (string.IsNullOrWhiteSpace(content))
+                {
+                    throw new Exception("Invalid content. It cannot be null or empty.");
+                }
+                else if (ModifierId == Guid.Empty)
+                {
+                    throw new Exception("Invalid modifierId. It cannot be null or empty.");
+                }
+
+                Threads _thread = await _threadService.UpdateThreadAsync(threadId, ModifierId, content);
+                return Ok(_thread);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while updating thread with ID = {threadId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while updating thread with ID = {threadId} \nError: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Deletes a thread based on the given thread ID.
+        /// </summary>
+        /// <param name="threadId">The ID of the thread to be deleted.</param>
+        /// <param name="ModifierId">The ID of the user deleting the thread.</param>
         [HttpDelete("{threadId}")]
         public async Task<IActionResult> DeleteThread(long threadId, Guid ModifierId)
         {
-            await _threadService.DeleteThreadAsync(threadId, ModifierId);
-            return Ok();
-            
+            try
+            {
+                //Validates the request data
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
+                else if (ModifierId == Guid.Empty)
+                {
+                    throw new Exception("Invalid modifierId. It cannot be null or empty.");
+                }
+
+                Threads _thread = await _threadService.DeleteThreadAsync(threadId, ModifierId);
+                return Ok(_thread);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while deleting thread with ID = {threadId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while deleting thread with ID = {threadId} \nError: {ex.Message}");
+            }
         }
 
 

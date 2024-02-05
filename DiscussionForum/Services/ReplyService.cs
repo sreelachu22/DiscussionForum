@@ -45,7 +45,7 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _thread = await Task.FromResult(_context.Threads.Find(threadID));
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
                 //Checks if the thread is valid
                 if(_thread == null)
                 {
@@ -74,7 +74,7 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyID));
+                Reply _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyID));
                 //Checks if the parent reply is valid
                 if (_parentReply == null)
                 {
@@ -103,8 +103,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _thread = await Task.FromResult(_context.Threads.Find(threadID));
-                var _creator = await Task.FromResult(_context.Users.Find(creatorID));
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
+                User _creator = await Task.FromResult(_context.Users.Find(creatorID));
                 //Checks if the thread is valid
                 if (_thread == null)
                 {
@@ -118,7 +118,7 @@ namespace DiscussionForum.Services
                 //Checks if the parent reply is valid
                 else if(parentReplyId != null)
                 {
-                    var _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
+                    Reply _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
                     if (_parentReply == null)
                     {
                         throw new Exception("Parent reply not found");
@@ -150,8 +150,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _reply = await Task.FromResult(_context.Replies.Find(replyID));
-                var _modifier = await Task.FromResult(_context.Users.Find(modifierID));
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyID));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierID));
                 //Checks if modifier is valid
                 if (_modifier == null)
                 {
@@ -166,7 +166,7 @@ namespace DiscussionForum.Services
                     _context.SaveChanges();
                     return _reply;
                 }
-                //Checks if the designation is valid but deleted
+                //Checks if the reply is valid but deleted
                 else if (_reply != null && _reply.IsDeleted)
                 {
                     throw new Exception("Reply has been deleted.");
@@ -185,8 +185,8 @@ namespace DiscussionForum.Services
         {
             try
             {
-                var _reply = await Task.FromResult(_context.Replies.Find(replyID));
-                var _modifier = await Task.FromResult(_context.Users.Find(modifierID));
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyID));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierID));
                 //Checks if modifier is valid
                 if (_modifier == null)
                 {
@@ -201,7 +201,7 @@ namespace DiscussionForum.Services
                     _context.SaveChanges();
                     return _reply;
                 }
-                //Checks if the designation is valid but deleted
+                //Checks if the reply is valid but deleted
                 else if (_reply != null && _reply.IsDeleted)
                 {
                     throw new Exception("Reply already deleted.");
@@ -229,27 +229,38 @@ namespace DiscussionForum.Services
                 pageSize = Math.Max(1, pageSize);
 
                 var query = _context.Replies
-                    .Include(r => r.Thread)
+                    .Include(r => r.Threads)
                     .Include(r => r.ParentReply)
+                    .Include(r => r.ReplyVotes)
+                    .Include(r => r.CreatedByUser)
                     .Where(r => r.ThreadID == threadId && r.ParentReplyID == parentReplyId);
 
-                // Perform pagination on the retrieved replies
+
                 var replies = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
                 // Map the Reply entities to ReplyDTO objects
-                var replyDTOs = replies.Select(r => new ReplyDTO
-                {
-                    ReplyID = r.ReplyID,
-                    ThreadID = r.ThreadID,
-                    ParentReplyID = r.ParentReplyID,
-                    Content = r.Content,
-                    NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
-                });
+                var replyDTOs = replies
+                    .Select(r => new ReplyDTO
+                    {
+                        ReplyID = r.ReplyID,
+                        ThreadID = r.ThreadID,
+                        ParentReplyID = r.ParentReplyID,
+                        Content = r.Content,
+                        UpvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
+                        DownvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
+                        IsDeleted = r.IsDeleted,
+                        CreatedUserName = r.CreatedByUser != null ? r.CreatedByUser.Name : "",
+                        CreatedBy = r.CreatedBy,
+                        CreatedAt = r.CreatedAt,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedAt = r.ModifiedAt,
+                        NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
+                    }); ;
 
                 return replyDTOs.AsQueryable();
             }
             catch (Exception ex)
-            {                
+            {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 throw;
             }
@@ -270,14 +281,22 @@ namespace DiscussionForum.Services
                         ThreadID = reply.ThreadID,
                         ParentReplyID = reply.ParentReplyID,
                         Content = reply.Content,
+                        UpvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
+                        DownvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
+                        IsDeleted = reply.IsDeleted,
+                        CreatedUserName = reply.CreatedByUser != null ? reply.CreatedByUser.Name : "",
+                        CreatedBy = reply.CreatedBy,
+                        CreatedAt = reply.CreatedAt,
+                        ModifiedBy = reply.ModifiedBy,
+                        ModifiedAt = reply.ModifiedAt,
                         // Recursively call GetNestedReplies to retrieve nested replies of the current reply
                         NestedReplies = GetNestedReplies(replies, reply.ReplyID)
                     })
-                    .ToList();                
+                    .ToList();
                 return nestedReplies;
             }
             catch (Exception ex)
-            {                
+            {
                 Console.WriteLine($"An error occurred while getting nested replies: {ex.Message}");
                 throw;
             }

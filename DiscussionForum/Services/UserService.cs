@@ -36,11 +36,7 @@ namespace DiscussionForum.Services
                 // Normalize and clean up the search term
                 term = string.IsNullOrWhiteSpace(term) ? null : term.Trim().ToLower();
                 // Build the initial query based on search term
-                /*var usersQuery = _userContext.Users
-                .Where(u =>
-                    (string.IsNullOrWhiteSpace(term) &&
-                    u.Name.ToLower() != "system user" || u.Name.ToLower().Contains(term))
-                );*/
+
                 IQueryable<User> usersQuery;
 
                 if (string.IsNullOrWhiteSpace(term))
@@ -50,6 +46,7 @@ namespace DiscussionForum.Services
                          u.Name.ToLower() != "system user"
                      );
                 }
+
                 else
                 {
                     // Get users containing the value in term
@@ -57,6 +54,7 @@ namespace DiscussionForum.Services
                         u.Name.ToLower() != "system user" && u.Name.ToLower().Contains(term)
                     );
                 }
+
 
                 // Apply sorting if specified
                 if (!string.IsNullOrWhiteSpace(sort))
