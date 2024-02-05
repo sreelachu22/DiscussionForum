@@ -15,6 +15,7 @@ namespace DiscussionForum.UnitOfWork
         IUserRepository User { get; }
         IThreadRepository Threads { get; }
         IReplyRepository Reply { get; }
+        IThreadVoteRepository ThreadVote { get; }
         int Complete();
 
     }

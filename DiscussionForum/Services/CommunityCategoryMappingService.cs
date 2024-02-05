@@ -137,18 +137,20 @@ namespace DiscussionForum.Services
             try
             {
                 // Constructing a LINQ query to retrieve community categories details with associated information
-                var result = await (
-                    from cc in _context.CommunityCategories
-                    join ccm in _context.CommunityCategoryMapping
+              
+             var result = await (
+                from cc in _context.CommunityCategories
+                join ccm in _context.CommunityCategoryMapping
                     on cc.CommunityCategoryID equals ccm.CommunityCategoryID into ccMapping
-                    from mapping in ccMapping.Where(mapping => mapping.CommunityID == communityID && !mapping.IsDeleted).DefaultIfEmpty()
-                    where mapping == null
-                    select new CommunityCategory
-                    {
-                        CommunityCategoryID = cc.CommunityCategoryID,
-                        CommunityCategoryName = cc.CommunityCategoryName,
-                    })
-                    .ToListAsync();
+                from mapping in ccMapping.Where(mapping => mapping.CommunityID == communityID && !mapping.IsDeleted).DefaultIfEmpty()
+                where cc.IsDeleted == false && mapping == null
+                select new CommunityCategory
+                {
+                    CommunityCategoryID = cc.CommunityCategoryID,
+                    CommunityCategoryName = cc.CommunityCategoryName,
+                })
+                .ToListAsync();
+
 
                 return result;
             }

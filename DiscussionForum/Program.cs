@@ -32,6 +32,9 @@ builder.Services.AddScoped<ICommunityCategoryMappingService, CommunityCategoryMa
 builder.Services.AddScoped<INoticeService, NoticeService>();
 builder.Services.AddScoped<IThreadService, ThreadService>();
 builder.Services.AddScoped<IReplyService, ReplyService>();
+builder.Services.AddScoped<IThreadVoteService, ThreadVoteService>();
+builder.Services.AddScoped<IReplyVoteService, ReplyVoteService>();
+
 
 builder.Services.AddControllers();
 
@@ -45,6 +48,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
