@@ -29,7 +29,7 @@ namespace DiscussionForum.Models.EntityModels
 
         public bool IsDeleted { get; set; }
 
-        [Required(ErrorMessage = "Created User is required.")]
+        //[Required(ErrorMessage = "Created User is required.")]
         public Guid? CreatedBy { get; set; }
 
         public virtual User CreatedByUser { get; set; }
@@ -44,10 +44,10 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         public virtual ICollection<ThreadVote> ThreadVotesCreatedBy { get; set; }
-
         public virtual ICollection<ThreadVote> ThreadVotesModifiedBy { get; set; }
+        public virtual ICollection<ReplyVote> ReplyVotesCreatedBy { get; set; }
+        public virtual ICollection<ReplyVote> ReplyVotesModifiedBy { get; set; }
+
 
     }
-
-
 }

@@ -20,6 +20,7 @@ namespace DiscussionForum.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Threads> Threads { get; set; }
         public DbSet<ThreadVote> ThreadVotes { get; set; }
+        public DbSet<ReplyVote> ReplyVotes { get; set; }
         public DbSet<Community> Communities { get; set; }
         public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }
         public DbSet<Notice> Notices { get; set; }
@@ -128,6 +129,58 @@ namespace DiscussionForum.Data
                 .HasForeignKey(c => c.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
+//========================================================================================
+
+            modelBuilder.Entity<Reply>()
+                .HasOne(t => t.CreatedByUser)
+                .WithOne()
+                .HasForeignKey<Reply>(u => u.CreatedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+            //=====================================================problematic?
+            modelBuilder.Entity<Reply>()
+       .HasOne(r => r.CreatedByUser)
+       .WithMany()
+       .HasForeignKey(r => r.CreatedBy);
+            //========================================================
+
+            modelBuilder.Entity<Reply>()
+                .HasOne(t => t.ModifiedByUser)
+                .WithOne()
+                .HasForeignKey<Reply>(u => u.ModifiedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reply>()
+                .HasMany(t => t.ReplyVotes)
+                .WithOne(tv => tv.Reply)
+                .HasForeignKey(tv => tv.ReplyID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relationships for ThreadVote entity
+            modelBuilder.Entity<ReplyVote>()
+                .HasOne(tv => tv.CreatedByUser)
+                .WithMany(tv => tv.ReplyVotesCreatedBy)
+                .HasForeignKey(tv => tv.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReplyVote>()
+                .HasOne(tv => tv.ModifiedByUser)
+                .WithMany(tv => tv.ReplyVotesModifiedBy)
+                .HasForeignKey(tv => tv.ModifiedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<Reply>()
+                .HasOne(r => r.Threads)
+                .WithMany() // No navigation property on the other side
+                .HasForeignKey(r => r.ThreadID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reply>()
+               .HasOne(r => r.ParentReply)
+               .WithMany()  // Remove the argument to indicate that a reply can have only one parent
+               .HasForeignKey(r => r.ParentReplyID)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            //================================================
             base.OnModelCreating(modelBuilder);
         }
     }
