@@ -27,6 +27,8 @@ namespace DiscussionForum.UnitOfWork
             Community = new CommunityRepository(_context);
             Threads=new ThreadRepository(_context);
             Reply = new ReplyRepository(_context);
+            ThreadVote = new ThreadVoteRepository(_context);
+            ReplyVote = new ReplyVoteRepository(_context);
         }
 
         public IDesignationRepository Designations { get; }
@@ -39,7 +41,8 @@ namespace DiscussionForum.UnitOfWork
         public IUserRepository User { get; }
         public IThreadRepository Threads { get; }
         public IReplyRepository Reply { get; }
-
+        public IThreadVoteRepository ThreadVote { get; }
+        public IReplyVoteRepository ReplyVote { get; }
 
         public int Complete()
         {

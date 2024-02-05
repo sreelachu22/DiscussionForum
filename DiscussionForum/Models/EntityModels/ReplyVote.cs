@@ -5,6 +5,23 @@ using System.Text.Json.Serialization;
 namespace DiscussionForum.Models.EntityModels
 {
     public class ReplyVote
+<<<<<<< HEAD
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ReplyVoteID { get; set; }
+        [Required]
+        public Guid? UserID { get; set; }
+        [Required]
+        public long ReplyID { get; set; }
+        [Required]
+        public bool IsUpVote { get; set; }
+        public bool IsDeleted { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public Guid? ModifiedBy { get; set; }
+        public DateTime? ModifiedAt { get; set; }
+=======
      {
          [Key]
          [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -21,6 +38,7 @@ namespace DiscussionForum.Models.EntityModels
          [ForeignKey("ModifiedBy")]
          public Guid? ModifiedBy { get; set; }
          public DateTime? ModifiedAt { get; set; }
+>>>>>>> c2dbaf4fd3d98e5e934025f00ec098a52b877908
 
          // Navigation properties
          [ForeignKey("UserID")]
