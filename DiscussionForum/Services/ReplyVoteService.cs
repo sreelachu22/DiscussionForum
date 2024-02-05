@@ -1,42 +1,50 @@
 ﻿using DiscussionForum.Data;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.Services
 {
     public class ReplyVoteService : IReplyVoteService
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbContext;
 
-        public ReplyVoteService(AppDbContext context)
+        public ReplyVoteService(AppDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
-        public async Task<int> CreateReplyVote(ReplyVoteDto replyVoteDto)
-        {
-            try
+        public async Task VoteAsync(ReplyVoteDto voteDto)
+        {           
+            var existingReplyVote = await _dbContext.ReplyVotes
+                .FirstOrDefaultAsync(rv => rv.UserID == voteDto.UserID && rv.ReplyID == voteDto.ReplyID);
+
+            if (existingReplyVote != null)
             {
-                var replyVote = new ReplyVote
+                // Update the existing ReplyVote with the data from the DTO
+                existingReplyVote.IsUpVote = voteDto.IsUpVote;
+                existingReplyVote.IsDeleted = voteDto.IsDeleted;
+                existingReplyVote.ModifiedAt = DateTime.Now;                
+
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                // Create a new ReplyVote
+                var newReplyVote = new ReplyVote
                 {
-                    UserID = replyVoteDto.UserID,
-                    ReplyID = replyVoteDto.ReplyID,
-                    IsUpVote = replyVoteDto.IsUpVote,
-                    CreatedBy = replyVoteDto.UserID, // Assuming CreatedBy is the same as UserID for simplicity
-                    CreatedAt = DateTime.Now,
-                    ModifiedBy = replyVoteDto.UserID,
-                    ModifiedAt = DateTime.Now
+                    UserID = voteDto.UserID,
+                    ReplyID = voteDto.ReplyID,
+                    IsUpVote = voteDto.IsUpVote,
+                    IsDeleted = voteDto.IsDeleted,
+                    CreatedBy = voteDto.UserID,
+                    CreatedAt = DateTime.Now,                    
                 };
 
-                _context.ReplyVotes.Add(replyVote);
-                await _context.SaveChangesAsync();
-
-                return replyVote.ReplyVoteID;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error occurred during ReplyVote: {ex.Message}", ex);
+                _dbContext.ReplyVotes.Add(newReplyVote);
+                await _dbContext.SaveChangesAsync();
             }
         }
+
     }
 }

@@ -145,7 +145,7 @@ namespace DiscussionForum.Data
                 .WithOne(tv => tv.Reply)
                 .HasForeignKey(tv => tv.ReplyID)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             modelBuilder.Entity<Reply>()
                 .HasOne(r => r.Threads)
                 .WithMany() // No navigation property on the other side
@@ -157,7 +157,7 @@ namespace DiscussionForum.Data
                .WithMany()  // Remove the argument to indicate that a reply can have only one parent
                .HasForeignKey(r => r.ParentReplyID)
                .OnDelete(DeleteBehavior.Restrict);
-            
+
             //Relationships for Reply entity
             modelBuilder.Entity<Reply>()
             .HasOne(r => r.CreatedByUser)
@@ -182,7 +182,7 @@ namespace DiscussionForum.Data
                 .HasOne(rv => rv.ModifiedByUser)
                 .WithMany(u => u.ReplyVotesModifiedBy)
                 .HasForeignKey(rv => rv.ModifiedBy)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict);       
 
             base.OnModelCreating(modelBuilder);
         }
