@@ -8,8 +8,11 @@ namespace DiscussionForum.Models.EntityModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ReplyVoteID { get; set; }
+        [Required]
         public Guid? UserID { get; set; }
+        [Required]
         public long ReplyID { get; set; }
+        [Required]
         public bool IsUpVote { get; set; }
         public bool IsDeleted { get; set; }
         public Guid? CreatedBy { get; set; }

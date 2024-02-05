@@ -27,7 +27,7 @@ namespace DiscussionForum.Data
         public DbSet<UserRoleMapping> UserRoleMapping { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
-
+        public DbSet<ReplyVote> ReplyVotes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and delete behaviors
@@ -129,6 +129,31 @@ namespace DiscussionForum.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
+            //Relationships for Reply entity
+            modelBuilder.Entity<Reply>()
+            .HasOne(r => r.CreatedByUser)
+            .WithMany()
+            .HasForeignKey(r => r.CreatedBy)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Reply>()
+                .HasOne(r => r.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(r => r.ModifiedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Relationships for ReplyVote entity
+            modelBuilder.Entity<ReplyVote>()
+                .HasOne(rv => rv.CreatedByUser)
+                .WithMany(rv => rv.ReplyVotesCreatedBy)
+                .HasForeignKey(rv => rv.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReplyVote>()
+                .HasOne(rv => rv.ModifiedByUser)
+                .WithMany(u => u.ReplyVotesModifiedBy)
+                .HasForeignKey(rv => rv.ModifiedBy)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
