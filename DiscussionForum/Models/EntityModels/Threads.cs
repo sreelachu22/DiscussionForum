@@ -12,6 +12,9 @@ namespace DiscussionForum.Models.EntityModels
         [Required(ErrorMessage = "Community Category Mapping ID is required.")]
         public int CommunityCategoryMappingID { get; set; }
 
+        [Required(ErrorMessage = "Post title is required.")]
+        public string Title { get; set; }
+
         [Required(ErrorMessage = "Post Content is required.")]
         public string Content { get; set; }
 
@@ -22,8 +25,8 @@ namespace DiscussionForum.Models.EntityModels
         public bool IsAnswered { get; set; }
         public bool IsDeleted { get; set; }
         public Guid CreatedBy { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public Guid ModifiedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public Guid? ModifiedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation properties
