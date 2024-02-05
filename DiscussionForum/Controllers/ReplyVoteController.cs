@@ -17,18 +17,18 @@ namespace DiscussionForum.Controllers
             _replyVoteService = replyVoteService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> PostReplyVote(ReplyVoteDto replyVoteDto)
+        [HttpPost("vote")]
+        public async Task<IActionResult> Vote([FromBody] ReplyVoteDto voteDto)
         {
             try
             {
-                var result = await _replyVoteService.CreateReplyVote(replyVoteDto);
-                return Ok(new { ReplyVoteID = result });
+                await _replyVoteService.VoteAsync(voteDto);
+                return Ok("Vote recorded successfully.");
             }
             catch (Exception ex)
             {
                 // Log the exception or handle it as needed
-                return StatusCode(500, "An error occurred while processing the request.");
+                return StatusCode(500, "Internal server error");
             }
         }
     }

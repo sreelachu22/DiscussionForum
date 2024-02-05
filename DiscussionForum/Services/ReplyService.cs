@@ -47,22 +47,22 @@ namespace DiscussionForum.Services
             {
                 Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
                 //Checks if the thread is valid
-                if(_thread == null)
+                if (_thread == null)
                 {
                     throw new Exception("Thread not found");
                 }
                 return await (from reply in _context.Replies
-                                    where reply.ThreadID == _thread.ThreadID
-                                    select new Reply
-                                    {
-                                        ReplyID = reply.ReplyID,
-                                        ThreadID = reply.ThreadID,
-                                        Content = reply.Content,
-                                        ParentReplyID = reply.ParentReplyID,
-                                        IsDeleted = reply.IsDeleted,
-                                        CreatedBy = reply.CreatedBy,
-                                        CreatedAt = reply.CreatedAt
-                                    }).ToListAsync();
+                              where reply.ThreadID == _thread.ThreadID
+                              select new Reply
+                              {
+                                  ReplyID = reply.ReplyID,
+                                  ThreadID = reply.ThreadID,
+                                  Content = reply.Content,
+                                  ParentReplyID = reply.ParentReplyID,
+                                  IsDeleted = reply.IsDeleted,
+                                  CreatedBy = reply.CreatedBy,
+                                  CreatedAt = reply.CreatedAt
+                              }).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -81,17 +81,17 @@ namespace DiscussionForum.Services
                     throw new Exception("Parent reply not found");
                 }
                 return await (from reply in _context.Replies
-                                    where reply.ParentReplyID == _parentReply.ReplyID
-                                    select new Reply
-                                    {
-                                        ReplyID = reply.ReplyID,
-                                        ThreadID = reply.ThreadID,
-                                        Content = reply.Content,
-                                        ParentReplyID = reply.ParentReplyID,
-                                        IsDeleted = reply.IsDeleted,
-                                        CreatedBy = reply.CreatedBy,
-                                        CreatedAt = reply.CreatedAt
-                                    }).ToListAsync();
+                              where reply.ParentReplyID == _parentReply.ReplyID
+                              select new Reply
+                              {
+                                  ReplyID = reply.ReplyID,
+                                  ThreadID = reply.ThreadID,
+                                  Content = reply.Content,
+                                  ParentReplyID = reply.ParentReplyID,
+                                  IsDeleted = reply.IsDeleted,
+                                  CreatedBy = reply.CreatedBy,
+                                  CreatedAt = reply.CreatedAt
+                              }).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -111,12 +111,12 @@ namespace DiscussionForum.Services
                     throw new Exception("Thread not found");
                 }
                 //Checks if the creator is valid
-                else if(_creator == null)
+                else if (_creator == null)
                 {
                     throw new Exception("Creator not found");
                 }
                 //Checks if the parent reply is valid
-                else if(parentReplyId != null)
+                else if (parentReplyId != null)
                 {
                     Reply _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
                     if (_parentReply == null)
@@ -193,7 +193,7 @@ namespace DiscussionForum.Services
                     throw new Exception("Modifier not found");
                 }
                 //Checks if reply is valid and not deleted
-                else if(_reply != null && !_reply.IsDeleted)
+                else if (_reply != null && !_reply.IsDeleted)
                 {
                     _reply.IsDeleted = true;
                     _reply.ModifiedBy = modifierID;
@@ -254,7 +254,7 @@ namespace DiscussionForum.Services
                         CreatedAt = r.CreatedAt,
                         ModifiedBy = r.ModifiedBy,
                         ModifiedAt = r.ModifiedAt,
-                        NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
+                        NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID, _context)
                     }); ;
 
                 return replyDTOs.AsQueryable();
@@ -267,32 +267,39 @@ namespace DiscussionForum.Services
         }
 
         // Recursive method to retrieve nested replies for a given replyId
-        static List<ReplyDTO> GetNestedReplies(List<Reply> replies, long replyId)
+        static List<ReplyDTO> GetNestedReplies(List<Reply> replies, long replyId, AppDbContext context)
         {
             try
             {
                 // Filter the list of replies to find those with the specified replyId as ParentReplyID
                 var nestedReplies = replies
                     .Where(r => r.ParentReplyID == replyId)
-                    .Select(reply => new ReplyDTO
+                    .Select(reply =>
                     {
+                        // Explicitly load the ReplyVotes collection for each nested reply
+                        context.Entry(reply).Collection(r => r.ReplyVotes).Load();
+
                         // Map each nested reply to a new ReplyDTO object
-                        ReplyID = reply.ReplyID,
-                        ThreadID = reply.ThreadID,
-                        ParentReplyID = reply.ParentReplyID,
-                        Content = reply.Content,
-                        UpvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
-                        DownvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
-                        IsDeleted = reply.IsDeleted,
-                        CreatedUserName = reply.CreatedByUser != null ? reply.CreatedByUser.Name : "",
-                        CreatedBy = reply.CreatedBy,
-                        CreatedAt = reply.CreatedAt,
-                        ModifiedBy = reply.ModifiedBy,
-                        ModifiedAt = reply.ModifiedAt,
-                        // Recursively call GetNestedReplies to retrieve nested replies of the current reply
-                        NestedReplies = GetNestedReplies(replies, reply.ReplyID)
+                        return new ReplyDTO
+                        {
+                            ReplyID = reply.ReplyID,
+                            ThreadID = reply.ThreadID,
+                            ParentReplyID = reply.ParentReplyID,
+                            Content = reply.Content,
+                            UpvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
+                            DownvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
+                            IsDeleted = reply.IsDeleted,
+                            CreatedUserName = reply.CreatedByUser != null ? reply.CreatedByUser.Name : "",
+                            CreatedBy = reply.CreatedBy,
+                            CreatedAt = reply.CreatedAt,
+                            ModifiedBy = reply.ModifiedBy,
+                            ModifiedAt = reply.ModifiedAt,
+                            // Recursively call GetNestedReplies to retrieve nested replies of the current reply
+                            NestedReplies = GetNestedReplies(replies, reply.ReplyID, context)
+                        };
                     })
                     .ToList();
+
                 return nestedReplies;
             }
             catch (Exception ex)
@@ -301,6 +308,7 @@ namespace DiscussionForum.Services
                 throw;
             }
         }
+
 
     }
 }

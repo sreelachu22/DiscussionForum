@@ -3,7 +3,7 @@
 namespace DiscussionForum.Services
 {
     public interface IReplyVoteService
-    {
-        Task<int> CreateReplyVote(ReplyVoteDto replyVoteDto);
+    {        
+        Task VoteAsync(ReplyVoteDto voteDto);
     }
 }
