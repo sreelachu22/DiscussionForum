@@ -169,27 +169,38 @@ namespace DiscussionForum.Services
                 pageSize = Math.Max(1, pageSize);
 
                 var query = _context.Replies
-                    .Include(r => r.Thread)
+                    .Include(r => r.Threads)
                     .Include(r => r.ParentReply)
+                    .Include(r => r.ReplyVotes)
+                    .Include(r => r.CreatedByUser)
                     .Where(r => r.ThreadID == threadId && r.ParentReplyID == parentReplyId);
 
-                // Perform pagination on the retrieved replies
+
                 var replies = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
                 // Map the Reply entities to ReplyDTO objects
-                var replyDTOs = replies.Select(r => new ReplyDTO
-                {
-                    ReplyID = r.ReplyID,
-                    ThreadID = r.ThreadID,
-                    ParentReplyID = r.ParentReplyID,
-                    Content = r.Content,
-                    NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
-                });
+                var replyDTOs = replies
+                    .Select(r => new ReplyDTO
+                    {
+                        ReplyID = r.ReplyID,
+                        ThreadID = r.ThreadID,
+                        ParentReplyID = r.ParentReplyID,
+                        Content = r.Content,
+                        UpvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
+                        DownvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
+                        IsDeleted = r.IsDeleted,
+                        CreatedUserName = r.CreatedByUser != null ? r.CreatedByUser.Name : "",
+                        CreatedBy = r.CreatedBy,
+                        CreatedAt = r.CreatedAt,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedAt = r.ModifiedAt,
+                        NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID)
+                    }); ;
 
                 return replyDTOs.AsQueryable();
             }
             catch (Exception ex)
-            {                
+            {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 throw;
             }
@@ -210,14 +221,22 @@ namespace DiscussionForum.Services
                         ThreadID = reply.ThreadID,
                         ParentReplyID = reply.ParentReplyID,
                         Content = reply.Content,
+                        UpvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
+                        DownvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
+                        IsDeleted = reply.IsDeleted,
+                        CreatedUserName = reply.CreatedByUser != null ? reply.CreatedByUser.Name : "",
+                        CreatedBy = reply.CreatedBy,
+                        CreatedAt = reply.CreatedAt,
+                        ModifiedBy = reply.ModifiedBy,
+                        ModifiedAt = reply.ModifiedAt,
                         // Recursively call GetNestedReplies to retrieve nested replies of the current reply
                         NestedReplies = GetNestedReplies(replies, reply.ReplyID)
                     })
-                    .ToList();                
+                    .ToList();
                 return nestedReplies;
             }
             catch (Exception ex)
-            {                
+            {
                 Console.WriteLine($"An error occurred while getting nested replies: {ex.Message}");
                 throw;
             }
