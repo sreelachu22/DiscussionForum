@@ -101,7 +101,7 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<Threads> CreateThreadAsync(int communityCategoryMappingId, Guid creatorId, string content)
+        public async Task<Threads> CreateThreadAsync(int communityCategoryMappingId, Guid creatorId, string title, string content)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace DiscussionForum.Services
                 {
                     throw new Exception("Creator not found");
                 }
-                return await Task.FromResult(CreateThread(communityCategoryMappingId, creatorId, content));
+                return await Task.FromResult(CreateThread(communityCategoryMappingId, creatorId, title, content));
             }
             catch (Exception ex)
             {
@@ -125,23 +125,23 @@ namespace DiscussionForum.Services
             }
         }
 
-        private Threads CreateThread(int communityCategoryMappingId, Guid creatorId, string content)
+        private Threads CreateThread(int communityCategoryMappingId, Guid creatorId, string title, string content)
         {
             //Creates a new thread and saves it to the database
             try
             {
-                Threads _thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = creatorId, CreatedAt = DateTime.Now };
+                Threads _thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Title = title, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = creatorId, CreatedAt = DateTime.Now };
                 _unitOfWork.Threads.Add(_thread);
                 _unitOfWork.Complete();
                 return _thread;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error occurred while creating a thread.", ex);
+                throw new ApplicationException($"Error occurred while creating the thread.", ex);
             }
         }
 
-        public async Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string content)
+        public async Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string? title, string? content)
         {
             try
             {
@@ -155,11 +155,31 @@ namespace DiscussionForum.Services
                 //Checks if thread is valid and not deleted
                 else if (_thread != null && !_thread.IsDeleted)
                 {
-                    _thread.Content = content;
-                    _thread.ModifiedBy = modifierId;
-                    _thread.ModifiedAt = DateTime.Now;
-                    _context.SaveChanges();
-                    return _thread;
+                    if(title == null && content != null)
+                    {
+                        _thread.Content = content;
+                        _thread.ModifiedBy = modifierId;
+                        _thread.ModifiedAt = DateTime.Now;
+                        _context.SaveChanges();
+                        return _thread;
+                    }
+                    else if(title != null && content == null)
+                    {
+                        _thread.Title = title;
+                        _thread.ModifiedBy = modifierId;
+                        _thread.ModifiedAt = DateTime.Now;
+                        _context.SaveChanges();
+                        return _thread;
+                    }
+                    else
+                    {
+                        _thread.Title = title;
+                        _thread.Content = content;
+                        _thread.ModifiedBy = modifierId;
+                        _thread.ModifiedAt = DateTime.Now;
+                        _context.SaveChanges();
+                        return _thread;
+                    }
                 }
                 //Checks if the thread is valid but deleted
                 else if (_thread != null && _thread.IsDeleted)
