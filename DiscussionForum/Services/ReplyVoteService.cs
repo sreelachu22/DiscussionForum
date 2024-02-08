@@ -9,9 +9,12 @@ namespace DiscussionForum.Services
     {
         private readonly AppDbContext _dbContext;
 
-        public ReplyVoteService(AppDbContext dbContext)
+        private readonly IPointService _pointService;
+
+        public ReplyVoteService(AppDbContext dbContext, IPointService pointService)
         {
             _dbContext = dbContext;
+            _pointService = pointService;
         }
 
         public async Task VoteAsync(ReplyVoteDto voteDto)
@@ -24,8 +27,16 @@ namespace DiscussionForum.Services
                 // Update the existing ReplyVote with the data from the DTO
                 existingReplyVote.IsUpVote = voteDto.IsUpVote;
                 existingReplyVote.IsDeleted = voteDto.IsDeleted;
-                existingReplyVote.ModifiedAt = DateTime.Now;                
-
+                existingReplyVote.ModifiedAt = DateTime.Now;
+                
+                if(voteDto.IsUpVote)
+                {
+                    await _pointService.ReplyUpvoted(voteDto.UserID, voteDto.ReplyID);
+                }
+                else
+                {
+                    await _pointService.ReplyDownvoted(voteDto.UserID, voteDto.ReplyID);
+                }
                 await _dbContext.SaveChangesAsync();
             }
             else
@@ -42,6 +53,16 @@ namespace DiscussionForum.Services
                 };
 
                 _dbContext.ReplyVotes.Add(newReplyVote);
+
+                if (voteDto.IsUpVote)
+                {
+                    await _pointService.ReplyUpvoted(voteDto.UserID, voteDto.ReplyID);
+                }
+                else
+                {
+                    await _pointService.ReplyDownvoted(voteDto.UserID, voteDto.ReplyID);
+                }
+
                 await _dbContext.SaveChangesAsync();
             }
         }

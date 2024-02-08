@@ -1,6 +1,7 @@
 ﻿using DiscussionForum.Data;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
+using System;
 
 namespace DiscussionForum.Services
 {
@@ -12,11 +13,11 @@ namespace DiscussionForum.Services
         {
             _context = context;
         }
-        public async Task PostCreated(Guid guid)
+        public async Task PostCreated(Guid createdBy)
         {
             try
             {
-                await Task.FromResult(AddPoints(guid, 10));
+                await Task.FromResult(AddPoints(createdBy, 10));
             }
             catch (Exception ex)
             {
@@ -24,11 +25,11 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task PostUpdated(Guid guid)
+        public async Task PostUpdated(Guid updatedBy)
         {
             try
             {
-                await Task.FromResult(AddPoints(guid, 1));
+                await Task.FromResult(AddPoints(updatedBy, 1));
             }
             catch (Exception ex)
             {
@@ -36,11 +37,11 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task PostDeleted(Guid guid)
+        public async Task PostDeleted(Guid deletedBy)
         {
             try
             {
-                await Task.FromResult(RemovePoints(guid, 1));
+                await Task.FromResult(RemovePoints(deletedBy, 1));
             }
             catch (Exception ex)
             {
@@ -48,11 +49,11 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task ReplyCreated(Guid guid)
+        public async Task ReplyCreated(Guid createdBy)
         {
             try
             {
-                await Task.FromResult(AddPoints(guid, 10));
+                await Task.FromResult(AddPoints(createdBy, 10));
             }
             catch (Exception ex)
             {
@@ -60,11 +61,11 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task ReplyUpdated(Guid guid)
+        public async Task ReplyUpdated(Guid updatedBy)
         {
             try
             {
-                await Task.FromResult(AddPoints(guid, 1));
+                await Task.FromResult(AddPoints(updatedBy, 1));
             }
             catch (Exception ex)
             {
@@ -72,15 +73,55 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task ReplyDeleted(Guid guid)
+        public async Task ReplyDeleted(Guid deletedBy)
         {
             try
             {
-                await Task.FromResult(RemovePoints(guid, 1));
+                await Task.FromResult(RemovePoints(deletedBy, 1));
             }
             catch (Exception ex)
             {
                 throw new ApplicationException($"Error occurred while assigning points for deleting a reply.", ex);
+            }
+        }
+
+        public async Task ReplyUpvoted(Guid upVotedBy, long replyId)
+        {
+            try
+            {
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyId));
+                if(_reply == null)
+                {
+                    throw new Exception("Reply not found while assigning points");
+                }
+                Guid upVotedOn = _reply.CreatedBy;
+
+                await Task.FromResult(AddPoints(upVotedBy, 1));
+                await Task.FromResult(AddPoints(upVotedOn, 5));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for upvoting a reply.", ex);
+            }
+        }
+
+        public async Task ReplyDownvoted(Guid downVotedBy, long replyId)
+        {
+            try
+            {
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyId));
+                if (_reply == null)
+                {
+                    throw new Exception("Reply not found while assigning points");
+                }
+                Guid downVotedOn = _reply.CreatedBy;
+
+                await Task.FromResult(RemovePoints(downVotedBy, 1));
+                await Task.FromResult(RemovePoints(downVotedOn, 2));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for downvoting a reply.", ex);
             }
         }
 
