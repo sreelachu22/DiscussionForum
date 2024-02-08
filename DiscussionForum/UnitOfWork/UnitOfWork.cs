@@ -29,6 +29,7 @@ namespace DiscussionForum.UnitOfWork
             Reply = new ReplyRepository(_context);
             ThreadVote = new ThreadVoteRepository(_context);
             ReplyVote = new ReplyVoteRepository(_context);
+            Tag=new TagRepository(_context);
         }
 
         public IDesignationRepository Designations { get; }
@@ -43,6 +44,8 @@ namespace DiscussionForum.UnitOfWork
         public IReplyRepository Reply { get; }
         public IThreadVoteRepository ThreadVote { get; }
         public IReplyVoteRepository ReplyVote { get; }
+
+        public ITagRepository Tag { get; }
 
         public int Complete()
         {

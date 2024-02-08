@@ -34,6 +34,7 @@ builder.Services.AddScoped<IThreadService, ThreadService>();
 builder.Services.AddScoped<IReplyService, ReplyService>();
 builder.Services.AddScoped<IThreadVoteService, ThreadVoteService>();
 builder.Services.AddScoped<IReplyVoteService, ReplyVoteService>();
+builder.Services.AddScoped<ITagService, TagService>();
 
 
 builder.Services.AddControllers();
