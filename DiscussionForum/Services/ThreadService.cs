@@ -16,10 +16,14 @@ namespace DiscussionForum.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDbContext _context;
 
-        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context)
+        private readonly IPointService _pointService;
+
+        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
+
+            _pointService = pointService;
         }
 
         
@@ -131,8 +135,12 @@ namespace DiscussionForum.Services
             try
             {
                 Threads _thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Title = title, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = creatorId, CreatedAt = DateTime.Now };
+
+                _pointService.PostCreated(creatorId);
+
                 _unitOfWork.Threads.Add(_thread);
                 _unitOfWork.Complete();
+
                 return _thread;
             }
             catch (Exception ex)
@@ -160,7 +168,11 @@ namespace DiscussionForum.Services
                         _thread.Content = content;
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
+
+                        _pointService.PostUpdated(modifierId);
+
                         _context.SaveChanges();
+
                         return _thread;
                     }
                     else if(title != null && content == null)
@@ -168,7 +180,11 @@ namespace DiscussionForum.Services
                         _thread.Title = title;
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
+
+                        _pointService.PostUpdated(modifierId);
+
                         _context.SaveChanges();
+
                         return _thread;
                     }
                     else
@@ -177,7 +193,11 @@ namespace DiscussionForum.Services
                         _thread.Content = content;
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
+
+                        _pointService.PostUpdated(modifierId);
+
                         _context.SaveChanges();
+
                         return _thread;
                     }
                 }
@@ -214,7 +234,11 @@ namespace DiscussionForum.Services
                     _thread.IsDeleted = true;
                     _thread.ModifiedBy = modifierId;
                     _thread.ModifiedAt = DateTime.Now;
+
+                    _pointService.PostDeleted(modifierId);
+
                     _context.SaveChanges();
+
                     return _thread;
                 }
                 //Checks if the thread is valid but deleted
