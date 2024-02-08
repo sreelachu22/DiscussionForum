@@ -10,6 +10,8 @@ namespace DiscussionForum.Models.EntityModels
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long DesignationID { get; set; }
         public string DesignationName { get; set; }
+
+        public virtual ICollection<User> Users { get; set; }
         public bool IsDeleted { get; set; }
         
     }

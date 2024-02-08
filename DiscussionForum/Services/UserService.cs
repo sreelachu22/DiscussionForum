@@ -82,7 +82,7 @@ namespace DiscussionForum.Services
                     }
                     else
                     {
-                        usersQuery = usersQuery.OrderBy(u => u.UserID);
+                        usersQuery = usersQuery.OrderBy(u => u.Id);
                     }
                 }
 
@@ -125,7 +125,7 @@ namespace DiscussionForum.Services
                 var user = await _userContext.Users
                 .Include(u => u.Department)
                 .Include(u => u.Designation)
-                .FirstOrDefaultAsync(u => u.UserID == UserId);
+                .FirstOrDefaultAsync(u => u.Id == UserId);
 
                 if (user == null)
                 {
@@ -147,7 +147,7 @@ namespace DiscussionForum.Services
 
                 var userDto = new SingleUserDTO
                 {
-                    UserID = user.UserID,
+                    UserID = user.Id,
                     Name = user.Name,
                     Email = user.Email,
                     Score = user.Score,
@@ -175,14 +175,14 @@ namespace DiscussionForum.Services
             try
             {
                 // Check if the user exists
-                var userExists = await _userContext.Users.AnyAsync(u => u.UserID == userId);
+                var userExists = await _userContext.Users.AnyAsync(u => u.Id == userId);
                 if (!userExists)
                 {
                     return ("User not found");
                 }
 
                 // Check if the admin user exists
-                var adminExists = await _userContext.Users.AnyAsync(u => u.UserID == adminId);
+                var adminExists = await _userContext.Users.AnyAsync(u => u.Id == adminId);
 
                 if (!adminExists)
                 {
@@ -251,7 +251,7 @@ namespace DiscussionForum.Services
                 .Join(_userContext.Designations, u => u.User.DesignationID, des => des.DesignationID, (ud, des) => new { User = ud, Designation = des })
                 .Select(ud => new SingleUserDTO
                 {
-                    UserID = ud.User.User.UserID,
+                    UserID = ud.User.User.Id,
                     Name = ud.User.User.Name,
                     Email = ud.User.User.Email,
                     Score = ud.User.User.Score,

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.ComponentModel.DataAnnotations.Schema;
 using DiscussionForum.Models.APIModels;
+using DiscussionForum.Seeds;
 
 namespace DiscussionForum.Data
 {
@@ -17,7 +18,9 @@ namespace DiscussionForum.Data
         public DbSet<CommunityStatus> CommunityStatus { get; set; }
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users{ get; set; }
+
+        /*public DbSet<UserLog> UserLog { get; set; }*/
         public DbSet<Threads> Threads { get; set; }
         public DbSet<ThreadVote> ThreadVotes { get; set; }
         public DbSet<ReplyVote> ReplyVotes { get; set; }
@@ -30,7 +33,25 @@ namespace DiscussionForum.Data
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>(entity => {
+                entity.ToTable(name:"Users");
+                // Specify your custom table name here
+                entity.Property(e => e.Id).HasColumnName("UserId");
+                // Specify your custom column name here
+            });
             // Configure relationships and delete behaviors
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Department)
+                .WithMany(d => d.Users)
+                .HasForeignKey(u => u.DepartmentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Designation)
+                .WithMany(d => d.Users)
+                .HasForeignKey(u => u.DesignationID)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // Relationships for Threads entity
             modelBuilder.Entity<Threads>()
@@ -182,7 +203,10 @@ namespace DiscussionForum.Data
                 .HasOne(rv => rv.ModifiedByUser)
                 .WithMany(u => u.ReplyVotesModifiedBy)
                 .HasForeignKey(rv => rv.ModifiedBy)
-                .OnDelete(DeleteBehavior.Restrict);       
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.ApplyConfiguration(new UserSeed());
+            UserRoleMappingSeed.SeedUserRoleMapping(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }

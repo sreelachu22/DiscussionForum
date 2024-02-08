@@ -1,4 +1,4 @@
-﻿/*using DiscussionForum.Models.APIModels;
+﻿using DiscussionForum.Models.APIModels;
 using DiscussionForum.Type;
 
 namespace DiscussionForum.Services
@@ -7,7 +7,6 @@ namespace DiscussionForum.Services
     {
         Task<ServiceResponse<string>> AdminLoginAsync(LoginDto dto);
 
-       *//* Task<ServiceResponse<string>> ExternalAuthenticationAsync(string token, string provider);*//*
+        /*Task<ServiceResponse<string>> ExternalAuthenticationAsync(string token, string provider);*/
     }
 }
-*/

@@ -1,4 +1,4 @@
-﻿/*using DiscussionForum.Data;
+﻿using DiscussionForum.Data;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Type;
@@ -27,6 +27,12 @@ namespace DiscussionForum.Services
             _configuration = configuration;
             _userManager = userManager;
         }
+
+        /// <summary>
+        /// Attempts to log in an admin user asynchronously.
+        /// </summary>
+        /// <param name="dto">The login information provided by the user.</param>
+        /// <returns>A service response containing a token if the login is successful, or an error message otherwise.</returns>
         public async Task<ServiceResponse<string>> AdminLoginAsync(LoginDto dto)
         {
             var response = new ServiceResponse<string>();
@@ -46,6 +52,12 @@ namespace DiscussionForum.Services
             return response;
         }
 
+        /// <summary>
+        /// Generates a JSON Web Token (JWT) for the specified user.
+        /// </summary>
+        /// <param name="user">The user for whom the token is generated.</param>
+        /// <param name="expiry">Optional. The expiry time for the token from the external provider. If not provided, a default expiry time of 1 day from the current UTC time will be used.</param>
+        /// <returns>A string representing the generated JWT.</returns>
         public string GenerateToken(User user)
         {
             string key = _configuration["Jwt:Key"];
@@ -56,11 +68,11 @@ namespace DiscussionForum.Services
             var credentials = new SigningCredentials(signingKey, "HS256");
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Role, role),
                 new Claim("Role", role),
-                new Claim("UserId", user.Id),
+                new Claim("UserId", user.Id.ToString()),
             };
             var token = new JwtSecurityToken(
                 issuer: issuer,
@@ -72,7 +84,7 @@ namespace DiscussionForum.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-       *//* public async Task<ServiceResponse<string>> ExternalAuthenticationAsync(string token, string provider)
+        /*public async Task<ServiceResponse<string>> ExternalAuthenticationAsync(string token, string provider)
         {
             var response = new ServiceResponse<string>();
             var newToken = new JwtSecurityToken(token);
@@ -90,7 +102,7 @@ namespace DiscussionForum.Services
                 response.AddError("", "Your authorization failed.Please try refreshing the page and fill in the correct credentials.");
                 return response;
             }
-            var demo = await _db.UserLogins.FirstOrDefaultAsync(c => c.UserId == user.Id);
+            var demo = await _db.UserLog.FirstOrDefaultAsync(c => c.UserID == user.Id);
             if (demo == null)
             {
                 user.Name = firstName;
@@ -110,7 +122,6 @@ namespace DiscussionForum.Services
                 response.Result = GenerateToken(user);
                 return response;
             }
-        }*//*
+        }*/
     }
 }
-*/
