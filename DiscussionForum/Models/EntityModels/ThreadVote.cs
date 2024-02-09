@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -9,7 +10,7 @@ namespace DiscussionForum.Models.EntityModels
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ThreadVoteID { get; set; }
         [Required]
-        public Guid? UserID { get; set; }
+        public Guid UserID { get; set; }
         [Required]
         public long ThreadID { get; set; }
         [Required]

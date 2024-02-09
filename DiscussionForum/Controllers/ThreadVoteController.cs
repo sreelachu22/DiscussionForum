@@ -17,13 +17,13 @@ namespace DiscussionForum.Controllers
             _threadVoteService = threadVoteService;
         }
 
-        [HttpPost]
+        [HttpPost("vote")]
         public async Task<IActionResult> PostThreadVote(ThreadVoteDto threadVoteDto)
         {
             try
             {
-                var result = await _threadVoteService.CreateThreadVote(threadVoteDto);
-                return Ok(new { ThreadVoteID = result });
+                await _threadVoteService.CreateThreadVote(threadVoteDto);
+                return Ok("Vote recorded successfully.");
             }
             catch (Exception ex)
             {

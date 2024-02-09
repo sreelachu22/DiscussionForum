@@ -13,7 +13,7 @@ namespace DiscussionForum.Services
         {
             _context = context;
         }
-        public async Task PostCreated(Guid createdBy)
+        public async Task ThreadCreated(Guid createdBy)
         {
             try
             {
@@ -25,7 +25,7 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task PostUpdated(Guid updatedBy)
+        public async Task ThreadUpdated(Guid updatedBy)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task PostDeleted(Guid deletedBy)
+        public async Task ThreadDeleted(Guid deletedBy)
         {
             try
             {
@@ -46,6 +46,46 @@ namespace DiscussionForum.Services
             catch (Exception ex)
             {
                 throw new ApplicationException($"Error occurred while assigning points for deleting a post.", ex);
+            }
+        }
+
+        public async Task ThreadUpvoted(Guid upVotedBy, long threadId)
+        {
+            try
+            {
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                if (_thread == null)
+                {
+                    throw new Exception("Post/Thread not found while assigning points");
+                }
+                Guid upVotedOn = _thread.CreatedBy;
+
+                await Task.FromResult(AddPoints(upVotedBy, 1));
+                await Task.FromResult(AddPoints(upVotedOn, 5));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for upvoting a post/thread.", ex);
+            }
+        }
+
+        public async Task ThreadDownvoted(Guid downVotedBy, long threadId)
+        {
+            try
+            {
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                if (_thread == null)
+                {
+                    throw new Exception("Post/Thread not found while assigning points");
+                }
+                Guid downVotedOn = _thread.CreatedBy;
+
+                await Task.FromResult(RemovePoints(downVotedBy, 1));
+                await Task.FromResult(RemovePoints(downVotedOn, 2));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for downvoting a post/thread.", ex);
             }
         }
 
@@ -131,7 +171,7 @@ namespace DiscussionForum.Services
             //Checks if user is valid
             if (_user == null)
             {
-                throw new Exception("User not found");
+                throw new Exception("User not found while assigning points");
             }
             else
             {
@@ -146,7 +186,7 @@ namespace DiscussionForum.Services
             //Checks if user is valid
             if (_user == null)
             {
-                throw new Exception("User not found");
+                throw new Exception("User not found while assigning points");
             }
             else
             {
