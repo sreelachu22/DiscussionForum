@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿05-02-2024 00:05:55 - GET /swagger/index.html
 05-02-2024 00:05:56 - GET /swagger/v1/swagger.json
 05-02-2024 00:06:06 - GET /api/Community
@@ -734,3 +735,11 @@
 09-02-2024 09:42:14 - POST /api/Thread
 09-02-2024 09:42:28 - GET /api/users/TopUsersByScore/16
 09-02-2024 09:43:13 - DELETE /api/Thread/45
+=======
+>>>>>>> 2ee756978182a9dd7471458b3a9924c47a9ccfd7
+09-02-2024 09:53:42 - GET /swagger/index.html
+09-02-2024 09:53:43 - GET /swagger/v1/swagger.json
+09-02-2024 09:57:22 - POST /api/Thread
+09-02-2024 10:04:09 - GET /swagger/index.html
+09-02-2024 10:04:09 - GET /swagger/v1/swagger.json
+09-02-2024 10:04:26 - POST /api/Thread

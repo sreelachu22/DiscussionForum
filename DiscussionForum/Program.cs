@@ -38,6 +38,7 @@ builder.Services.AddScoped<IPointService, PointService>();
 builder.Services.AddScoped<ITagService, TagService>();
 
 
+
 builder.Services.AddControllers();
 
 /*builder.Services.AddControllers()
