@@ -13,10 +13,12 @@ namespace DiscussionForum.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDbContext _context;
 
-        public ReplyService(IUnitOfWork unitOfWork, AppDbContext context)
+        private readonly IPointService _pointService;
+        public ReplyService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
+            _pointService = pointService;
         }
 
         public async Task<IEnumerable<Reply>> GetAllRepliesAsync()
@@ -137,8 +139,12 @@ namespace DiscussionForum.Services
             try
             {
                 Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
+
+                _pointService.ReplyCreated(creatorID);
+
                 _unitOfWork.Reply.Add(_reply);
                 _unitOfWork.Complete();
+
                 return _reply;
             }
             catch (Exception ex)
@@ -163,7 +169,11 @@ namespace DiscussionForum.Services
                     _reply.Content = content;
                     _reply.ModifiedBy = modifierID;
                     _reply.ModifiedAt = DateTime.Now;
+
+                    _pointService.ReplyUpdated(modifierID);
+
                     _context.SaveChanges();
+
                     return _reply;
                 }
                 //Checks if the reply is valid but deleted
@@ -198,7 +208,11 @@ namespace DiscussionForum.Services
                     _reply.IsDeleted = true;
                     _reply.ModifiedBy = modifierID;
                     _reply.ModifiedAt = DateTime.Now;
+
+                    _pointService.ReplyDeleted(modifierID);
+
                     _context.SaveChanges();
+
                     return _reply;
                 }
                 //Checks if the reply is valid but deleted

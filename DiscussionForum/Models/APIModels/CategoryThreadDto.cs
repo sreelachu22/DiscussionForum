@@ -2,6 +2,19 @@
 {
     public class CategoryThreadDto
     {
+
+        public CategoryThreadDto(string title,string content,List<string> tagnames)
+        {
+            this.Title = title;
+            this.Content = content;
+            this.TagNames = tagnames;
+
+        }
+        public CategoryThreadDto()
+        {
+           
+        }
+
         public long ThreadID { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }

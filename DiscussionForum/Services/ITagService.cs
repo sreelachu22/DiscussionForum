@@ -8,5 +8,6 @@ namespace DiscussionForum.Services
     {
         Task<Tag> CreateTagAsync(string tagname, Guid createdby);
         Task<IEnumerable<Tag>> GetAllTagAsync(Boolean isdel);
+
     }
 }
