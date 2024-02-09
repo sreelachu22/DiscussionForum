@@ -30,9 +30,13 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation properties
+        [ForeignKey("CommunityCategoryMappingID")]
         public virtual CommunityCategoryMapping CommunityCategoryMapping { get; set; }
+        [ForeignKey("ThreadStatusID")]
         public virtual ThreadStatus ThreadStatus { get; set; }
+        [ForeignKey("CreatedBy")]
         public virtual User CreatedByUser { get; set; }
+        [ForeignKey("ModifiedBy")]
         public virtual User ModifiedByUser { get; set; }
         public virtual ICollection<ThreadVote> ThreadVotes { get; set; }
 

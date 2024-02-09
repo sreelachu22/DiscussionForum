@@ -34,16 +34,11 @@ builder.Services.AddScoped<IThreadService, ThreadService>();
 builder.Services.AddScoped<IReplyService, ReplyService>();
 builder.Services.AddScoped<IThreadVoteService, ThreadVoteService>();
 builder.Services.AddScoped<IReplyVoteService, ReplyVoteService>();
+builder.Services.AddScoped<IPointService, PointService>();
+builder.Services.AddScoped<ITagService, TagService>();
 
 
 builder.Services.AddControllers();
-
-/*builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-    });*/
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

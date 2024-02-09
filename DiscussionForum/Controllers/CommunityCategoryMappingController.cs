@@ -32,7 +32,7 @@ namespace DiscussionForum.Controllers
         /// <param name="limit">The limit for the number of items per page.</param>
         /// <returns>Paginated categories inside a community with total count and total pages.</returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllCategories(int communityID, string term, string sort, int page = 1, int limit = 10)
+        public async Task<IActionResult> GetAllCategories(int communityID, string term="", string sort = "communityCategoryName", int page = 1, int limit = 10)
         {
             var categoryResult = await _communityCategoryMappingService.GetCategories(communityID, term, sort, page, limit);
 
