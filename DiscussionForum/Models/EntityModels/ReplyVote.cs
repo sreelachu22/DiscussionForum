@@ -11,7 +11,7 @@ namespace DiscussionForum.Models.EntityModels
         public int ReplyVoteID { get; set; }
         [ForeignKey("UserID")]
         [Required]
-        public Guid? UserID { get; set; }
+        public Guid UserID { get; set; }
         [ForeignKey("ReplyID")]
         [Required]
         public long ReplyID { get; set; }

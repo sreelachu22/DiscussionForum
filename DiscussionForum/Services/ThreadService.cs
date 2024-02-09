@@ -204,7 +204,7 @@ namespace DiscussionForum.Services
                 }
                 await _context.SaveChangesAsync();
 
-                _pointService.PostCreated(createdby);
+                await _pointService.ThreadCreated(createdby);
 
                 return newThread;
 
@@ -254,7 +254,7 @@ namespace DiscussionForum.Services
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
 
-                        _pointService.PostUpdated(modifierId);
+                        await _pointService.ThreadUpdated(modifierId);
 
                         _context.SaveChanges();
 
@@ -266,7 +266,7 @@ namespace DiscussionForum.Services
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
 
-                        _pointService.PostUpdated(modifierId);
+                        await _pointService.ThreadUpdated(modifierId);
 
                         _context.SaveChanges();
 
@@ -279,7 +279,7 @@ namespace DiscussionForum.Services
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
 
-                        _pointService.PostUpdated(modifierId);
+                        await _pointService.ThreadUpdated(modifierId);
 
                         _context.SaveChanges();
 
@@ -320,7 +320,7 @@ namespace DiscussionForum.Services
                     _thread.ModifiedBy = modifierId;
                     _thread.ModifiedAt = DateTime.Now;
 
-                    _pointService.PostDeleted(modifierId);
+                    await _pointService.ThreadDeleted(modifierId);
 
                     _context.SaveChanges();
 

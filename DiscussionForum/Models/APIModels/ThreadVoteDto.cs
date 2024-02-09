@@ -5,5 +5,6 @@
         public Guid UserID { get; set; }
         public long ThreadID { get; set; }
         public bool IsUpVote { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
