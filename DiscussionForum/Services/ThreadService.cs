@@ -64,7 +64,6 @@ namespace DiscussionForum.Services
                     .Take(pageSize)
                     .Select(t => new CategoryThreadDto
                     {
-                        Title = t.Title,
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
