@@ -40,6 +40,7 @@ namespace DiscussionForum.Services
         /// Retrieves all threads.
         /// </summary>
         Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync();
+        Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount);
     }
-
 }
+
