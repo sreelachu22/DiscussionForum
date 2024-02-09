@@ -15,5 +15,7 @@
         public int DownVoteCount { get; set; }
 
         public List<String> TagNames { get; set; }
+
+        //public int RepliesCount { get; set; }
     }
 }

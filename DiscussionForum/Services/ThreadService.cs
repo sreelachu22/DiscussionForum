@@ -22,7 +22,7 @@ namespace DiscussionForum.Services
             _context = context;
         }
 
-        
+
         /*GetAllThreads retrieves paginated threads for a specific community category mapping.
         It includes additional logic to obtain the total thread count, category name, and description.
         The method takes CommunityCategoryMappingID, pageNumber, and pageSize as inputs, returning 
@@ -60,7 +60,7 @@ namespace DiscussionForum.Services
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
-                        Title =t.Title,
+                        Title = t.Title,
                         Content = t.Content,
                         CreatedBy = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
@@ -69,13 +69,13 @@ namespace DiscussionForum.Services
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
                         UpVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
-                        DownVoteCount =t.ThreadVotes!= null ? t.ThreadVotes.Count(tv=>!tv.IsDeleted && !tv.IsUpVote) : 0,
+                        DownVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == t.ThreadID
                                     select tg.TagName).ToList()
 
-            })
+                    })
                     .ToListAsync();
 
 
@@ -87,6 +87,62 @@ namespace DiscussionForum.Services
                 throw new Exception("Error  while fetching threads.", ex);
             }
         }
+
+        public async Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount)
+        {
+            try
+            {
+                IQueryable<Threads> query = _context.Threads
+                    .Include(t => t.CommunityCategoryMapping)
+                    .ThenInclude(c => c.CommunityCategory)
+                    .Include(t => t.ThreadStatus)
+                    .Include(t => t.CreatedByUser)
+                    .Include(t => t.ModifiedByUser)
+                    .Include(t => t.ThreadVotes)
+                    .Where(t => t.CommunityCategoryMappingID == CommunityCategoryMappingID);
+
+                switch (sortBy.ToLower())
+                {
+                    case "vote":
+                        query = query.OrderByDescending(t => t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote));
+                        break;
+                    case "latest":
+                        query = query.OrderByDescending(t => t.CreatedAt);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid sortBy parameter. Only 'votes' or 'createdAt' are allowed.");
+                }
+
+                var threads = await query.Take(topCount)
+                    .Select(t => new CategoryThreadDto
+                    {
+                        ThreadID = t.ThreadID,
+                        Title = t.Title,
+                        Content = t.Content,
+                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedAt = t.CreatedAt,
+                        ModifiedBy = t.ModifiedByUser != null ? t.ModifiedByUser.Name : null,
+                        ModifiedAt = t.ModifiedAt,
+                        ThreadStatusName = t.ThreadStatus.ThreadStatusName,
+                        IsAnswered = t.IsAnswered,
+                        UpVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        DownVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == t.ThreadID
+                                    select tg.TagName).ToList()
+                    })
+                    .ToListAsync();
+
+                return threads;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while fetching top threads.", ex);
+            }
+        }
+
+
 
         public async Task<Threads> GetThreadByIdAsync(long threadId)
         {
@@ -155,7 +211,7 @@ namespace DiscussionForum.Services
                 //Checks if thread is valid and not deleted
                 else if (_thread != null && !_thread.IsDeleted)
                 {
-                    if(title == null && content != null)
+                    if (title == null && content != null)
                     {
                         _thread.Content = content;
                         _thread.ModifiedBy = modifierId;
@@ -163,7 +219,7 @@ namespace DiscussionForum.Services
                         _context.SaveChanges();
                         return _thread;
                     }
-                    else if(title != null && content == null)
+                    else if (title != null && content == null)
                     {
                         _thread.Title = title;
                         _thread.ModifiedBy = modifierId;

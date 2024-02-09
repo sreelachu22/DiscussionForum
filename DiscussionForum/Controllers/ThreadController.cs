@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Models.APIModels;
+using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -47,7 +48,19 @@ namespace DiscussionForum.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        [HttpGet("top-threads")]
+        public async Task<IActionResult> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount)
+        {
+            try
+            {
+                var threads = await _threadService.GetTopThreads(CommunityCategoryMappingID, sortBy, topCount);
+                return Ok(threads);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while fetching top threads: {ex.Message}");
+            }
+        }
         /// <summary>
         /// Retrieves a thread based on the given thread ID.
         /// </summary>

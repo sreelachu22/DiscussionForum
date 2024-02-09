@@ -36,5 +36,6 @@ namespace DiscussionForum.Models.EntityModels
         public virtual User ModifiedByUser { get; set; }
         public virtual ICollection<ThreadVote> ThreadVotes { get; set; }
 
+
     }
 }
