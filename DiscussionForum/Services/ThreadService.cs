@@ -16,7 +16,6 @@ namespace DiscussionForum.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDbContext _context;
-
         private readonly IPointService _pointService;
         private readonly ITagService _tagService;
 
@@ -24,7 +23,6 @@ namespace DiscussionForum.Services
         {
             _unitOfWork = unitOfWork;
             _context = context;
-
             _pointService = pointService;
             _tagService = tagService;
         }
