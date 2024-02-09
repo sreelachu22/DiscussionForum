@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Data;
+using DiscussionForum.Services;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
@@ -15,14 +16,18 @@ namespace DiscussionForum.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDbContext _context;
+        private readonly IPointService _pointService;
+        private readonly ITagService _tagService;
 
-        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context)
+        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService,ITagService tagService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
+            _pointService = pointService;
+            _tagService = tagService;
         }
 
-        
+
         /*GetAllThreads retrieves paginated threads for a specific community category mapping.
         It includes additional logic to obtain the total thread count, category name, and description.
         The method takes CommunityCategoryMappingID, pageNumber, and pageSize as inputs, returning 
@@ -60,7 +65,7 @@ namespace DiscussionForum.Services
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
-                        Title =t.Title,
+                        Title = t.Title,
                         Content = t.Content,
                         CreatedBy = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
@@ -69,13 +74,13 @@ namespace DiscussionForum.Services
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
                         UpVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
-                        DownVoteCount =t.ThreadVotes!= null ? t.ThreadVotes.Count(tv=>!tv.IsDeleted && !tv.IsUpVote) : 0,
+                        DownVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == t.ThreadID
                                     select tg.TagName).ToList()
 
-            })
+                    })
                     .ToListAsync();
 
 
@@ -87,6 +92,62 @@ namespace DiscussionForum.Services
                 throw new Exception("Error  while fetching threads.", ex);
             }
         }
+
+        public async Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount)
+        {
+            try
+            {
+                IQueryable<Threads> query = _context.Threads
+                    .Include(t => t.CommunityCategoryMapping)
+                    .ThenInclude(c => c.CommunityCategory)
+                    .Include(t => t.ThreadStatus)
+                    .Include(t => t.CreatedByUser)
+                    .Include(t => t.ModifiedByUser)
+                    .Include(t => t.ThreadVotes)
+                    .Where(t => t.CommunityCategoryMappingID == CommunityCategoryMappingID);
+
+                switch (sortBy.ToLower())
+                {
+                    case "vote":
+                        query = query.OrderByDescending(t => t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote));
+                        break;
+                    case "latest":
+                        query = query.OrderByDescending(t => t.CreatedAt);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid sortBy parameter. Only 'votes' or 'createdAt' are allowed.");
+                }
+
+                var threads = await query.Take(topCount)
+                    .Select(t => new CategoryThreadDto
+                    {
+                        ThreadID = t.ThreadID,
+                        Title = t.Title,
+                        Content = t.Content,
+                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedAt = t.CreatedAt,
+                        ModifiedBy = t.ModifiedByUser != null ? t.ModifiedByUser.Name : null,
+                        ModifiedAt = t.ModifiedAt,
+                        ThreadStatusName = t.ThreadStatus.ThreadStatusName,
+                        IsAnswered = t.IsAnswered,
+                        UpVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        DownVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == t.ThreadID
+                                    select tg.TagName).ToList()
+                    })
+                    .ToListAsync();
+
+                return threads;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while fetching top threads.", ex);
+            }
+        }
+
+
 
         public async Task<Threads> GetThreadByIdAsync(long threadId)
         {
@@ -101,23 +162,52 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<Threads> CreateThreadAsync(int communityCategoryMappingId, Guid creatorId, string content)
+        public async Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto,int communityCategoryId, Guid createdby)
         {
             try
             {
-                CommunityCategoryMapping _communityCategoryMapping = await Task.FromResult(_context.CommunityCategoryMapping.Find(communityCategoryMappingId));
-                User _creator = await Task.FromResult(_context.Users.Find(creatorId));
-                //Checks if the community category is valid
-                if (_communityCategoryMapping == null)
+
+                bool communityCategoryMappingExists = await Task.FromResult(_context.CommunityCategoryMapping.Any(mapping => mapping.CommunityCategoryID == communityCategoryId));
+                if (!communityCategoryMappingExists)
                 {
-                    throw new Exception("Community category mapping not found");
+                    throw new Exception("Category does not exists in your community");
                 }
-                //Checks if the creator is valid
-                else if (_creator == null)
+
+                User userexists = await Task.FromResult(_context.Users.Find(createdby));
+                if (userexists == null) {
+                    throw new Exception("User no valid or doesnt exists");
+                }
+
+                Threads newThread = CreateThread(categorythreaddto, communityCategoryId, createdby);
+
+                foreach (string tagName in categorythreaddto.TagNames)
                 {
-                    throw new Exception("Creator not found");
+                    string tagname = tagName.ToLower();
+                    Tag tagexists = _context.Tags.SingleOrDefault(tag => tag.TagName.ToLower() == tagname);
+                   
+                    if (tagexists == null)
+                    {
+                        Tag newTag = await _tagService.CreateTagAsync(tagname, createdby);
+                        tagexists = newTag;
+                    }
+                    
+                    ThreadTagsMapping threadtagmapping = new ThreadTagsMapping
+                    {
+                        TagID = tagexists.TagID,
+                        ThreadID = newThread.ThreadID,
+                        IsDeleted = false,
+                        CreatedBy = createdby,
+                        CreatedAt = DateTime.Now,
+                    };
+                    
+                _context.ThreadTagsMapping.Add(threadtagmapping);
                 }
-                return await Task.FromResult(CreateThread(communityCategoryMappingId, creatorId, content));
+                await _context.SaveChangesAsync();
+
+                _pointService.PostCreated(createdby);
+
+                return newThread;
+
             }
             catch (Exception ex)
             {
@@ -125,23 +215,26 @@ namespace DiscussionForum.Services
             }
         }
 
-        private Threads CreateThread(int communityCategoryMappingId, Guid creatorId, string content)
+        private Threads CreateThread(CategoryThreadDto categorythreaddto,int communityCategoryId, Guid createdby)
         {
-            //Creates a new thread and saves it to the database
             try
             {
-                Threads _thread = new Threads { CommunityCategoryMappingID = communityCategoryMappingId, Content = content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = creatorId, CreatedAt = DateTime.Now };
-                _unitOfWork.Threads.Add(_thread);
+                Threads thread = new Threads { CommunityCategoryMappingID = communityCategoryId, Title = categorythreaddto.Title, Content = categorythreaddto.Content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = createdby, CreatedAt = DateTime.Now };
+
+                
+                _unitOfWork.Threads.Add(thread);
                 _unitOfWork.Complete();
-                return _thread;
+
+                return thread;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error occurred while creating a thread.", ex);
+                throw new ApplicationException($"Error occurred while creating the thread.", ex);
             }
         }
 
-        public async Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string content)
+
+        public async Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string? title, string? content)
         {
             try
             {
@@ -155,11 +248,43 @@ namespace DiscussionForum.Services
                 //Checks if thread is valid and not deleted
                 else if (_thread != null && !_thread.IsDeleted)
                 {
-                    _thread.Content = content;
-                    _thread.ModifiedBy = modifierId;
-                    _thread.ModifiedAt = DateTime.Now;
-                    _context.SaveChanges();
-                    return _thread;
+                    if (title == null && content != null)
+                    {
+                        _thread.Content = content;
+                        _thread.ModifiedBy = modifierId;
+                        _thread.ModifiedAt = DateTime.Now;
+
+                        _pointService.PostUpdated(modifierId);
+
+                        _context.SaveChanges();
+
+                        return _thread;
+                    }
+                    else if (title != null && content == null)
+                    {
+                        _thread.Title = title;
+                        _thread.ModifiedBy = modifierId;
+                        _thread.ModifiedAt = DateTime.Now;
+
+                        _pointService.PostUpdated(modifierId);
+
+                        _context.SaveChanges();
+
+                        return _thread;
+                    }
+                    else
+                    {
+                        _thread.Title = title;
+                        _thread.Content = content;
+                        _thread.ModifiedBy = modifierId;
+                        _thread.ModifiedAt = DateTime.Now;
+
+                        _pointService.PostUpdated(modifierId);
+
+                        _context.SaveChanges();
+
+                        return _thread;
+                    }
                 }
                 //Checks if the thread is valid but deleted
                 else if (_thread != null && _thread.IsDeleted)
@@ -194,7 +319,11 @@ namespace DiscussionForum.Services
                     _thread.IsDeleted = true;
                     _thread.ModifiedBy = modifierId;
                     _thread.ModifiedAt = DateTime.Now;
+
+                    _pointService.PostDeleted(modifierId);
+
                     _context.SaveChanges();
+
                     return _thread;
                 }
                 //Checks if the thread is valid but deleted

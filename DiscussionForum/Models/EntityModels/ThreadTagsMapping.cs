@@ -17,9 +17,13 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation properties
+        [ForeignKey("TagID")]
         public virtual Tag Tag { get; set; }
+        [ForeignKey("ThreadID")]
         public virtual Threads Thread { get; set; }
+        [ForeignKey("CreatedBy")]
         public virtual User CreatedByUser { get; set; }
+        [ForeignKey("ModifiedBy")]
         public virtual User ModifiedByUser { get; set; }
     }
 }

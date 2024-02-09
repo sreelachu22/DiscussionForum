@@ -16,6 +16,8 @@ namespace DiscussionForum.UnitOfWork
         IThreadRepository Threads { get; }
         IReplyRepository Reply { get; }
         IThreadVoteRepository ThreadVote { get; }
+
+        ITagRepository Tag { get; } 
         int Complete();
 
     }
