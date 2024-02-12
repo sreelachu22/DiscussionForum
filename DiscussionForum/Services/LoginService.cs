@@ -140,6 +140,7 @@ namespace DiscussionForum.Services
                 else
                 {
                     var user = await _context.Users.Where(us => us.Email == email).FirstOrDefaultAsync();
+
                     var systemUserId = await _context.Users
                         .Where(us => us.Email == "system@example.com")
                         .Select(us => us.UserID)
