@@ -1,2 +1,4 @@
-﻿12-02-2024 10:46:46 - GET /swagger/index.html
-12-02-2024 10:46:46 - GET /swagger/v1/swagger.json
+﻿12-02-2024 11:20:29 - GET /swagger/index.html
+12-02-2024 11:20:29 - GET /swagger/v1/swagger.json
+12-02-2024 11:20:59 - OPTIONS /api/Login/ExternalLogin
+12-02-2024 11:20:59 - POST /api/Login/ExternalLogin

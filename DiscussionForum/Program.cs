@@ -25,39 +25,9 @@ builder.Services.AddCors(options =>
         });
 });
 
-/*builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin",
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:4200")
-                   .AllowAnyHeader()
-                   .AllowAnyMethod();
-        });
-});*/
-
-
-
-// JWT Configuration
 var jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
 var jwtAudience = builder.Configuration.GetSection("Jwt:Audience").Get<string>();
 var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
-
-string GenerateKey(int length)
-{
-    var randomBytes = new byte[length / 8];
-    using (var rng = new RNGCryptoServiceProvider())
-    {
-        rng.GetBytes(randomBytes);
-    }
-    return Convert.ToBase64String(randomBytes);
-}
-// Generate a new key with 256 bits (32 bytes)
-/*var jwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GenerateKey(jwtkey.Length)));*/
-
-
-var generatedJwtKey = GenerateKey(256);
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -74,11 +44,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-/*.AddMicrosoftAccount(microsoftOptions =>
-{
-    microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
-    microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
-});*/
 
 builder.Services.AddAuthorization(options =>
 {
