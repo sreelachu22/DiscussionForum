@@ -16,9 +16,9 @@ namespace DiscussionForum.Models.APIModels
         public long? ParentReplyID { get; set; }
         public string Content { get; set; }
         public int UpvoteCount { get; set; }
-        public int DownvoteCount { get; set; }   
+        public int DownvoteCount { get; set; }
         public bool IsDeleted { get; set; }
-
+        public bool? HasViewed { get; set; }
         public Guid? CreatedBy { get; set; }
         public string? CreatedUserName { get; set; }
         public DateTime? CreatedAt { get; set; }

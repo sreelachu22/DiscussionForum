@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Models.APIModels;
+using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -223,7 +224,7 @@ namespace DiscussionForum.Controllers
                 {
                     throw new Exception("Invalid content. It cannot be null or empty.");
                 }
-                else if(creatorId == Guid.Empty)
+                else if (creatorId == Guid.Empty)
                 {
                     throw new Exception("Invalid creatorId. It cannot be null or empty.");
                 }
@@ -302,7 +303,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid modifierId. It cannot be null or empty.");
                 }
 
-                Reply _reply = await _replyService.DeleteReplyAsync(replyId,modifierId);
+                Reply _reply = await _replyService.DeleteReplyAsync(replyId, modifierId);
                 return Ok(_reply);
             }
             catch (Exception ex)
@@ -343,6 +344,24 @@ namespace DiscussionForum.Controllers
             {
                 return StatusCode(500, "An error occurred while processing your request.");
             }
+        }
+        
+        [HttpGet("unviewed")]
+        public ActionResult<IEnumerable<ReplyNotifyDTO>> GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize)
+        {
+            var replies = _replyService.GetUnviewedReplies(userId, categoryId, sortDirection, pageNumber, pageSize);
+            return Ok(replies);
+        }
+        [HttpPost("{replyId}/updateHasViewed")]
+        public async Task<IActionResult> UpdateHasViewed(long replyId)
+        {
+            var success = await _replyService.UpdateHasViewed(replyId);
+            if (success)
+            {
+                return Ok();
+            }
+
+            return NotFound();
         }
 
     }
