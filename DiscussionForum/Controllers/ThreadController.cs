@@ -137,13 +137,13 @@ namespace DiscussionForum.Controllers
         /// <param name="CommunityCategoryMappingId">he mapping ID of the category in a community where threads must be posted.</param>
         /// <param name="CreatorId">The ID of the user posting the thread.</param>
         [HttpPost]
-        public async Task<IActionResult> CreateThread(int communityCategoryId, Guid createdby, [FromBody] ThreadContent threadcontent)
+        public async Task<IActionResult> CreateThread(int communityMappingId,Guid userId, [FromBody] ThreadContent threadcontent)
         {
             try
             {
                 //Validates the request data
 
-                if (communityCategoryId <= 0)
+                if (communityMappingId <= 0)
                 {
                     throw new Exception("Invalid CommunityCategoryMappingId. It should be greater than zero.");
                 }
@@ -159,7 +159,7 @@ namespace DiscussionForum.Controllers
                 {
                     throw new Exception("Invalid content. It cannot be null or empty.");
                 }
-                else if (createdby == Guid.Empty)
+                else if (userId == Guid.Empty)
                 {
                     throw new Exception("Invalid creatorId. It cannot be null or empty.");
                 }
@@ -169,7 +169,7 @@ namespace DiscussionForum.Controllers
                     tagnames: threadcontent.Tags
                 );
 
-                Threads _thread = await _threadService.CreateThreadAsync(categorythreaddto, communityCategoryId, createdby);
+                Threads _thread = await _threadService.CreateThreadAsync(categorythreaddto, communityMappingId, userId);
                 return Ok(_thread);
             }
             catch (Exception ex)
