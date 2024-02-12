@@ -19,7 +19,7 @@ namespace DiscussionForum.Services
         private readonly IPointService _pointService;
         private readonly ITagService _tagService;
 
-        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService,ITagService tagService)
+        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService, ITagService tagService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
@@ -66,7 +66,6 @@ namespace DiscussionForum.Services
                     {
                         Title = t.Title,
                         ThreadID = t.ThreadID,
-                        Title = t.Title,
                         Content = t.Content,
                         CreatedBy = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
@@ -163,7 +162,7 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto,int communityCategoryId, Guid createdby)
+        public async Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto, int communityCategoryId, Guid createdby)
         {
             try
             {
@@ -175,7 +174,8 @@ namespace DiscussionForum.Services
                 }
 
                 User userexists = await Task.FromResult(_context.Users.Find(createdby));
-                if (userexists == null) {
+                if (userexists == null)
+                {
                     throw new Exception("User no valid or doesnt exists");
                 }
 
@@ -185,13 +185,13 @@ namespace DiscussionForum.Services
                 {
                     string tagname = tagName.ToLower();
                     Tag tagexists = _context.Tags.SingleOrDefault(tag => tag.TagName.ToLower() == tagname);
-                   
+
                     if (tagexists == null)
                     {
                         Tag newTag = await _tagService.CreateTagAsync(tagname, createdby);
                         tagexists = newTag;
                     }
-                    
+
                     ThreadTagsMapping threadtagmapping = new ThreadTagsMapping
                     {
                         TagID = tagexists.TagID,
@@ -200,8 +200,8 @@ namespace DiscussionForum.Services
                         CreatedBy = createdby,
                         CreatedAt = DateTime.Now,
                     };
-                    
-                _context.ThreadTagsMapping.Add(threadtagmapping);
+
+                    _context.ThreadTagsMapping.Add(threadtagmapping);
                 }
                 await _context.SaveChangesAsync();
 
@@ -216,13 +216,13 @@ namespace DiscussionForum.Services
             }
         }
 
-        private Threads CreateThread(CategoryThreadDto categorythreaddto,int communityCategoryId, Guid createdby)
+        private Threads CreateThread(CategoryThreadDto categorythreaddto, int communityCategoryId, Guid createdby)
         {
             try
             {
                 Threads thread = new Threads { CommunityCategoryMappingID = communityCategoryId, Title = categorythreaddto.Title, Content = categorythreaddto.Content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = createdby, CreatedAt = DateTime.Now };
 
-                
+
                 _unitOfWork.Threads.Add(thread);
                 _unitOfWork.Complete();
 
