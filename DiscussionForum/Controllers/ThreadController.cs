@@ -49,6 +49,7 @@ namespace DiscussionForum.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
         [HttpGet("top-threads")]
         public async Task<IActionResult> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount)
         {
@@ -62,6 +63,30 @@ namespace DiscussionForum.Controllers
                 return StatusCode(500, $"Error while fetching top threads: {ex.Message}");
             }
         }
+
+        [HttpGet("ClosedThreads")]
+        public async Task<IActionResult> GetClosedThreads(int CommunityID, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var result = await _threadService.GetClosedThreads(CommunityID, pageNumber, pageSize);
+
+                var response = new
+                {
+                    Threads = result.Threads,
+                    TotalCount = result.TotalCount,
+                    CommunityName = result.CommunityName
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in GetClosedThreads: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         /// <summary>
         /// Retrieves a thread based on the given thread ID.
         /// </summary>

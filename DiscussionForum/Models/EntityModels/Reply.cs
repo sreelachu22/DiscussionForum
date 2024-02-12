@@ -22,6 +22,7 @@ namespace DiscussionForum.Models.EntityModels
         [ForeignKey("ModifiedBy")]
         public Guid? ModifiedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public bool? HasViewed { get; set; } 
 
         // Navigation properties
         [ForeignKey("ThreadID")]
