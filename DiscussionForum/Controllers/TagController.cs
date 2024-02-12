@@ -32,6 +32,31 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [HttpGet("Search")]
+
+        public async Task<IActionResult> SearchTags(string keyword)
+        {
+            try
+            {
+                var tags = await _tagService.GeAllTagAsync(keyword);
+                if (tags.Any())
+                {
+                    return Ok(tags);
+                }
+                else
+                {
+                    return NotFound("No tags found");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in fetching Searched Tags: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+
         [HttpPost] 
         public async Task<IActionResult> CreateTag([FromBody] string tagname,Guid createdby)
         {

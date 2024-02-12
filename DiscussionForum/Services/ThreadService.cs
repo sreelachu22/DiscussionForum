@@ -66,7 +66,6 @@ namespace DiscussionForum.Services
                     {
                         Title = t.Title,
                         ThreadID = t.ThreadID,
-                        Title = t.Title,
                         Content = t.Content,
                         CreatedBy = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
