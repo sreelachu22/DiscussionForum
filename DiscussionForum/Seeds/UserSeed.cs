@@ -1,4 +1,4 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿/*using DiscussionForum.Models.EntityModels;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,3 +32,4 @@ namespace DiscussionForum.Seeds
         }
     }
 }
+*/

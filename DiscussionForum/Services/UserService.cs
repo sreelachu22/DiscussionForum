@@ -82,7 +82,7 @@ namespace DiscussionForum.Services
                     }
                     else
                     {
-                        usersQuery = usersQuery.OrderBy(u => u.Id);
+                        usersQuery = usersQuery.OrderBy(u => u.UserID);
                     }
                 }
 
@@ -125,7 +125,7 @@ namespace DiscussionForum.Services
                 var user = await _userContext.Users
                 .Include(u => u.Department)
                 .Include(u => u.Designation)
-                .FirstOrDefaultAsync(u => u.Id == UserId);
+                .FirstOrDefaultAsync(u => u.UserID == UserId);
 
                 if (user == null)
                 {
@@ -139,7 +139,9 @@ namespace DiscussionForum.Services
                                  where rm.UserID == UserId
                                  select r.RoleName)
                                  .FirstOrDefault();*/
-
+                var role = _userContext.UserRoleMapping
+                                .Where(rm => rm.UserID == UserId)
+                                .Join(_userContext.Roles, rm => rm.RoleID, r => r.RoleID, (rm, r) => r.RoleName);
                 var roleName = _userContext.UserRoleMapping
                                 .Where(rm => rm.UserID == UserId)
                                 .Join(_userContext.Roles, rm => rm.RoleID, r => r.RoleID, (rm, r) => r.RoleName)
@@ -147,7 +149,7 @@ namespace DiscussionForum.Services
 
                 var userDto = new SingleUserDTO
                 {
-                    UserID = user.Id,
+                    UserID = user.UserID,
                     Name = user.Name,
                     Email = user.Email,
                     Score = user.Score,
@@ -175,14 +177,14 @@ namespace DiscussionForum.Services
             try
             {
                 // Check if the user exists
-                var userExists = await _userContext.Users.AnyAsync(u => u.Id == userId);
+                var userExists = await _userContext.Users.AnyAsync(u => u.UserID == userId);
                 if (!userExists)
                 {
                     return ("User not found");
                 }
 
                 // Check if the admin user exists
-                var adminExists = await _userContext.Users.AnyAsync(u => u.Id == adminId);
+                var adminExists = await _userContext.Users.AnyAsync(u => u.UserID == adminId);
 
                 if (!adminExists)
                 {
@@ -251,7 +253,7 @@ namespace DiscussionForum.Services
                 .Join(_userContext.Designations, u => u.User.DesignationID, des => des.DesignationID, (ud, des) => new { User = ud, Designation = des })
                 .Select(ud => new SingleUserDTO
                 {
-                    UserID = ud.User.User.Id,
+                    UserID = ud.User.User.UserID,
                     Name = ud.User.User.Name,
                     Email = ud.User.User.Email,
                     Score = ud.User.User.Score,

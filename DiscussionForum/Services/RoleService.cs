@@ -56,24 +56,6 @@ namespace DiscussionForum.Services
             }
         }
 
-        /// <summary>
-        /// Retrieves all roles from the IdentityRoles table in the database and returns them as a list of DropdownDto objects.
-        /// The role names are modified by adding spaces before capital letters in the name.
-        /// </summary>
-        /// <returns>A service response containing the list of roles as DropdownDto objects with modified names.</returns>
-        /*public async Task<ServiceResponse<List<ListDto<string>>>> GetAllRolesAsync()
-        {
-            var response = new ServiceResponse<List<ListDto<string>>>();
-            response.Result = await _context.Roles
-                .Select(r => new ListDto<string>
-                {
-                    Id = r.RoleId,
-                    Name = AddSpacesToRoleName(r.Name)
-                })
-                .ToListAsync();
-            return response;
-        }*/
-
-
+        
     }
 }

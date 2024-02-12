@@ -3,125 +3,215 @@ using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Type;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace DiscussionForum.Services
 {
     public class LoginService : ILoginService
     {
-        private readonly AppDbContext _db;
-        private readonly SignInManager<User> _signInManager;
-        private readonly IConfiguration _configuration;
-        private readonly UserManager<User> _userManager;
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _config;
 
         public LoginService(AppDbContext db,
-                            SignInManager<User> signInManager,
-                            IConfiguration configuration,
-                            UserManager<User> userManager)
+                            IConfiguration configuration)
         {
-            _db = db;
-            _signInManager = signInManager;
-            _configuration = configuration;
-            _userManager = userManager;
+            _context = db;
+            _config = configuration;
         }
+
+
 
         /// <summary>
         /// Attempts to log in an admin user asynchronously.
         /// </summary>
         /// <param name="dto">The login information provided by the user.</param>
         /// <returns>A service response containing a token if the login is successful, or an error message otherwise.</returns>
-        public async Task<ServiceResponse<string>> AdminLoginAsync(LoginDto dto)
+        public async Task<TokenDto> AdminLoginAsync(AdminLoginDto userLogin)
         {
-            var response = new ServiceResponse<string>();
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null)
-            {
-                response.AddError("", "Email entered not found.");
-                return response;
-            }
-            var signin = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, true);
-            if (signin.Succeeded)
-            {
-                response.Result = GenerateToken(user);
-                return response;
-            }
-            response.AddError("", "Unable to login, recheck your email and password.");
-            return response;
+                string adminPassword = _config.GetValue<string>("SuperAdmin:Password");
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
+
+                if (user != null)
+                {
+                    if (string.Equals(HashPassword(userLogin.Password), HashPassword(adminPassword), StringComparison.Ordinal))
+                    {
+                        var userName = userLogin.Email;
+                        string tokengenerated = await TokenGenerater(user);
+
+                        return new TokenDto { Token = tokengenerated };
+                    }
+
+                    return null;
+                }
+
+                return null;
         }
 
-        /// <summary>
-        /// Generates a JSON Web Token (JWT) for the specified user.
-        /// </summary>
-        /// <param name="user">The user for whom the token is generated.</param>
-        /// <param name="expiry">Optional. The expiry time for the token from the external provider. If not provided, a default expiry time of 1 day from the current UTC time will be used.</param>
-        /// <returns>A string representing the generated JWT.</returns>
-        public string GenerateToken(User user)
+        private string HashPassword(string password)
         {
-            string key = _configuration["Jwt:Key"];
-            string issuer = _configuration["Jwt:Issuer"];
-            string audience = _configuration["Jwt:Audience"];
-            var role = _userManager.GetRolesAsync(user).GetAwaiter().GetResult().First();
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-            var credentials = new SigningCredentials(signingKey, "HS256");
-            var claims = new Claim[]
+
+            using (SHA256 sha256 = SHA256.Create())
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }
+
+        string GenerateKey(int length)
+        {
+            var randomBytes = new byte[length / 8];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes);
+        }
+
+
+        public async Task<string> TokenGenerater(User user)
+        {
+            string key = _config["Jwt:Key"];
+            string issuer = _config["Jwt:Issuer"];
+            string audience = _config["Jwt:Audience"];
+            var role = await GetRole(user);
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, role),
-                new Claim("Role", role),
-                new Claim("UserId", user.Id.ToString()),
+                new Claim(ClaimTypes.Role, role.ToString()),
+                new Claim("Role", role.ToString()),
+                new Claim("UserId", user.UserID.ToString()),
             };
             var token = new JwtSecurityToken(
                 issuer: issuer,
-                claims: claims,
+                claims:  claims,
                 audience: audience,
-                expires: DateTime.UtcNow + TimeSpan.FromDays(1),
+                expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        /*public async Task<ServiceResponse<string>> ExternalAuthenticationAsync(string token, string provider)
+        private async Task<string> GetRole(User user)
         {
-            var response = new ServiceResponse<string>();
-            var newToken = new JwtSecurityToken(token);
-            var claims = newToken.Claims;
-            string email = claims.First(c => c.Type == "preferred_username").Value;
-            string oid = claims.First(c => c.Type == "oid").Value;
-            string fullName = claims.First(c => c.Type == "name").Value;
-            string[] nameParts = fullName.Split(' ');
-            string firstName = nameParts[0];
-            string[] lastNameParts = nameParts.Skip(1).ToArray();
-            string lastName = string.Join(" ", lastNameParts);
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            var roleName = await _context.Users
+                .Where(u => u.UserID == user.UserID)
+                .Join(_context.UserRoleMapping,
+                      u => u.UserID,
+                      ur => ur.UserID,
+                      (u, ur) => ur)
+                .Join(_context.Roles,
+                      ur => ur.RoleID,
+                      r => r.RoleID,
+                      (ur, r) => r.RoleName)
+                .FirstOrDefaultAsync();
+
+            return roleName;
+        }
+
+        public async Task<TokenDto> ExternalAuthenticationAsync(string token, string provider)
+        {
+            var response = new ServiceResponse<TokenDto>();
+
+            try
             {
-                response.AddError("", "Your authorization failed.Please try refreshing the page and fill in the correct credentials.");
-                return response;
-            }
-            var demo = await _db.UserLog.FirstOrDefaultAsync(c => c.UserID == user.Id);
-            if (demo == null)
-            {
-                user.Name = firstName;
-                await _db.SaveChangesAsync();
-                var loginInfo = new UserLoginInfo(provider, oid, provider);
-                var signin = await _userManager.AddLoginAsync(user, loginInfo);
-                if (signin.Succeeded)
+                var newToken = new JwtSecurityToken(token);
+                var claims = newToken.Claims;
+                // retrieve name, role, email from azure token claims
+                string name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                string[] roles = claims.Where(c => c.Type == "roles").Select(c => c.Value).ToArray();
+                string roleName = roles[0];
+                string email = claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
+                
+
+                if (string.IsNullOrEmpty(email))
                 {
-                    response.Result = GenerateToken(user);
-                    return response;
+                    return null;
                 }
-                response.AddError("", "Your authorization failed. Please try refreshing the page and fill in the correct credentials.");
-                return response;
+
+                else
+                {
+                    var user = await _context.Users.Where(us => us.Email == email).FirstOrDefaultAsync();
+
+                    if (user == null)
+                    {
+                        // User does not exist, create a new user
+                        user = new User
+                        {
+                            Email = email,
+                            Name = name,
+                            Score = 0,
+                            DepartmentID = null,
+                            DesignationID = null,
+                            IsDeleted = false,
+                            CreatedBy = Guid.Parse("18C0540F-70B8-44E8-A4CD-2A6F459E0630"),
+                            CreatedAt = DateTime.Now,
+                            ModifiedBy = null,
+                            ModifiedAt = null,
+                        };
+
+                        _context.Users.Add(user);
+                        await _context.SaveChangesAsync();
+
+                        var newUserId = (from u in _context.Users
+                                         where u.Email == email
+                                         select u.UserID).FirstOrDefault();
+                        int roleId;
+
+                        if (roleName == "SuperAdmin") {
+                            roleId = 1;
+                        }
+                        else if (roleName == "CommunityHead")
+                        {
+                            roleId = 2;
+                        }
+                        else if (roleName == "User")
+                        {
+                            roleId = 3;
+                        }
+                        else
+                        {
+                            roleId = 3; // Default value is RoleID of User (3)
+                        }
+
+                        var userRoleMapping = new UserRoleMapping
+                        {
+                            UserID = newUserId,
+                            RoleID = roleId,
+                            IsDeleted = false,
+                            CreatedBy = Guid.Parse("18C0540F-70B8-44E8-A4CD-2A6F459E0630"),
+                            CreatedAt = DateTime.Now,
+                            ModifiedBy = null,
+                            ModifiedAt = null,
+                        };
+
+
+
+                        _context.UserRoleMapping.Add(userRoleMapping);
+                        await _context.SaveChangesAsync();
+                    }
+
+
+                    // Generate token for the user
+                    var result = new TokenDto { Token = await TokenGenerater(user) };
+
+                    return result;
+                }
+                
             }
-            else
+            catch (Exception ex)
             {
-                response.Result = GenerateToken(user);
-                return response;
+                return null;
             }
-        }*/
+        }
+
     }
 }

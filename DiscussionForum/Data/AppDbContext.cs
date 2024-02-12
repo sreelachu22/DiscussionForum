@@ -33,12 +33,6 @@ namespace DiscussionForum.Data
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(entity => {
-                entity.ToTable(name:"Users");
-                // Specify your custom table name here
-                entity.Property(e => e.Id).HasColumnName("UserId");
-                // Specify your custom column name here
-            });
             // Configure relationships and delete behaviors
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Department)
@@ -204,9 +198,6 @@ namespace DiscussionForum.Data
                 .WithMany(u => u.ReplyVotesModifiedBy)
                 .HasForeignKey(rv => rv.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.ApplyConfiguration(new UserSeed());
-            UserRoleMappingSeed.SeedUserRoleMapping(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }

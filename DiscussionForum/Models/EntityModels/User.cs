@@ -7,23 +7,30 @@ using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
 {
-    public class User : IdentityUser<Guid> // Specify the type of key for the user
+    public class User
     {
+        [Key]
+        public Guid UserID { get; set; } = Guid.NewGuid();
+
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(50, ErrorMessage = "Name cannot exceed 50 characters.")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
+        public string Email { get; set; }
 
         public long? Score { get; set; }
 
         [ForeignKey("DepartmentID")]
         [Required(ErrorMessage = "Department ID required.")]
-        public int DepartmentID { get; set; }
+        public int? DepartmentID { get; set; }
 
         public virtual Department Department { get; set; }
 
         [ForeignKey("DesignationID")]
         [Required(ErrorMessage = "Designation ID required.")]
-        public long DesignationID { get; set; }
+        public long? DesignationID { get; set; }
 
         public virtual Designation Designation { get; set; }
 
