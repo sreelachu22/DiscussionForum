@@ -3,6 +3,8 @@ using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using DiscussionForum.Repositories;
+using DiscussionForum.Models.APIModels;
+using DiscussionForum.Type;
 
 namespace DiscussionForum.Services
 {

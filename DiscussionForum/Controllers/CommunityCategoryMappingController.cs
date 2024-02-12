@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowAngularDev")]

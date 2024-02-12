@@ -41,6 +41,7 @@ namespace DiscussionForum.Services
         /// </summary>
         Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync();
         Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount);
+        Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CommunityName)> GetClosedThreads(int CommunityID, int pageNumber, int pageSize);
     }
 }
 

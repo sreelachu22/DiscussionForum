@@ -19,7 +19,7 @@ namespace DiscussionForum.Services
         private readonly IPointService _pointService;
         private readonly ITagService _tagService;
 
-        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService,ITagService tagService)
+        public ThreadService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService, ITagService tagService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
@@ -65,7 +65,6 @@ namespace DiscussionForum.Services
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
-                        Title = t.Title,
                         Content = t.Content,
                         CreatedBy = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
@@ -147,7 +146,65 @@ namespace DiscussionForum.Services
             }
         }
 
+        public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CommunityName)> GetClosedThreads(int CommunityID, int pageNumber, int pageSize)
+        {
+            try
+            {
+                /* get total count based on query*/
+                var _query = _context.Threads
+                .Include(t => t.CommunityCategoryMapping)
+                .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1);
+                var _totalCount = await _query.CountAsync();
 
+                /* to get category related info*/
+
+                var _communityName = await _context.CommunityCategoryMapping
+                .Where(ccm => ccm.CommunityID == CommunityID)
+                .Select(ccm => ccm.Community.CommunityName)
+                .FirstOrDefaultAsync();
+
+                /* get threads with limit(pagination)*/
+                var _threads = await _context.Threads
+                .Include(t => t.CommunityCategoryMapping)
+                .ThenInclude(c => c.CommunityCategory)
+                .Include(t => t.ThreadStatus)
+                .Include(t => t.CreatedByUser)
+                .Include(t => t.ModifiedByUser)
+                .Include(t => t.ThreadVotes)
+                    .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1)
+                    .OrderByDescending(t => t.CreatedAt)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(t => new CategoryThreadDto
+                    {
+                        ThreadID = t.ThreadID,
+                        Title = t.Title,
+                        Content = t.Content,
+                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedAt = (DateTime)t.CreatedAt,
+                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedAt = (DateTime)t.ModifiedAt,
+                        ThreadStatusName = t.ThreadStatus.ThreadStatusName,
+                        IsAnswered = t.IsAnswered,
+                        UpVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        DownVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == t.ThreadID
+                                    select tg.TagName).ToList()
+
+                    })
+                    .ToListAsync();
+
+
+                return (_threads, _totalCount, _communityName ?? string.Empty);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error  while fetching threads.", ex);
+            }
+        }
 
         public async Task<Threads> GetThreadByIdAsync(long threadId)
         {
@@ -162,7 +219,7 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto,int communityCategoryId, Guid createdby)
+        public async Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto, int communityCategoryId, Guid createdby)
         {
             try
             {
@@ -174,7 +231,8 @@ namespace DiscussionForum.Services
                 }
 
                 User userexists = await Task.FromResult(_context.Users.Find(createdby));
-                if (userexists == null) {
+                if (userexists == null)
+                {
                     throw new Exception("User no valid or doesnt exists");
                 }
 
@@ -184,13 +242,13 @@ namespace DiscussionForum.Services
                 {
                     string tagname = tagName.ToLower();
                     Tag tagexists = _context.Tags.SingleOrDefault(tag => tag.TagName.ToLower() == tagname);
-                   
+
                     if (tagexists == null)
                     {
                         Tag newTag = await _tagService.CreateTagAsync(tagname, createdby);
                         tagexists = newTag;
                     }
-                    
+
                     ThreadTagsMapping threadtagmapping = new ThreadTagsMapping
                     {
                         TagID = tagexists.TagID,
@@ -199,12 +257,12 @@ namespace DiscussionForum.Services
                         CreatedBy = createdby,
                         CreatedAt = DateTime.Now,
                     };
-                    
-                _context.ThreadTagsMapping.Add(threadtagmapping);
+
+                    _context.ThreadTagsMapping.Add(threadtagmapping);
                 }
                 await _context.SaveChangesAsync();
 
-                _pointService.PostCreated(createdby);
+                await _pointService.ThreadCreated(createdby);
 
                 return newThread;
 
@@ -215,13 +273,13 @@ namespace DiscussionForum.Services
             }
         }
 
-        private Threads CreateThread(CategoryThreadDto categorythreaddto,int communityCategoryId, Guid createdby)
+        private Threads CreateThread(CategoryThreadDto categorythreaddto, int communityCategoryId, Guid createdby)
         {
             try
             {
                 Threads thread = new Threads { CommunityCategoryMappingID = communityCategoryId, Title = categorythreaddto.Title, Content = categorythreaddto.Content, ThreadStatusID = 2, IsAnswered = false, IsDeleted = false, CreatedBy = createdby, CreatedAt = DateTime.Now };
 
-                
+
                 _unitOfWork.Threads.Add(thread);
                 _unitOfWork.Complete();
 
@@ -254,7 +312,7 @@ namespace DiscussionForum.Services
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
 
-                        _pointService.PostUpdated(modifierId);
+                        await _pointService.ThreadUpdated(modifierId);
 
                         _context.SaveChanges();
 
@@ -266,7 +324,7 @@ namespace DiscussionForum.Services
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
 
-                        _pointService.PostUpdated(modifierId);
+                        await _pointService.ThreadUpdated(modifierId);
 
                         _context.SaveChanges();
 
@@ -279,7 +337,7 @@ namespace DiscussionForum.Services
                         _thread.ModifiedBy = modifierId;
                         _thread.ModifiedAt = DateTime.Now;
 
-                        _pointService.PostUpdated(modifierId);
+                        await _pointService.ThreadUpdated(modifierId);
 
                         _context.SaveChanges();
 
@@ -320,7 +378,7 @@ namespace DiscussionForum.Services
                     _thread.ModifiedBy = modifierId;
                     _thread.ModifiedAt = DateTime.Now;
 
-                    _pointService.PostDeleted(modifierId);
+                    await _pointService.ThreadDeleted(modifierId);
 
                     _context.SaveChanges();
 

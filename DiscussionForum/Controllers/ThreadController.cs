@@ -49,6 +49,7 @@ namespace DiscussionForum.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
         [HttpGet("top-threads")]
         public async Task<IActionResult> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount)
         {
@@ -62,6 +63,30 @@ namespace DiscussionForum.Controllers
                 return StatusCode(500, $"Error while fetching top threads: {ex.Message}");
             }
         }
+
+        [HttpGet("ClosedThreads")]
+        public async Task<IActionResult> GetClosedThreads(int CommunityID, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var result = await _threadService.GetClosedThreads(CommunityID, pageNumber, pageSize);
+
+                var response = new
+                {
+                    Threads = result.Threads,
+                    TotalCount = result.TotalCount,
+                    CommunityName = result.CommunityName
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in GetClosedThreads: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         /// <summary>
         /// Retrieves a thread based on the given thread ID.
         /// </summary>
@@ -112,13 +137,13 @@ namespace DiscussionForum.Controllers
         /// <param name="CommunityCategoryMappingId">he mapping ID of the category in a community where threads must be posted.</param>
         /// <param name="CreatorId">The ID of the user posting the thread.</param>
         [HttpPost]
-        public async Task<IActionResult> CreateThread(int communityCategoryId, Guid createdby, [FromBody] ThreadContent threadcontent)
+        public async Task<IActionResult> CreateThread(int communityMappingId,Guid userId, [FromBody] ThreadContent threadcontent)
         {
             try
             {
                 //Validates the request data
 
-                if (communityCategoryId <= 0)
+                if (communityMappingId <= 0)
                 {
                     throw new Exception("Invalid CommunityCategoryMappingId. It should be greater than zero.");
                 }
@@ -134,7 +159,7 @@ namespace DiscussionForum.Controllers
                 {
                     throw new Exception("Invalid content. It cannot be null or empty.");
                 }
-                else if (createdby == Guid.Empty)
+                else if (userId == Guid.Empty)
                 {
                     throw new Exception("Invalid creatorId. It cannot be null or empty.");
                 }
@@ -144,7 +169,7 @@ namespace DiscussionForum.Controllers
                     tagnames: threadcontent.Tags
                 );
 
-                Threads _thread = await _threadService.CreateThreadAsync(categorythreaddto, communityCategoryId, createdby);
+                Threads _thread = await _threadService.CreateThreadAsync(categorythreaddto, communityMappingId, userId);
                 return Ok(_thread);
             }
             catch (Exception ex)

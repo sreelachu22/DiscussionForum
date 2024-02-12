@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Data;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -23,7 +24,7 @@ namespace DiscussionForum.Services
 
 
         //Get All Tags async
-        public async Task<IEnumerable<Tag>> GetAllTagAsync(Boolean isdel)
+        public async Task<IEnumerable<TagDto>> GetAllTagAsync(Boolean isdel)
         {
             try
             {
@@ -69,16 +70,58 @@ namespace DiscussionForum.Services
 
         
 
-        private IEnumerable<Tag> GetAllTags(Boolean isdel)
+        private IEnumerable<TagDto> GetAllTags(Boolean isdel)
         {
-            if (isdel)
-            {
-                return _context.Tags.Where(tag => !tag.IsDeleted).ToList();
+            try {
+                var tags=_context.Tags
+                            .Where(tag => !tag.IsDeleted)
+                            .Select(tag => new TagDto
+                            {
+                                TagId = tag.TagID,
+                                TagName = tag.TagName,
+                                TagCount = _context.ThreadTagsMapping
+                            .Count(tt => tt.TagID == tag.TagID && !tt.IsDeleted)
+                            })
+                            .OrderByDescending(tagDto => tagDto.TagCount)
+                            .ToList();
+                return tags;
+
             }
-            else { 
-                return _unitOfWork.Tag.GetAll();
+            catch (Exception ex)
+            {
+                throw new Exception("No Tags found.", ex);
             }
             
+        }
+
+        public async Task<IEnumerable<TagDto>> GeAllTagAsync(string keyword)
+        {
+            try {
+                return await Task.FromResult(GetAllTags(keyword));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("No Tags found.", ex);
+            }
+        }
+
+        private IEnumerable<TagDto> GetAllTags(String keyword)
+        { 
+            string lowerkeyword=keyword.ToLower();
+
+            var tags = _context.Tags
+                    .Where(tag => tag.TagName.ToLower().Contains(lowerkeyword) && !tag.IsDeleted)
+                    .Select(tag => new TagDto
+                    {
+                        TagId=tag.TagID,
+                        TagName = tag.TagName,
+                        TagCount = _context.ThreadTagsMapping
+                            .Count(tt => tt.TagID == tag.TagID && !tt.IsDeleted)
+                    })
+                    .OrderByDescending(tagDto => tagDto.TagCount)
+                    .ToList();
+            
+            return tags;
         }
     }
 

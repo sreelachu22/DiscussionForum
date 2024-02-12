@@ -1,6 +1,7 @@
 ﻿using DiscussionForum.Data;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.Services
 {
@@ -8,34 +9,68 @@ namespace DiscussionForum.Services
     {
         private readonly AppDbContext _context;
 
-        public ThreadVoteService(AppDbContext Context)
+        private readonly IPointService _pointService;
+
+        public ThreadVoteService(AppDbContext context, IPointService pointService)
         {
-            _context = Context;
+            _context = context;
+            _pointService = pointService;
         }
 
-        public async Task<int> CreateThreadVote(ThreadVoteDto threadVoteDto)
+        public async Task CreateThreadVote(ThreadVoteDto threadVoteDto)
         {
             try
             {
-                var threadVote = new ThreadVote
+                var _existingThreadVote = await _context.ThreadVotes
+                .FirstOrDefaultAsync(tv => tv.UserID == threadVoteDto.UserID && tv.ThreadID == threadVoteDto.ThreadID);
+
+                if (_existingThreadVote != null)
                 {
-                    UserID = threadVoteDto.UserID,
-                    ThreadID = threadVoteDto.ThreadID,
-                    IsUpVote = threadVoteDto.IsUpVote,
-                    CreatedBy = threadVoteDto.UserID, // Assuming CreatedBy is the same as UserID for simplicity
-                    CreatedAt = DateTime.Now,
-                    ModifiedBy = threadVoteDto.UserID,
-                    ModifiedAt = DateTime.Now
-            };
+                    // Update the existing ThreadVote with the data from the DTO
+                    _existingThreadVote.IsUpVote = threadVoteDto.IsUpVote;
+                    _existingThreadVote.IsDeleted = threadVoteDto.IsDeleted;
+                    _existingThreadVote.ModifiedAt = DateTime.Now;
 
-                _context.ThreadVotes.Add(threadVote);
-                await _context.SaveChangesAsync();
+                    if (_existingThreadVote.IsUpVote)
+                    {
+                        await _pointService.ThreadUpvoted(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                    }
+                    else
+                    {
+                        await _pointService.ThreadDownvoted(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                    }
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    // Create a new ThreadVote
+                    var _newThreadVote = new ThreadVote
+                    {
+                        UserID = threadVoteDto.UserID,
+                        ThreadID = threadVoteDto.ThreadID,
+                        IsUpVote = threadVoteDto.IsUpVote,
+                        IsDeleted = threadVoteDto.IsDeleted,
+                        CreatedBy = threadVoteDto.UserID,
+                        CreatedAt = DateTime.Now,
+                    };
 
-                return threadVote.ThreadVoteID;
+                    _context.ThreadVotes.Add(_newThreadVote);
+
+                    if (threadVoteDto.IsUpVote)
+                    {
+                        await _pointService.ThreadUpvoted(_newThreadVote.UserID, _newThreadVote.ThreadID);
+                    }
+                    else
+                    {
+                        await _pointService.ThreadDownvoted(_newThreadVote.UserID, _newThreadVote.ThreadID);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error occured during Upvote: {ex.Message}", ex);
+                throw new Exception($"Error occurred while voting for thread: {ex.Message}", ex);
             }
         }
     }

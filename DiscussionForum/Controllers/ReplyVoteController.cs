@@ -28,7 +28,7 @@ namespace DiscussionForum.Controllers
             catch (Exception ex)
             {
                 // Log the exception or handle it as needed
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, "An error occurred while processing the request.");
             }
         }
     }

@@ -29,13 +29,13 @@ namespace DiscussionForum.Services
                 existingReplyVote.IsDeleted = voteDto.IsDeleted;
                 existingReplyVote.ModifiedAt = DateTime.Now;
                 
-                if(voteDto.IsUpVote)
+                if(existingReplyVote.IsUpVote)
                 {
-                    await _pointService.ReplyUpvoted(voteDto.UserID, voteDto.ReplyID);
+                    await _pointService.ReplyUpvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
                 }
                 else
                 {
-                    await _pointService.ReplyDownvoted(voteDto.UserID, voteDto.ReplyID);
+                    await _pointService.ReplyDownvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
                 }
                 await _dbContext.SaveChangesAsync();
             }
@@ -54,13 +54,13 @@ namespace DiscussionForum.Services
 
                 _dbContext.ReplyVotes.Add(newReplyVote);
 
-                if (voteDto.IsUpVote)
+                if (newReplyVote.IsUpVote)
                 {
-                    await _pointService.ReplyUpvoted(voteDto.UserID, voteDto.ReplyID);
+                    await _pointService.ReplyUpvoted(newReplyVote.UserID, newReplyVote.ReplyID);
                 }
                 else
                 {
-                    await _pointService.ReplyDownvoted(voteDto.UserID, voteDto.ReplyID);
+                    await _pointService.ReplyDownvoted(newReplyVote.UserID, newReplyVote.ReplyID);
                 }
 
                 await _dbContext.SaveChangesAsync();
