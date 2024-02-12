@@ -206,11 +206,40 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<Threads> GetThreadByIdAsync(long threadId)
+        public async Task<CategoryThreadDto> GetThreadByIdAsync(long threadId)
         {
             try
             {
-                return await Task.FromResult(_context.Threads.Find(threadId));
+                var _thread = await _context.Threads
+                .Include(t => t.CommunityCategoryMapping)
+                .ThenInclude(c => c.CommunityCategory)
+                .Include(t => t.ThreadStatus)
+                .Include(t => t.CreatedByUser)
+                .Include(t => t.ModifiedByUser)
+                .Include(t => t.ThreadVotes)
+                    .Where(t => t.ThreadID == threadId && t.ThreadStatusID == 2)
+                    .Select(t => new CategoryThreadDto
+                    {
+                        ThreadID = t.ThreadID,
+                        Title = t.Title,
+                        Content = t.Content,
+                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedAt = (DateTime)t.CreatedAt,
+                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedAt = (DateTime)t.ModifiedAt,
+                        ThreadStatusName = t.ThreadStatus.ThreadStatusName,
+                        IsAnswered = t.IsAnswered,
+                        UpVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        DownVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == t.ThreadID
+                                    select tg.TagName).ToList()
+
+                    })
+                    .FirstOrDefaultAsync();
+
+                return _thread;
 
             }
             catch (Exception ex)
