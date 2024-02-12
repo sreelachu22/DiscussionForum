@@ -147,7 +147,65 @@ namespace DiscussionForum.Services
             }
         }
 
+        public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CommunityName)> GetClosedThreads(int CommunityID, int pageNumber, int pageSize)
+        {
+            try
+            {
+                /* get total count based on query*/
+                var _query = _context.Threads
+                .Include(t => t.CommunityCategoryMapping)
+                .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1);
+                var _totalCount = await _query.CountAsync();
 
+                /* to get category related info*/
+
+                var _communityName = await _context.CommunityCategoryMapping
+                .Where(ccm => ccm.CommunityID == CommunityID)
+                .Select(ccm => ccm.Community.CommunityName)
+                .FirstOrDefaultAsync();
+
+                /* get threads with limit(pagination)*/
+                var _threads = await _context.Threads
+                .Include(t => t.CommunityCategoryMapping)
+                .ThenInclude(c => c.CommunityCategory)
+                .Include(t => t.ThreadStatus)
+                .Include(t => t.CreatedByUser)
+                .Include(t => t.ModifiedByUser)
+                .Include(t => t.ThreadVotes)
+                    .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1)
+                    .OrderByDescending(t => t.CreatedAt)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(t => new CategoryThreadDto
+                    {
+                        ThreadID = t.ThreadID,
+                        Title = t.Title,
+                        Content = t.Content,
+                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedAt = (DateTime)t.CreatedAt,
+                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedAt = (DateTime)t.ModifiedAt,
+                        ThreadStatusName = t.ThreadStatus.ThreadStatusName,
+                        IsAnswered = t.IsAnswered,
+                        UpVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        DownVoteCount = t.ThreadVotes != null ? t.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == t.ThreadID
+                                    select tg.TagName).ToList()
+
+                    })
+                    .ToListAsync();
+
+
+                return (_threads, _totalCount, _communityName ?? string.Empty);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error  while fetching threads.", ex);
+            }
+        }
 
         public async Task<Threads> GetThreadByIdAsync(long threadId)
         {
