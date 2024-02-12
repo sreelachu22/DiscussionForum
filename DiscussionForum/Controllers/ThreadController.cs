@@ -102,7 +102,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid threadId. It should be greater than zero.");
                 }
 
-                Threads _thread = await _threadService.GetThreadByIdAsync(threadId);
+                CategoryThreadDto _thread = await _threadService.GetThreadByIdAsync(threadId);
 
                 //Checks if the retrieved thread is null
                 if (_thread == null)
