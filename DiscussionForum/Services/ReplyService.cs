@@ -13,10 +13,12 @@ namespace DiscussionForum.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDbContext _context;
 
-        public ReplyService(IUnitOfWork unitOfWork, AppDbContext context)
+        private readonly IPointService _pointService;
+        public ReplyService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
+            _pointService = pointService;
         }
 
         public async Task<IEnumerable<Reply>> GetAllRepliesAsync()
@@ -137,8 +139,12 @@ namespace DiscussionForum.Services
             try
             {
                 Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
+
+                _pointService.ReplyCreated(creatorID);
+
                 _unitOfWork.Reply.Add(_reply);
                 _unitOfWork.Complete();
+
                 return _reply;
             }
             catch (Exception ex)
@@ -163,7 +169,11 @@ namespace DiscussionForum.Services
                     _reply.Content = content;
                     _reply.ModifiedBy = modifierID;
                     _reply.ModifiedAt = DateTime.Now;
+
+                    _pointService.ReplyUpdated(modifierID);
+
                     _context.SaveChanges();
+
                     return _reply;
                 }
                 //Checks if the reply is valid but deleted
@@ -198,7 +208,11 @@ namespace DiscussionForum.Services
                     _reply.IsDeleted = true;
                     _reply.ModifiedBy = modifierID;
                     _reply.ModifiedAt = DateTime.Now;
+
+                    _pointService.ReplyDeleted(modifierID);
+
                     _context.SaveChanges();
+
                     return _reply;
                 }
                 //Checks if the reply is valid but deleted
@@ -254,6 +268,7 @@ namespace DiscussionForum.Services
                         CreatedAt = r.CreatedAt,
                         ModifiedBy = r.ModifiedBy,
                         ModifiedAt = r.ModifiedAt,
+                        HasViewed = r.HasViewed,
                         NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID, _context)
                     }); ;
 
@@ -294,6 +309,7 @@ namespace DiscussionForum.Services
                             CreatedAt = reply.CreatedAt,
                             ModifiedBy = reply.ModifiedBy,
                             ModifiedAt = reply.ModifiedAt,
+                            HasViewed = reply.HasViewed,
                             // Recursively call GetNestedReplies to retrieve nested replies of the current reply
                             NestedReplies = GetNestedReplies(replies, reply.ReplyID, context)
                         };
@@ -308,6 +324,76 @@ namespace DiscussionForum.Services
                 throw;
             }
         }
+        public IEnumerable<ReplyNotifyDTO> GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize)
+        {
+            IQueryable<Reply> query = _context.Replies
+                .Where(r => r.HasViewed == false &&  // Include condition for HasViewed
+                            ((r.ParentReply != null && r.ParentReply.CreatedBy == userId) ||
+                             (r.ParentReply == null && r.Threads.CreatedBy == userId)))
+                .Where(r => !(r.ParentReply != null && r.ParentReply.CreatedBy == userId &&
+                              r.CreatedBy == userId) &&
+                            !(r.ParentReply == null && r.Threads.CreatedBy == userId &&
+                              r.CreatedBy == userId));
+
+            if (categoryId.HasValue && categoryId != 0)
+            {
+                query = query.Where(r => r.Threads.CommunityCategoryMapping.CommunityCategory.CommunityCategoryID == categoryId.Value);
+            }
+
+            if (sortDirection.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(r => r.CreatedAt);
+            }
+            else
+            {
+                query = query.OrderBy(r => r.CreatedAt);
+            }
+
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            var paginatedQuery = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+            var repliesForUser = paginatedQuery
+                .Select(r => new ReplyNotifyDTO
+                {
+                    ChildReplyID = r.ReplyID,
+                    ChildReplyContent = r.Content,
+                    ChildReplyCreatedAt = r.CreatedAt,
+                    ChildReplyUserName = r.CreatedByUser.Name,
+                    ParentReplyID = r.ParentReplyID,
+                    ParentReplyUserName = r.ParentReply != null ? r.ParentReply.CreatedByUser.Name :
+                        (r.Threads.CreatedBy == userId ? r.Threads.CreatedByUser.Name : null),
+                    ParentReplyContent = r.ParentReply != null ? r.ParentReply.Content :
+                        (r.Threads.CreatedBy == userId ? r.Threads.Content : null),
+                    CategoryName = r.Threads.CommunityCategoryMapping.CommunityCategory.CommunityCategoryName,
+                    CommunityName = r.Threads.CommunityCategoryMapping.Community.CommunityName,
+                    ThreadContent = r.Threads.Content
+                })
+                .ToList();
+
+            return repliesForUser;
+        }
+        public async Task<bool> UpdateHasViewed(long replyId)
+        {
+            var reply = await _context.Replies.FindAsync(replyId);
+            if (reply == null)
+            {
+                return false;
+            }
+
+            reply.HasViewed = true;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+
+
+
+
+
+
+
 
 
     }

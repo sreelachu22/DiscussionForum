@@ -1,7 +1,9 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Models.APIModels;
+using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 
@@ -48,6 +50,43 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [HttpGet("top-threads")]
+        public async Task<IActionResult> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount)
+        {
+            try
+            {
+                var threads = await _threadService.GetTopThreads(CommunityCategoryMappingID, sortBy, topCount);
+                return Ok(threads);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while fetching top threads: {ex.Message}");
+            }
+        }
+
+        [HttpGet("ClosedThreads")]
+        public async Task<IActionResult> GetClosedThreads(int CommunityID, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var result = await _threadService.GetClosedThreads(CommunityID, pageNumber, pageSize);
+
+                var response = new
+                {
+                    Threads = result.Threads,
+                    TotalCount = result.TotalCount,
+                    CommunityName = result.CommunityName
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in GetClosedThreads: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         /// <summary>
         /// Retrieves a thread based on the given thread ID.
         /// </summary>
@@ -85,10 +124,12 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        public struct TitleContent
+        public struct ThreadContent
         {
-            public string? Title { get; set; }
-            public string? Content { get; set; }
+            public string Title { get; set; }
+            public string Content { get; set; }
+
+            public List<string> Tags { get; set; }
         }
         /// <summary>
         /// Creates a new thread with content from request body.
@@ -96,29 +137,39 @@ namespace DiscussionForum.Controllers
         /// <param name="CommunityCategoryMappingId">he mapping ID of the category in a community where threads must be posted.</param>
         /// <param name="CreatorId">The ID of the user posting the thread.</param>
         [HttpPost]
-        public async Task<IActionResult> CreateThread(int CommunityCategoryMappingId, Guid CreatorId, [FromBody] TitleContent titleContent)
+        public async Task<IActionResult> CreateThread(int communityMappingId,Guid userId, [FromBody] ThreadContent threadcontent)
         {
             try
             {
                 //Validates the request data
-                if (CommunityCategoryMappingId <= 0)
+
+                if (communityMappingId <= 0)
                 {
                     throw new Exception("Invalid CommunityCategoryMappingId. It should be greater than zero.");
                 }
-                else if (string.IsNullOrWhiteSpace(titleContent.Title))
+                else if (string.IsNullOrWhiteSpace(threadcontent.Title))
                 {
                     throw new Exception("Invalid title. It cannot be null or empty.");
                 }
-                else if (string.IsNullOrWhiteSpace(titleContent.Content))
+                else if (string.IsNullOrWhiteSpace(threadcontent.Content))
                 {
                     throw new Exception("Invalid content. It cannot be null or empty.");
                 }
-                else if (CreatorId == Guid.Empty)
+                else if (threadcontent.Tags == null || threadcontent.Tags.Count == 0)
+                {
+                    throw new Exception("Invalid content. It cannot be null or empty.");
+                }
+                else if (userId == Guid.Empty)
                 {
                     throw new Exception("Invalid creatorId. It cannot be null or empty.");
                 }
+                CategoryThreadDto categorythreaddto = new CategoryThreadDto(
+                    title: threadcontent.Title,
+                    content: threadcontent.Content,
+                    tagnames: threadcontent.Tags
+                );
 
-                Threads _thread = await _threadService.CreateThreadAsync(CommunityCategoryMappingId, CreatorId, titleContent.Title, titleContent.Content);
+                Threads _thread = await _threadService.CreateThreadAsync(categorythreaddto, communityMappingId, userId);
                 return Ok(_thread);
             }
             catch (Exception ex)
@@ -139,7 +190,7 @@ namespace DiscussionForum.Controllers
         /// <param name="threadId">The ID of the thread to be updated.</param>
         /// <param name="ModifierId">The ID of the user editing the thread.</param>
         [HttpPut("{threadId}")]
-        public async Task<IActionResult> UpdateThread(long threadId, Guid ModifierId, [FromBody] TitleContent titleContent)
+        public async Task<IActionResult> UpdateThread(long threadId, Guid ModifierId, [FromBody] ThreadContent titleContent)
         {
             try
             {

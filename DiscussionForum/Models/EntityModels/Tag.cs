@@ -16,7 +16,10 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation property to represent the relationship with the 'Users' table
+        [ForeignKey("CreatedBy")]
         public virtual User CreatedByUser { get; set; }
+
+        [ForeignKey("ModifiedBy")]
         public virtual User ModifiedByUser { get; set; }
     }
 }

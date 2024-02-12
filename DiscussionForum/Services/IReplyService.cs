@@ -45,7 +45,10 @@ namespace DiscussionForum.Services
         /// <param name="replyID">The ID of the reply to be deleted.</param>
         /// <param name="modifierID">The ID of the user deleting the reply.</param>
         Task<Reply> DeleteReplyAsync(long replyID, Guid modifierID);
-        IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10);
+        IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10);        
+        IEnumerable<ReplyNotifyDTO> GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize);
+
+        Task<bool> UpdateHasViewed(long replyId);
 
     }
 }
