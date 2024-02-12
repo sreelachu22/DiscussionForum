@@ -140,10 +140,6 @@ namespace DiscussionForum.Services
                 else
                 {
                     var user = await _context.Users.Where(us => us.Email == email).FirstOrDefaultAsync();
-                    var usr = await _context.Users
-                        .Where(us => us.Email == "system@example.com")
-                        .Select(us => us.UserID)
-                        .FirstOrDefaultAsync();
 
                     var systemUserId = await _context.Users
                         .Where(us => us.Email == "system@example.com")
@@ -160,7 +156,7 @@ namespace DiscussionForum.Services
                             DepartmentID = null,
                             DesignationID = null,
                             IsDeleted = false,
-                            CreatedBy = Guid.Parse("18C0540F-70B8-44E8-A4CD-2A6F459E0630"),
+                            CreatedBy = systemUserId,
                             CreatedAt = DateTime.Now,
                             ModifiedBy = null,
                             ModifiedAt = null,
@@ -195,7 +191,7 @@ namespace DiscussionForum.Services
                             UserID = newUserId,
                             RoleID = roleId,
                             IsDeleted = false,
-                            CreatedBy = Guid.Parse("18C0540F-70B8-44E8-A4CD-2A6F459E0630"),
+                            CreatedBy = systemUserId,
                             CreatedAt = DateTime.Now,
                             ModifiedBy = null,
                             ModifiedAt = null,
