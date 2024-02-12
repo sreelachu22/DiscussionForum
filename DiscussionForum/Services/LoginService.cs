@@ -140,7 +140,15 @@ namespace DiscussionForum.Services
                 else
                 {
                     var user = await _context.Users.Where(us => us.Email == email).FirstOrDefaultAsync();
+                    var usr = await _context.Users
+                        .Where(us => us.Email == "system@example.com")
+                        .Select(us => us.UserID)
+                        .FirstOrDefaultAsync();
 
+                    var systemUserId = await _context.Users
+                        .Where(us => us.Email == "system@example.com")
+                        .Select(us => us.UserID)
+                        .FirstOrDefaultAsync();
                     if (user == null)
                     {
                         // User does not exist, create a new user
