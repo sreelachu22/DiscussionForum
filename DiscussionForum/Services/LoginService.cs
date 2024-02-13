@@ -1,7 +1,6 @@
 ﻿using DiscussionForum.Data;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
-using DiscussionForum.Type;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -119,7 +118,6 @@ namespace DiscussionForum.Services
 
         public async Task<TokenDto> ExternalAuthenticationAsync(string token, string provider)
         {
-            var response = new ServiceResponse<TokenDto>();
 
             try
             {

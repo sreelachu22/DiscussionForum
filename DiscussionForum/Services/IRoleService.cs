@@ -1,6 +1,5 @@
 ﻿using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
-using DiscussionForum.Type;
 
 namespace DiscussionForum.Services
 {

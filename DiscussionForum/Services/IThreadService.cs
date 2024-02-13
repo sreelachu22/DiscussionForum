@@ -15,7 +15,7 @@ namespace DiscussionForum.Services
         /// Retrieves a thread based on the given thread ID.
         /// </summary>
         /// <param name="threadId">The ID of the thread to search for in threads.</param>
-        Task<Threads> GetThreadByIdAsync(long threadId);
+        Task<CategoryThreadDto> GetThreadByIdAsync(long threadId);
         /// <summary>
         /// Creates a new thread with content from request body.
         /// </summary>
