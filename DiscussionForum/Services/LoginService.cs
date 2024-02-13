@@ -138,9 +138,6 @@ namespace DiscussionForum.Services
                 else
                 {
                     var user = await _context.Users.Where(us => us.Email == email).FirstOrDefaultAsync();
-=========
-
->>>>>>>>> Temporary merge branch 2
                     var systemUserId = await _context.Users
                         .Where(us => us.Email == "system@example.com")
                         .Select(us => us.UserID)
