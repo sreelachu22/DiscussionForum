@@ -13,7 +13,7 @@ namespace DiscussionForum.Services
         /// Retrieves a reply based on the given reply ID.
         /// </summary>
         /// <param name="replyID">The ID to search for in replies.</param>
-        Task<Reply> GetReplyByIdAsync(long replyID);
+        Task<IQueryable<ReplyDTO>> GetReplyByIdAsync(long replyID);
         /// <summary>
         /// Retrieves a list of replies based on the given thread ID.
         /// </summary>
@@ -45,8 +45,8 @@ namespace DiscussionForum.Services
         /// <param name="replyID">The ID of the reply to be deleted.</param>
         /// <param name="modifierID">The ID of the user deleting the reply.</param>
         Task<Reply> DeleteReplyAsync(long replyID, Guid modifierID);
-        IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10);        
-        IEnumerable<ReplyNotifyDTO> GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize);
+        IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10);
+        (IEnumerable<ReplyNotifyDTO> replies, int totalCount) GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize);
 
         Task<bool> UpdateHasViewed(long replyId);
 

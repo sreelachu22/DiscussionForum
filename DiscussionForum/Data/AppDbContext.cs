@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.ComponentModel.DataAnnotations.Schema;
 using DiscussionForum.Models.APIModels;
-using DiscussionForum.Seeds;
 
 namespace DiscussionForum.Data
 {
@@ -31,6 +30,8 @@ namespace DiscussionForum.Data
         public DbSet<UserRoleMapping> UserRoleMapping { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
+
+        public DbSet<UserLog> UserLog { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and delete behaviors
@@ -198,6 +199,43 @@ namespace DiscussionForum.Data
                 .WithMany(u => u.ReplyVotesModifiedBy)
                 .HasForeignKey(rv => rv.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserLog>()
+                .HasKey(ul => ul.UserLogID);
+
+            modelBuilder.Entity<UserLog>()
+                .Property(ul => ul.UserLogID)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<UserLog>()
+                .Property(ul => ul.LoginTime)
+                .IsRequired();
+
+            modelBuilder.Entity<UserLog>()
+                .Property(ul => ul.IsDeleted)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<UserLog>()
+                .Property(ul => ul.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<UserLog>()
+                .HasOne(ul => ul.User)
+                .WithMany()
+                .HasForeignKey(ul => ul.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserLog>()
+                .HasOne(ul => ul.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(ul => ul.CreatedBy)
+                .OnDelete(DeleteBehavior.Cascade); // Corrected from Restrict to Cascade
+
+            modelBuilder.Entity<UserLog>()
+                .HasOne(ul => ul.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(ul => ul.ModifiedBy)
+                .OnDelete(DeleteBehavior.Cascade); // Corrected from Restrict to Cascade
 
             base.OnModelCreating(modelBuilder);
         }

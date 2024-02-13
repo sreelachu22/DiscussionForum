@@ -392,6 +392,47 @@ namespace DiscussionForum.Services
             }
         }
 
+        public async Task<Threads> CloseThreadAsync(long threadId, Guid modifierId)
+        {
+            try
+            {
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierId));
+                //Checks if modifier is valid
+                if (_modifier == null)
+                {
+                    throw new Exception("Modifier not found");
+                }
+                //Checks if thread is valid and not deleted
+                else if (_thread != null && !_thread.IsDeleted)
+                {
+                    _thread.ThreadStatusID = 1;
+                    _thread.ModifiedBy = modifierId;
+                    _thread.ModifiedAt = DateTime.Now;
+
+                    await _pointService.ThreadUpdated(modifierId);
+
+                    _context.SaveChanges();
+
+                    return _thread;
+                    
+                }
+                //Checks if the thread is valid but deleted
+                else if (_thread != null && _thread.IsDeleted)
+                {
+                    throw new Exception("Thread has been deleted.");
+                }
+                else
+                {
+                    throw new Exception("Thread not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while closing a thread with ID {threadId}.", ex);
+            }
+        }
+
         public async Task<Threads> DeleteThreadAsync(long threadId, Guid modifierId)
         {
             try

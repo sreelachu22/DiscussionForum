@@ -1,6 +1,5 @@
 ﻿using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
-using DiscussionForum.Type;
 
 namespace DiscussionForum.Services
 {
@@ -8,5 +7,7 @@ namespace DiscussionForum.Services
     {
         Task<TokenDto> AdminLoginAsync(AdminLoginDto adminLogin);
         Task<TokenDto> ExternalAuthenticationAsync(string token, string provider);
+
+        Task LogUserLogout(Guid userId);
     }
 }
