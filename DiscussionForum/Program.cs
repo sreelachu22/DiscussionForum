@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DotNetEnv.Env.Load();
+var connectionString = Environment.GetEnvironmentVariable("DB_STRING");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DiscussionForum_API")));
+        options.UseSqlServer(connectionString));
 
 builder.Services.AddCors(options =>
 {
@@ -25,9 +27,18 @@ builder.Services.AddCors(options =>
         });
 });
 
-var jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
-var jwtAudience = builder.Configuration.GetSection("Jwt:Audience").Get<string>();
-var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
+var JwtIssuer = DotNetEnv.Env.GetString("ISSUER");
+var JwtKey = DotNetEnv.Env.GetString("KEY");
+var JwtAudience = DotNetEnv.Env.GetString("AUDIENCE");
+
+builder.Configuration["Jwt:JWT_Issuer"] = JwtIssuer;
+builder.Configuration["Jwt:JWT_Audience"] = JwtAudience;
+builder.Configuration["Jwt:JWT_Key"] = JwtKey;
+
+var jwtIssuer = builder.Configuration.GetSection("Jwt:JWT_Issuer").Value;
+var jwtAudience = builder.Configuration.GetSection("Jwt:JWT_Audience").Value;
+var jwtKey = builder.Configuration.GetSection("Jwt:JWT_Key").Value;
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -48,6 +59,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SuperAdmin", policy => policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("CommunityHead", policy => policy.RequireRole("CommunityHead"));
+    options.AddPolicy("User", policy => policy.RequireRole("User"));
 });
 
 

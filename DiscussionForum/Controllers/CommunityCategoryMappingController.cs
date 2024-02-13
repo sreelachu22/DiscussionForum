@@ -46,7 +46,6 @@ namespace DiscussionForum.Controllers
         }
 
         //GetByID
-
         [HttpGet("/{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMappingAPI>> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID)
         {

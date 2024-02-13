@@ -33,6 +33,7 @@ namespace DiscussionForum.Services
         /// <returns>A service response containing a token if the login is successful, or an error message otherwise.</returns>
         public async Task<TokenDto> AdminLoginAsync(AdminLoginDto userLogin)
         {
+            string Password = DotNetEnv.Env.GetString("AdminPassword");
                 string adminPassword = _config.GetValue<string>("SuperAdmin:Password");
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
 
@@ -75,9 +76,9 @@ namespace DiscussionForum.Services
 
         public async Task<string> TokenGenerater(User user)
         {
-            string key = _config["Jwt:Key"];
-            string issuer = _config["Jwt:Issuer"];
-            string audience = _config["Jwt:Audience"];
+            string key = _config["Jwt:JWT_Key"];
+            string issuer = _config["Jwt:JWT_Issuer"];
+            string audience = _config["Jwt:JWT_Audience"];
             var role = await GetRole(user);
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
@@ -138,9 +139,7 @@ namespace DiscussionForum.Services
                 else
                 {
                     var user = await _context.Users.Where(us => us.Email == email).FirstOrDefaultAsync();
-=========
 
->>>>>>>>> Temporary merge branch 2
                     var systemUserId = await _context.Users
                         .Where(us => us.Email == "system@example.com")
                         .Select(us => us.UserID)
