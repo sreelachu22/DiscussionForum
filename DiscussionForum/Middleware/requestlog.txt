@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿12-02-2024 11:20:29 - GET /swagger/index.html
 12-02-2024 11:20:29 - GET /swagger/v1/swagger.json
 12-02-2024 11:20:59 - OPTIONS /api/Login/ExternalLogin
@@ -558,3 +559,39 @@
 13-02-2024 09:51:48 - POST /api/Login/ExternalLogin
 13-02-2024 09:52:42 - OPTIONS /api/Login/ExternalLogin
 13-02-2024 09:52:42 - POST /api/Login/ExternalLogin
+=======
+>>>>>>> 065e32f829846aed77c69718ad5d3c1c92b90821
+13-02-2024 09:56:28 - GET /swagger
+13-02-2024 09:56:28 - GET /swagger/index.html
+13-02-2024 09:56:28 - GET /swagger/swagger-ui.css
+13-02-2024 09:56:28 - GET /swagger/swagger-ui-standalone-preset.js
+13-02-2024 09:57:37 - GET /swagger/index.html
+13-02-2024 09:57:38 - GET /swagger/swagger-ui-bundle.js
+13-02-2024 09:57:38 - GET /swagger/v1/swagger.json
+13-02-2024 09:58:11 - GET /api/Community
+13-02-2024 09:59:20 - OPTIONS /api/Login/ExternalLogin
+13-02-2024 09:59:20 - POST /api/Login/ExternalLogin
+13-02-2024 10:00:15 - OPTIONS /api/Login/ExternalLogin
+13-02-2024 10:00:15 - POST /api/Login/ExternalLogin
+13-02-2024 10:01:31 - GET /api/users/GetAllUsersWithPagination
+13-02-2024 10:02:34 - GET /api/CommunityCategory/1
+13-02-2024 10:04:13 - GET /swagger/index.html
+13-02-2024 10:04:14 - GET /swagger/v1/swagger.json
+13-02-2024 10:05:41 - OPTIONS /api/Login/ExternalLogin
+13-02-2024 10:05:41 - POST /api/Login/ExternalLogin
+13-02-2024 10:05:50 - GET /api/Community
+13-02-2024 10:06:43 - OPTIONS /api/Login/ExternalLogin
+13-02-2024 10:06:43 - POST /api/Login/ExternalLogin
+13-02-2024 10:06:44 - GET /api/CommunityCategoryMapping/InCommunity/1
+13-02-2024 10:06:53 - GET /api/Community
+13-02-2024 10:07:19 - GET /api/CommunityCategory
+13-02-2024 10:07:33 - GET /api/Reply/unviewed
+13-02-2024 10:07:33 - GET /api/CommunityCategoryMapping/InCommunity/1
+13-02-2024 10:07:46 - GET /api/Community
+13-02-2024 10:07:47 - GET /api/CommunityCategoryMapping
+13-02-2024 10:07:51 - GET /api/Thread
+13-02-2024 10:07:53 - GET /api/Thread/1
+13-02-2024 10:07:53 - GET /api/Reply/getAllNestedRepliesOfaPost/1/
+13-02-2024 10:33:47 - GET /api/Reply/getAllNestedRepliesOfaPost/1
+13-02-2024 10:49:10 - OPTIONS /api/Login/ExternalLogin
+13-02-2024 10:49:10 - POST /api/Login/ExternalLogin
