@@ -2,6 +2,7 @@
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DiscussionForum.Controllers
 {
@@ -51,6 +52,21 @@ namespace DiscussionForum.Controllers
                 return new UnauthorizedResult();
             }
             return Ok(res);
+        }
+
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout(Guid userId)
+        {
+            try
+            {
+                await _loginService.LogUserLogout(userId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it appropriately
+                return StatusCode(500, "An error occurred while logging out user.");
+            }
         }
     }
 }

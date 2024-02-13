@@ -104,7 +104,7 @@ namespace DiscussionForum.Controllers
                     throw new Exception("Invalid replyId. It should be greater than zero.");
                 }
 
-                Reply _reply = await _replyService.GetReplyByIdAsync(replyId);
+                var _reply = await _replyService.GetReplyByIdAsync(replyId);
 
                 //Checks if the retrieved reply is null
                 if (_reply == null)

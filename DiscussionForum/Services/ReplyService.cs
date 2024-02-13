@@ -4,6 +4,7 @@ using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading;
 
 namespace DiscussionForum.Services
@@ -32,11 +33,41 @@ namespace DiscussionForum.Services
                 throw new ApplicationException("Error occurred while retrieving all replies.", ex);
             }
         }
-        public async Task<Reply> GetReplyByIdAsync(long replyID)
+        public async Task<IQueryable<ReplyDTO>> GetReplyByIdAsync(long replyID)
         {
             try
             {
-                return await Task.FromResult(_context.Replies.Find(replyID));
+                var _reply = _context.Replies
+                    .Include(r => r.Threads)
+                    .Include(r => r.ParentReply)
+                    .Include(r => r.ReplyVotes)
+                    .Include(r => r.CreatedByUser)
+                    .Where(r => r.ReplyID == replyID);
+
+                if (_reply == null)
+                {
+                    throw new Exception("Reply not found");
+                }
+                else
+                {
+                    return _reply
+                        .Select(r => new ReplyDTO
+                    {
+                        ReplyID = r.ReplyID,
+                        ThreadID = r.ThreadID,
+                        ParentReplyID = r.ParentReplyID,
+                        Content = r.Content,
+                        IsDeleted = r.IsDeleted,
+                        CreatedBy = r.CreatedBy,
+                        CreatedAt = r.CreatedAt,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedAt = r.ModifiedAt,
+                        HasViewed = r.HasViewed,
+                        ThreadOwnerEmail = r.Threads.CreatedByUser.Email,
+
+                    });
+                }
+                
             }
             catch (Exception ex)
             {
@@ -269,6 +300,7 @@ namespace DiscussionForum.Services
                         ModifiedBy = r.ModifiedBy,
                         ModifiedAt = r.ModifiedAt,
                         HasViewed = r.HasViewed,
+                        ThreadOwnerEmail = r.Threads.CreatedByUser.Email,
                         NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID, _context)
                     }); ;
 
@@ -310,6 +342,7 @@ namespace DiscussionForum.Services
                             ModifiedBy = reply.ModifiedBy,
                             ModifiedAt = reply.ModifiedAt,
                             HasViewed = reply.HasViewed,
+                            ThreadOwnerEmail=reply.Threads.CreatedByUser.Email,
                             // Recursively call GetNestedReplies to retrieve nested replies of the current reply
                             NestedReplies = GetNestedReplies(replies, reply.ReplyID, context)
                         };
