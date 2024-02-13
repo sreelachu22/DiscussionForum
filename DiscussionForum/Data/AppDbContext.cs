@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.ComponentModel.DataAnnotations.Schema;
 using DiscussionForum.Models.APIModels;
-using DiscussionForum.Seeds;
 
 namespace DiscussionForum.Data
 {
