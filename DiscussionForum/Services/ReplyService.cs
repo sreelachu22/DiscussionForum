@@ -169,7 +169,7 @@ namespace DiscussionForum.Services
             //Creates a new reply and saves it to the database
             try
             {
-                Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
+                Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, HasViewed= false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
 
                 _pointService.ReplyCreated(creatorID);
 
@@ -357,10 +357,10 @@ namespace DiscussionForum.Services
                 throw;
             }
         }
-        public IEnumerable<ReplyNotifyDTO> GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize)
+        public (IEnumerable<ReplyNotifyDTO> replies, int totalCount) GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize)
         {
             IQueryable<Reply> query = _context.Replies
-                .Where(r => r.HasViewed == false &&  // Include condition for HasViewed
+                .Where(r => r.HasViewed == false &&
                             ((r.ParentReply != null && r.ParentReply.CreatedBy == userId) ||
                              (r.ParentReply == null && r.Threads.CreatedBy == userId)))
                 .Where(r => !(r.ParentReply != null && r.ParentReply.CreatedBy == userId &&
@@ -404,8 +404,9 @@ namespace DiscussionForum.Services
                 })
                 .ToList();
 
-            return repliesForUser;
+            return (repliesForUser, totalCount);
         }
+
         public async Task<bool> UpdateHasViewed(long replyId)
         {
             var reply = await _context.Replies.FindAsync(replyId);
