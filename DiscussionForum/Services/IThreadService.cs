@@ -30,6 +30,7 @@ namespace DiscussionForum.Services
         /// <param name="modifierId">The ID of the user editing the thread.</param>
         /// <param name="content">The content of the thread.</param>
         Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string? title, string? content);
+        Task<Threads> CloseThreadAsync(long threadId, Guid modifierId);
         /// <summary>
         /// Deletes a thread based on the given thread ID.
         /// </summary>
