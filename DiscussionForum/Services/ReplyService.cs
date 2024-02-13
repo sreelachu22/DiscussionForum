@@ -138,7 +138,7 @@ namespace DiscussionForum.Services
             //Creates a new reply and saves it to the database
             try
             {
-                Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
+                Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, HasViewed= false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
 
                 _pointService.ReplyCreated(creatorID);
 

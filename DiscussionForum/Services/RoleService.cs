@@ -4,7 +4,6 @@ using DiscussionForum.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using DiscussionForum.Repositories;
 using DiscussionForum.Models.APIModels;
-using DiscussionForum.Type;
 
 namespace DiscussionForum.Services
 {
@@ -22,6 +21,8 @@ namespace DiscussionForum.Services
         /* GetAllRoles retrieves all roles from the database, excluding the "SuperAdmin" role (RoleID=1).
          * The method uses the Unit of Work pattern and returns a Task<IEnumerable<Role>>. In case of an exception,
          * it logs the error message and throws an ApplicationException.*/
+
+
         public Task<IEnumerable<Role>> GetAllRoles()
         {
             try {

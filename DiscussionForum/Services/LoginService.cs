@@ -1,7 +1,6 @@
 ﻿using DiscussionForum.Data;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
-using DiscussionForum.Type;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,23 +33,23 @@ namespace DiscussionForum.Services
         /// <returns>A service response containing a token if the login is successful, or an error message otherwise.</returns>
         public async Task<TokenDto> AdminLoginAsync(AdminLoginDto userLogin)
         {
-                string adminPassword = _config.GetValue<string>("SuperAdmin:Password");
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
+            string adminPassword = _config.GetValue<string>("SuperAdmin:Password");
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
 
-                if (user != null)
+            if (user != null)
+            {
+                if (string.Equals(HashPassword(userLogin.Password), HashPassword(adminPassword), StringComparison.Ordinal))
                 {
-                    if (string.Equals(HashPassword(userLogin.Password), HashPassword(adminPassword), StringComparison.Ordinal))
-                    {
-                        var userName = userLogin.Email;
-                        string tokengenerated = await TokenGenerater(user);
+                    var userName = userLogin.Email;
+                    string tokengenerated = await TokenGenerater(user);
 
-                        return new TokenDto { Token = tokengenerated };
-                    }
-
-                    return null;
+                    return new TokenDto { Token = tokengenerated };
                 }
 
                 return null;
+            }
+
+            return null;
         }
 
         private string HashPassword(string password)
@@ -92,7 +91,7 @@ namespace DiscussionForum.Services
             };
             var token = new JwtSecurityToken(
                 issuer: issuer,
-                claims:  claims,
+                claims: claims,
                 audience: audience,
                 expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials
@@ -119,7 +118,6 @@ namespace DiscussionForum.Services
 
         public async Task<TokenDto> ExternalAuthenticationAsync(string token, string provider)
         {
-            var response = new ServiceResponse<TokenDto>();
 
             try
             {
@@ -130,7 +128,7 @@ namespace DiscussionForum.Services
                 string[] roles = claims.Where(c => c.Type == "roles").Select(c => c.Value).ToArray();
                 string roleName = roles[0];
                 string email = claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
-                
+
 
                 if (string.IsNullOrEmpty(email))
                 {
@@ -170,7 +168,8 @@ namespace DiscussionForum.Services
                                          select u.UserID).FirstOrDefault();
                         int roleId;
 
-                        if (roleName == "SuperAdmin") {
+                        if (roleName == "SuperAdmin")
+                        {
                             roleId = 1;
                         }
                         else if (roleName == "CommunityHead")
@@ -209,7 +208,7 @@ namespace DiscussionForum.Services
 
                     return result;
                 }
-                
+
             }
             catch (Exception ex)
             {
