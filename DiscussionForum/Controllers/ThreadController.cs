@@ -234,6 +234,35 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [HttpPut("CloseThread/{threadId}")]
+        public async Task<IActionResult> CloseThread(long threadId, Guid ModifierId)
+        {
+            try
+            {
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
+                else if (ModifierId == Guid.Empty)
+                {
+                    throw new Exception("Invalid modifierId. It cannot be null or empty.");
+                }
+
+                Threads _thread = await _threadService.CloseThreadAsync(threadId, ModifierId);
+                return Ok(_thread);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while closing thread with ID = {threadId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while closing thread with ID = {threadId} \nError: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// Deletes a thread based on the given thread ID.
         /// </summary>
