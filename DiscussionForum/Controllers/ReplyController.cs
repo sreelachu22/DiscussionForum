@@ -345,13 +345,21 @@ namespace DiscussionForum.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
-        
+
         [HttpGet("unviewed")]
-        public ActionResult<IEnumerable<ReplyNotifyDTO>> GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize)
+        public IActionResult GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize)
         {
-            var replies = _replyService.GetUnviewedReplies(userId, categoryId, sortDirection, pageNumber, pageSize);
-            return Ok(replies);
+            try
+            {
+                var (replies, totalCount) = _replyService.GetUnviewedReplies(userId, categoryId, sortDirection, pageNumber, pageSize);
+                return Ok(new { replies, totalCount });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
+
         [HttpPost("{replyId}/updateHasViewed")]
         public async Task<IActionResult> UpdateHasViewed(long replyId)
         {
