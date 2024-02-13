@@ -13,7 +13,7 @@ namespace DiscussionForum.Services
         /// Retrieves a reply based on the given reply ID.
         /// </summary>
         /// <param name="replyID">The ID to search for in replies.</param>
-        Task<Reply> GetReplyByIdAsync(long replyID);
+        Task<IQueryable<ReplyDTO>> GetReplyByIdAsync(long replyID);
         /// <summary>
         /// Retrieves a list of replies based on the given thread ID.
         /// </summary>

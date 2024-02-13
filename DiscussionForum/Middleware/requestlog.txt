@@ -1,1 +1,11 @@
-﻿
+﻿13-02-2024 12:33:05 - GET /swagger/index.html
+13-02-2024 12:33:05 - GET /swagger/v1/swagger.json
+13-02-2024 12:33:24 - GET /api/Community
+13-02-2024 12:34:58 - GET /api/Community
+13-02-2024 12:42:26 - GET /api/Community
+13-02-2024 12:42:49 - POST /api/Login/Logout
+13-02-2024 12:43:45 - OPTIONS /api/Login/ExternalLogin
+13-02-2024 12:43:45 - GET /api/Community
+13-02-2024 12:43:45 - POST /api/Login/ExternalLogin
+13-02-2024 12:43:45 - GET /api/CommunityCategoryMapping/InCommunity/1
+13-02-2024 12:44:01 - POST /api/Login/Logout

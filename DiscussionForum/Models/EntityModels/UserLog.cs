@@ -11,7 +11,7 @@ namespace DiscussionForum.Models.EntityModels
         public Guid UserID { get; set; }
         public DateTime LoginTime { get; set; }
         public DateTime? LogoutTime { get; set; }
-        public bool IsDeleted { get; set; }
+        public bool? IsDeleted { get; set; }
         public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid? ModifiedBy { get; set; }

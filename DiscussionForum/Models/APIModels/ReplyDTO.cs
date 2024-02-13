@@ -24,6 +24,7 @@ namespace DiscussionForum.Models.APIModels
         public DateTime? CreatedAt { get; set; }
         public Guid? ModifiedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public string ThreadOwnerEmail { get; set; }
         public List<ReplyDTO> NestedReplies { get; set; }
     }
 }

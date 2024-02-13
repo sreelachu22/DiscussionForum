@@ -8,5 +8,7 @@ namespace DiscussionForum.Services
     {
         Task<TokenDto> AdminLoginAsync(AdminLoginDto adminLogin);
         Task<TokenDto> ExternalAuthenticationAsync(string token, string provider);
+
+        Task LogUserLogout(Guid userId);
     }
 }
