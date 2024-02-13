@@ -341,7 +341,6 @@ namespace DiscussionForum.Services
                             ModifiedBy = reply.ModifiedBy,
                             ModifiedAt = reply.ModifiedAt,
                             HasViewed = reply.HasViewed,
-                            ThreadOwnerEmail=reply.Threads.CreatedByUser.Email,
                             // Recursively call GetNestedReplies to retrieve nested replies of the current reply
                             NestedReplies = GetNestedReplies(replies, reply.ReplyID, context)
                         };
