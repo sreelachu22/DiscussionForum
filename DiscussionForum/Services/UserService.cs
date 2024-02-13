@@ -139,7 +139,9 @@ namespace DiscussionForum.Services
                                  where rm.UserID == UserId
                                  select r.RoleName)
                                  .FirstOrDefault();*/
-
+                var role = _userContext.UserRoleMapping
+                                .Where(rm => rm.UserID == UserId)
+                                .Join(_userContext.Roles, rm => rm.RoleID, r => r.RoleID, (rm, r) => r.RoleName);
                 var roleName = _userContext.UserRoleMapping
                                 .Where(rm => rm.UserID == UserId)
                                 .Join(_userContext.Roles, rm => rm.RoleID, r => r.RoleID, (rm, r) => r.RoleName)
