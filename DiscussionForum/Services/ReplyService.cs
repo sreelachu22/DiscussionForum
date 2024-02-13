@@ -300,7 +300,6 @@ namespace DiscussionForum.Services
                         ModifiedBy = r.ModifiedBy,
                         ModifiedAt = r.ModifiedAt,
                         HasViewed = r.HasViewed,
-                        ThreadOwnerEmail = r.Threads.CreatedByUser.Email,
                         NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID, _context)
                     }); ;
 
