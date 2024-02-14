@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,7 +70,7 @@ builder.Services.AddScoped<IThreadVoteService, ThreadVoteService>();
 builder.Services.AddScoped<IReplyVoteService, ReplyVoteService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
-
+builder.Services.AddScoped<IMailjetService, MailjetService>();
 
 
 

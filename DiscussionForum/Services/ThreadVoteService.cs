@@ -30,19 +30,38 @@ namespace DiscussionForum.Services
                 .FirstOrDefaultAsync(tv => tv.UserID == threadVoteDto.UserID && tv.ThreadID == threadVoteDto.ThreadID);
 
                 if (_existingThreadVote != null)
-                {                    
-                    _existingThreadVote.IsUpVote = threadVoteDto.IsUpVote;
-                    _existingThreadVote.IsDeleted = threadVoteDto.IsDeleted;
-                    _existingThreadVote.ModifiedAt = DateTime.Now;
-
-                    if (_existingThreadVote.IsUpVote)
+                {
+                    // Update the existing ThreadVote with the data from the DTO                
+                    if (_existingThreadVote.IsUpVote == threadVoteDto.IsUpVote)
                     {
-                        await _pointService.ThreadUpvoted(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                        // If the existing vote and the incoming vote are the same, set IsDeleted to true
+                        _existingThreadVote.IsDeleted = !_existingThreadVote.IsDeleted;
+
+                        if (_existingThreadVote.IsUpVote)
+                        {
+                            await _pointService.RemoveThreadUpvote(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                        }
+                        else
+                        {
+                            await _pointService.RemoveThreadDownvote(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                        }
                     }
                     else
                     {
-                        await _pointService.ThreadDownvoted(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                        _existingThreadVote.IsUpVote = threadVoteDto.IsUpVote;
+                        _existingThreadVote.IsDeleted = threadVoteDto.IsDeleted;
+
+                        if (_existingThreadVote.IsUpVote)
+                        {
+                            await _pointService.ThreadUpvoted(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                        }
+                        else
+                        {
+                            await _pointService.ThreadDownvoted(_existingThreadVote.UserID, _existingThreadVote.ThreadID);
+                        }
                     }
+                    _existingThreadVote.ModifiedAt = DateTime.Now;
+
                     await _context.SaveChangesAsync();
                 }
                 else
