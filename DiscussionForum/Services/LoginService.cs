@@ -37,20 +37,20 @@ namespace DiscussionForum.Services
                 string adminPassword = _config.GetValue<string>("SuperAdmin:Password");
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
 
-                if (user != null)
+            if (user != null)
+            {
+                if (string.Equals(HashPassword(userLogin.Password), HashPassword(adminPassword), StringComparison.Ordinal))
                 {
-                    if (string.Equals(HashPassword(userLogin.Password), HashPassword(adminPassword), StringComparison.Ordinal))
-                    {
-                        var userName = userLogin.Email;
-                        string tokengenerated = await TokenGenerater(user);
+                    var userName = userLogin.Email;
+                    string tokengenerated = await TokenGenerater(user);
 
-                        return new TokenDto { Token = tokengenerated };
-                    }
-
-                    return null;
+                    return new TokenDto { Token = tokengenerated };
                 }
 
                 return null;
+            }
+
+            return null;
         }
 
         private string HashPassword(string password)
@@ -92,7 +92,7 @@ namespace DiscussionForum.Services
             };
             var token = new JwtSecurityToken(
                 issuer: issuer,
-                claims:  claims,
+                claims: claims,
                 audience: audience,
                 expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials
@@ -139,11 +139,11 @@ namespace DiscussionForum.Services
                 else
                 {
                     var user = await _context.Users.Where(us => us.Email == email).FirstOrDefaultAsync();
-
                     var systemUserId = await _context.Users
                         .Where(us => us.Email == "system@example.com")
                         .Select(us => us.UserID)
                         .FirstOrDefaultAsync();
+
                     if (user == null)
                     {
                         // User does not exist, create a new user
@@ -169,7 +169,8 @@ namespace DiscussionForum.Services
                                          select u.UserID).FirstOrDefault();
                         int roleId;
 
-                        if (roleName == "SuperAdmin") {
+                        if (roleName == "SuperAdmin")
+                        {
                             roleId = 1;
                         }
                         else if (roleName == "CommunityHead")
@@ -202,19 +203,60 @@ namespace DiscussionForum.Services
                         await _context.SaveChangesAsync();
                     }
 
-
+                    
                     // Generate token for the user
                     var result = new TokenDto { Token = await TokenGenerater(user) };
-
+                    await LogUserLogin(user.UserID);
                     return result;
                 }
-                
+
             }
             catch (Exception ex)
             {
                 return null;
             }
         }
+
+        public async Task LogUserLogin(Guid userId)
+        {
+            var userLog = new UserLog
+            {
+                UserID = userId,
+                LoginTime = DateTime.Now,
+                IsDeleted = false,
+                CreatedBy = userId,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.UserLog.Add(userLog);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task LogUserLogout(Guid userId)
+        {
+            try
+            {
+                // Find the user log entry for the given user ID
+                var userLog = await _context.UserLog.FirstOrDefaultAsync(log => log.UserID == userId && log.LogoutTime == null);
+
+                if (userLog != null)
+                {
+                    // Update the logout time for the user
+                    userLog.LogoutTime = DateTime.Now;
+
+                    // Save the changes to the database
+                    await _context.SaveChangesAsync();
+                }
+                // No need to return a value, as it's a void method
+            }
+            catch (Exception ex)
+            {
+                // Log any exceptions if needed
+                Console.WriteLine($"Error occurred during logout: {ex.Message}");
+                // You might want to handle the exception appropriately or propagate it up
+            }
+        }
+
 
     }
 }
