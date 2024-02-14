@@ -195,7 +195,7 @@ namespace DiscussionForum.Services
                     throw new Exception("Modifier not found");
                 }
                 //Checks if reply is valid and not deleted
-                else if (_reply != null && !_reply.IsDeleted)
+                else if (_reply != null)
                 {
                     _reply.Content = content;
                     _reply.ModifiedBy = modifierID;

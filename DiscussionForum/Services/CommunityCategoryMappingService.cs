@@ -53,7 +53,7 @@ namespace DiscussionForum.Services
                 // Apply filtering
                 if (!string.IsNullOrWhiteSpace(term))
                 {
-                    query = query.Where(c => c.Description.ToLower().Contains(term) || c.CommunityCategoryName.ToLower().Contains(term));
+                    query = query.Where(c =>c.CommunityCategoryName.ToLower().Contains(term));
                 }
 
                 // Apply sorting
