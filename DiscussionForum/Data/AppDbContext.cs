@@ -17,7 +17,7 @@ namespace DiscussionForum.Data
         public DbSet<CommunityStatus> CommunityStatus { get; set; }
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
-        public DbSet<User> Users{ get; set; }
+        public DbSet<User> Users { get; set; }
 
         /*public DbSet<UserLog> UserLog { get; set; }*/
         public DbSet<Threads> Threads { get; set; }
@@ -106,10 +106,12 @@ namespace DiscussionForum.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Relationships for User entity
+            //this is a new edit
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
                 .HasForeignKey<User>(u => u.CreatedBy)
+                .IsRequired(false) // Make the relationship optional
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()

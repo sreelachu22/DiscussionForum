@@ -234,6 +234,35 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [HttpPut("CloseThread/{threadId}")]
+        public async Task<IActionResult> CloseThread(long threadId, Guid ModifierId)
+        {
+            try
+            {
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
+                else if (ModifierId == Guid.Empty)
+                {
+                    throw new Exception("Invalid modifierId. It cannot be null or empty.");
+                }
+
+                Threads _thread = await _threadService.CloseThreadAsync(threadId, ModifierId);
+                return Ok(_thread);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while closing thread with ID = {threadId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while closing thread with ID = {threadId} \nError: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// Deletes a thread based on the given thread ID.
         /// </summary>
@@ -275,42 +304,20 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="searchTerm">The term to search for in reply content.</param>
         [HttpGet("SearchThreads")]
-        public async Task<IActionResult> SearchThread(string searchTerm)
+        public async Task<IActionResult> SearchThread(string searchTerm, int pageNumber, int pageSize)
         {
             try
             {
+
                 if (string.IsNullOrEmpty(searchTerm))
                 {
                     return BadRequest("Search term cannot be empty");
                 }
 
-                IEnumerable<Threads> sampleData = await _threadService.GetThreadsFromDatabaseAsync();
+                var (searchThreadDtoList, searchThreadDtoListLength) = await _threadService.GetThreadsFromDatabaseAsync(searchTerm,pageNumber,pageSize);
 
-                // Split the search term into individual words
-                var searchTermsArray = searchTerm.Split(' ');
-
-                // Create a list to store the filtered threads
-                var filteredThreads = new List<Threads>();
-
-                foreach (var term in searchTermsArray)
-                {
-                    // Filtering based on a search term
-                    var termFilteredData = sampleData
-                        .Where(thread => thread.Content.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
-                        .ToList();
-
-                    // Add the filtered threads to the result list
-                    filteredThreads.AddRange(termFilteredData);
-                }
-
-                // Remove duplicate threads based on threadID
-                var uniqueThreads = filteredThreads
-                    .GroupBy(thread => thread.ThreadID)
-                    .Select(group => group.First())
-                    .ToList();
-
-                // Return the filtered data.
-                return Ok(uniqueThreads);
+                // You can return the results as needed, for example:
+                return Ok(new { SearchThreadDtoList = searchThreadDtoList, SearchThreadDtoListLength = searchThreadDtoListLength });
             }
             catch (Exception ex)
             {

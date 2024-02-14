@@ -89,6 +89,46 @@ namespace DiscussionForum.Services
             }
         }
 
+        public async Task RemoveThreadUpvote(Guid upVotedBy, long threadId)
+        {
+            try
+            {
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                if (_thread == null)
+                {
+                    throw new Exception("Post/Thread not found while assigning points");
+                }
+                Guid upVotedOn = _thread.CreatedBy;
+
+                await Task.FromResult(RemovePoints(upVotedBy, 1));
+                await Task.FromResult(RemovePoints(upVotedOn, 5));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for removing upvote for a post/thread.", ex);
+            }
+        }
+
+        public async Task RemoveThreadDownvote(Guid downVotedBy, long threadId)
+        {
+            try
+            {
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                if (_thread == null)
+                {
+                    throw new Exception("Post/Thread not found while assigning points");
+                }
+                Guid downVotedOn = _thread.CreatedBy;
+
+                await Task.FromResult(AddPoints(downVotedBy, 1));
+                await Task.FromResult(AddPoints(downVotedOn, 2));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for removing downvote for a post/thread.", ex);
+            }
+        }
+
         public async Task ReplyCreated(Guid createdBy)
         {
             try
@@ -162,6 +202,46 @@ namespace DiscussionForum.Services
             catch (Exception ex)
             {
                 throw new ApplicationException($"Error occurred while assigning points for downvoting a reply.", ex);
+            }
+        }
+
+        public async Task RemoveReplyUpvote(Guid upVotedBy, long replyId)
+        {
+            try
+            {
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyId));
+                if (_reply == null)
+                {
+                    throw new Exception("Reply not found while assigning points");
+                }
+                Guid upVotedOn = _reply.CreatedBy;
+
+                await Task.FromResult(RemovePoints(upVotedBy, 1));
+                await Task.FromResult(RemovePoints(upVotedOn, 5));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for removing upvote for a reply.", ex);
+            }
+        }
+
+        public async Task RemoveReplyDownvote(Guid downVotedBy, long replyId)
+        {
+            try
+            {
+                Reply _reply = await Task.FromResult(_context.Replies.Find(replyId));
+                if (_reply == null)
+                {
+                    throw new Exception("Reply not found while assigning points");
+                }
+                Guid downVotedOn = _reply.CreatedBy;
+
+                await Task.FromResult(AddPoints(downVotedBy, 1));
+                await Task.FromResult(AddPoints(downVotedOn, 2));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while assigning points for removing downvote for a post/thread.", ex);
             }
         }
 

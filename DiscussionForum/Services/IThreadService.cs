@@ -30,6 +30,7 @@ namespace DiscussionForum.Services
         /// <param name="modifierId">The ID of the user editing the thread.</param>
         /// <param name="content">The content of the thread.</param>
         Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string? title, string? content);
+        Task<Threads> CloseThreadAsync(long threadId, Guid modifierId);
         /// <summary>
         /// Deletes a thread based on the given thread ID.
         /// </summary>
@@ -39,7 +40,7 @@ namespace DiscussionForum.Services
         /// <summary>
         /// Retrieves all threads.
         /// </summary>
-        Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync();
+        Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength)> GetThreadsFromDatabaseAsync(string searchTerm, int pageNumber, int pageSize);
         Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount);
         Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CommunityName)> GetClosedThreads(int CommunityID, int pageNumber, int pageSize);
     }

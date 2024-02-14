@@ -9,6 +9,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Threading;
 using System;
 using System.Reflection.Metadata;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace DiscussionForum.Services
 {
@@ -18,6 +19,7 @@ namespace DiscussionForum.Services
         private readonly AppDbContext _context;
         private readonly IPointService _pointService;
         private readonly ITagService _tagService;
+        private readonly ICommunityCategoryMappingService _communityCategoryMappingService;
 
         public ThreadService(IUnitOfWork unitOfWork, AppDbContext context, IPointService pointService, ITagService tagService)
         {
@@ -40,7 +42,7 @@ namespace DiscussionForum.Services
                 /* get total count based on query*/
                 var query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
-                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID);
+                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
                 var totalCount = await query.CountAsync();
 
                 /* to get category related info*/
@@ -50,6 +52,9 @@ namespace DiscussionForum.Services
                 .Select(ccm => new { CategoryName = ccm.CommunityCategory.CommunityCategoryName, CategoryDescription = ccm.Description })
                 .FirstOrDefaultAsync();
 
+
+
+
                 /* get threads with limit(pagination)*/
                 var threads = await _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
@@ -58,17 +63,20 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID)
+                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2)
                     .OrderByDescending(t => t.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
+                        Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = (DateTime)t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -77,7 +85,8 @@ namespace DiscussionForum.Services
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == t.ThreadID
-                                    select tg.TagName).ToList()
+                                    select tg.TagName).ToList(),
+                        ReplyCount = _context.Replies.Count(r => r.ThreadID == t.ThreadID && !r.IsDeleted)
 
                     })
                     .ToListAsync();
@@ -103,7 +112,7 @@ namespace DiscussionForum.Services
                     .Include(t => t.CreatedByUser)
                     .Include(t => t.ModifiedByUser)
                     .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMappingID == CommunityCategoryMappingID);
+                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
 
                 switch (sortBy.ToLower())
                 {
@@ -123,9 +132,11 @@ namespace DiscussionForum.Services
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser != null ? t.ModifiedByUser.Name : null,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -153,7 +164,7 @@ namespace DiscussionForum.Services
                 /* get total count based on query*/
                 var _query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
-                .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1);
+                .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1 && !t.IsDeleted);
                 var _totalCount = await _query.CountAsync();
 
                 /* to get category related info*/
@@ -171,7 +182,7 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1)
+                    .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1 && !t.IsDeleted)
                     .OrderByDescending(t => t.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
@@ -180,9 +191,11 @@ namespace DiscussionForum.Services
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = (DateTime)t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -223,9 +236,11 @@ namespace DiscussionForum.Services
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = (DateTime)t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -389,6 +404,47 @@ namespace DiscussionForum.Services
             }
         }
 
+        public async Task<Threads> CloseThreadAsync(long threadId, Guid modifierId)
+        {
+            try
+            {
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierId));
+                //Checks if modifier is valid
+                if (_modifier == null)
+                {
+                    throw new Exception("Modifier not found");
+                }
+                //Checks if thread is valid and not deleted
+                else if (_thread != null && !_thread.IsDeleted)
+                {
+                    _thread.ThreadStatusID = 1;
+                    _thread.ModifiedBy = modifierId;
+                    _thread.ModifiedAt = DateTime.Now;
+
+                    await _pointService.ThreadUpdated(modifierId);
+
+                    _context.SaveChanges();
+
+                    return _thread;
+                    
+                }
+                //Checks if the thread is valid but deleted
+                else if (_thread != null && _thread.IsDeleted)
+                {
+                    throw new Exception("Thread has been deleted.");
+                }
+                else
+                {
+                    throw new Exception("Thread not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while closing a thread with ID {threadId}.", ex);
+            }
+        }
+
         public async Task<Threads> DeleteThreadAsync(long threadId, Guid modifierId)
         {
             try
@@ -429,11 +485,111 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<IEnumerable<Threads>> GetThreadsFromDatabaseAsync()
+        public async Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength)> GetThreadsFromDatabaseAsync(string searchTerm,int pageNumber,int pageSize)
         {
             try
             {
-                return await _context.Threads.ToListAsync();
+
+                List<int> CommunityCategoryMappingIDs = await _context.CommunityCategoryMapping
+                                                        .Where(ccm => !ccm.IsDeleted)
+                                                        .Select(ccm => ccm.CommunityCategoryMappingID)
+                                                        .ToListAsync();
+
+                List<Threads> threads = await _context.Threads
+                    .Include(t => t.CommunityCategoryMapping)
+                        .ThenInclude(c => c.CommunityCategory)
+                    .Include(t => t.ThreadStatus)
+                    .Include(t => t.CreatedByUser)
+                    .Include(t => t.ModifiedByUser)
+                    .Include(t => t.ThreadVotes)
+                    .Where(t => CommunityCategoryMappingIDs.Contains(t.CommunityCategoryMappingID))
+                    .OrderByDescending(t => t.CreatedAt)
+                    .ToListAsync();
+
+
+                // Split the search term into individual words
+                var searchTermsArray = searchTerm.Split(' ');
+
+                // Create a list to store the filtered threads
+                var filteredThreads = new List<Threads>();
+
+                foreach (var term in searchTermsArray)
+                {
+                    // Filtering based on a search term
+                    var termFilteredData = threads
+                        .Where(thread => thread.Title.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                        .ToList();
+
+                    // Add the filtered threads to the result list
+                    filteredThreads.AddRange(termFilteredData);
+                }
+
+                // Remove duplicate threads based on threadID
+                // Group threads by ID and calculate the total hit count for each thread title
+                var groupedThreads = filteredThreads
+                    .GroupBy(thread => thread.ThreadID)
+                    .Select(group => new
+                    {
+                        ThreadID = group.Key,
+                        TotalHits = group.Sum(thread => searchTermsArray.Count(term => thread.Title.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0))
+                    })
+                    .OrderByDescending(thread => thread.TotalHits)
+                    .ThenByDescending(thread => thread.ThreadID)  // Add additional sorting criteria if needed
+                    .ToList();
+
+                // Retrieve threads based on the sorted ThreadIDs
+                var sortedThreads = groupedThreads
+                    .Select(thread => threads.FirstOrDefault(t => t.ThreadID == thread.ThreadID))
+                    .ToList();
+
+                // Remove duplicate threads based on threadID
+                var uniqueThreads = sortedThreads
+                    .GroupBy(thread => thread.ThreadID)
+                    .Select(group => group.First())
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+
+                var searchThreadDtoList = new List<CategoryThreadDto>();
+
+                foreach (var thread in uniqueThreads)
+                {
+                    var searchThreadDto = new CategoryThreadDto
+                    {
+                        ThreadID = thread.ThreadID,
+                        Title = thread.Title,
+                        Content = thread.Content,
+
+                        CreatedBy = thread.CreatedBy,
+                        CreatedByUser = _context.Users
+                                        .Where(u => u.UserID == thread.CreatedBy)
+                                        .Select(u => u.Name)
+                                        .FirstOrDefault(),
+                        CreatedAt = (DateTime)thread.CreatedAt,
+
+                        ModifiedBy = thread.ModifiedBy,
+                        ModifiedByUser = thread.ModifiedByUser?.Name,
+                        ModifiedAt = (DateTime?)thread.ModifiedAt,
+
+                        ThreadStatusName = thread.ThreadStatus?.ThreadStatusName,
+                        IsAnswered = thread.IsAnswered,
+                        UpVoteCount = thread.ThreadVotes != null ? thread.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        DownVoteCount = thread.ThreadVotes != null ? thread.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
+
+                        TagNames = (from ttm in _context.ThreadTagsMapping
+                                    join tg in _context.Tags on ttm.TagID equals tg.TagID
+                                    where ttm.ThreadID == thread.ThreadID
+                                    select tg.TagName).ToList(),
+                        ReplyCount = _context.Replies.Count(r => r.ThreadID == thread.ThreadID && !r.IsDeleted)
+
+                    };
+
+                    searchThreadDtoList.Add(searchThreadDto);
+                }
+
+                return (searchThreadDtoList, sortedThreads.Count);
+
             }
             catch (Exception ex)
             {

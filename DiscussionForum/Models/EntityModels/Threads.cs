@@ -41,5 +41,7 @@ namespace DiscussionForum.Models.EntityModels
         public virtual ICollection<ThreadVote> ThreadVotes { get; set; }
 
 
+
+
     }
 }

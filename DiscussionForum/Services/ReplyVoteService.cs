@@ -24,19 +24,37 @@ namespace DiscussionForum.Services
 
             if (existingReplyVote != null)
             {
-                // Update the existing ReplyVote with the data from the DTO
-                existingReplyVote.IsUpVote = voteDto.IsUpVote;
-                existingReplyVote.IsDeleted = voteDto.IsDeleted;
-                existingReplyVote.ModifiedAt = DateTime.Now;
-                
-                if(existingReplyVote.IsUpVote)
+                // Update the existing ReplyVote with the data from the DTO                
+                if (existingReplyVote.IsUpVote == voteDto.IsUpVote)
                 {
-                    await _pointService.ReplyUpvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    // If the existing vote and the incoming vote are the same, set IsDeleted to true
+                    existingReplyVote.IsDeleted = !existingReplyVote.IsDeleted;
+
+                    if (existingReplyVote.IsUpVote)
+                    {
+                        await _pointService.RemoveReplyUpvote(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                    else
+                    {
+                        await _pointService.RemoveReplyDownvote(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
                 }
                 else
-                {
-                    await _pointService.ReplyDownvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                {                    
+                    existingReplyVote.IsUpVote = voteDto.IsUpVote;
+                    existingReplyVote.IsDeleted = voteDto.IsDeleted;
+
+                    if (existingReplyVote.IsUpVote)
+                    {
+                        await _pointService.ReplyUpvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                    else
+                    {
+                        await _pointService.ReplyDownvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
                 }
+                existingReplyVote.ModifiedAt = DateTime.Now;
+                
                 await _dbContext.SaveChangesAsync();
             }
             else
