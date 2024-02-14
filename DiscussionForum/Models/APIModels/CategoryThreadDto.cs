@@ -27,6 +27,8 @@
         public int UpVoteCount { get; set; }
         public int DownVoteCount { get; set; }
 
+        public int ReplyCount { get; set; }
+
         public List<String> TagNames { get; set; }
 
         //public int RepliesCount { get; set; }
