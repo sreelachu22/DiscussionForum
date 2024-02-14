@@ -42,7 +42,7 @@ namespace DiscussionForum.Services
                 /* get total count based on query*/
                 var query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
-                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID);
+                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
                 var totalCount = await query.CountAsync();
 
                 /* to get category related info*/
@@ -63,7 +63,7 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted)
+                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2)
                     .OrderByDescending(t => t.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
@@ -72,9 +72,11 @@ namespace DiscussionForum.Services
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = (DateTime)t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -110,7 +112,7 @@ namespace DiscussionForum.Services
                     .Include(t => t.CreatedByUser)
                     .Include(t => t.ModifiedByUser)
                     .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMappingID == CommunityCategoryMappingID);
+                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
 
                 switch (sortBy.ToLower())
                 {
@@ -130,9 +132,11 @@ namespace DiscussionForum.Services
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser != null ? t.ModifiedByUser.Name : null,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -160,7 +164,7 @@ namespace DiscussionForum.Services
                 /* get total count based on query*/
                 var _query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
-                .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1);
+                .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1 && !t.IsDeleted);
                 var _totalCount = await _query.CountAsync();
 
                 /* to get category related info*/
@@ -178,7 +182,7 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1)
+                    .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1 && !t.IsDeleted)
                     .OrderByDescending(t => t.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
@@ -187,9 +191,11 @@ namespace DiscussionForum.Services
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = (DateTime)t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -230,9 +236,11 @@ namespace DiscussionForum.Services
                         ThreadID = t.ThreadID,
                         Title = t.Title,
                         Content = t.Content,
-                        CreatedBy = t.CreatedByUser.Name,
+                        CreatedBy = t.CreatedBy,
+                        CreatedByUser = t.CreatedByUser.Name,
                         CreatedAt = (DateTime)t.CreatedAt,
-                        ModifiedBy = t.ModifiedByUser.Name,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedByUser = t.ModifiedByUser.Name,
                         ModifiedAt = (DateTime)t.ModifiedAt,
                         ThreadStatusName = t.ThreadStatus.ThreadStatusName,
                         IsAnswered = t.IsAnswered,
@@ -553,10 +561,12 @@ namespace DiscussionForum.Services
                         Title = thread.Title,
                         Content = thread.Content,
 
-                        CreatedBy = thread.CreatedByUser?.Name,
+                        CreatedBy = thread.CreatedBy,
+                        CreatedByUser = thread.CreatedByUser?.Name,
                         CreatedAt = (DateTime)thread.CreatedAt,
 
-                        ModifiedBy = thread.ModifiedByUser?.Name,
+                        ModifiedBy = thread.ModifiedBy,
+                        ModifiedByUser = thread.ModifiedByUser?.Name,
                         ModifiedAt = (DateTime?)thread.ModifiedAt,
 
                         ThreadStatusName = thread.ThreadStatus?.ThreadStatusName,
