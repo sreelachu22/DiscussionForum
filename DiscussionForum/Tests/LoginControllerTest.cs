@@ -9,6 +9,9 @@ namespace DiscussionForum.Tests
 {
     public class LoginControllerTest
     {
+        /// <summary>
+        /// Verifies that the AdminLogin method returns an OkObjectResult with valid credentials.
+        /// </summary>
         [Fact]
         public async Task AdminLogin_ValidCredentials_ReturnsOkResult()
         {
@@ -28,6 +31,9 @@ namespace DiscussionForum.Tests
             Assert.NotNull(okResult.Value);
         }
 
+        /// <summary>
+        /// Verifies that the AdminLogin method returns a ConflictObjectResult with invalid credentials.
+        /// </summary>
         [Fact]
         public async Task AdminLogin_InvalidCredentials_ReturnsConflictResult()
         {
@@ -47,6 +53,9 @@ namespace DiscussionForum.Tests
             Assert.Equal("Failed to Log in user.", conflictResult.Value);
         }
 
+        /// <summary>
+        /// Verifies that the ExternalAuthentication method returns an OkObjectResult with a valid token.
+        /// </summary>
         [Fact]
         public async Task ExternalAuthentication_ValidToken_ReturnsOkResult()
         {
@@ -66,6 +75,9 @@ namespace DiscussionForum.Tests
             Assert.NotNull(okResult.Value);
         }
 
+        /// <summary>
+        /// Verifies that the ExternalAuthentication method returns an UnauthorizedResult with an invalid token.
+        /// </summary>
         [Fact]
         public async Task ExternalAuthentication_InvalidToken_ReturnsUnauthorizedResult()
         {

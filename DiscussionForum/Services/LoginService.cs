@@ -29,12 +29,13 @@ namespace DiscussionForum.Services
         /// <summary>
         /// Attempts to log in an admin user asynchronously.
         /// </summary>
-        /// <param name="dto">The login information provided by the user.</param>
-        /// <returns>A service response containing a token if the login is successful, or an error message otherwise.</returns>
+        /// <param name="userLogin">The login information provided by the user.</param>
+        /// <returns>A service response containing a token if the login is successful, or null otherwise.</returns>
         public async Task<TokenDto> AdminLoginAsync(AdminLoginDto userLogin)
         {
-            string adminPassword = _config.GetValue<string>("SuperAdmin:Password");
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
+            string Password = DotNetEnv.Env.GetString("AdminPassword");
+                string adminPassword = _config.GetValue<string>("SuperAdmin:Password");
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
 
             if (user != null)
             {
@@ -52,6 +53,11 @@ namespace DiscussionForum.Services
             return null;
         }
 
+        /// <summary>
+        /// Generates a hash for the provided password.
+        /// </summary>
+        /// <param name="password">The password to hash.</param>
+        /// <returns>The hashed password.</returns>
         private string HashPassword(string password)
         {
 
@@ -62,22 +68,16 @@ namespace DiscussionForum.Services
             }
         }
 
-        string GenerateKey(int length)
-        {
-            var randomBytes = new byte[length / 8];
-            using (var rng = new RNGCryptoServiceProvider())
-            {
-                rng.GetBytes(randomBytes);
-            }
-            return Convert.ToBase64String(randomBytes);
-        }
-
-
+        /// <summary>
+        /// Generates a JWT token for the given user.
+        /// </summary>
+        /// <param name="user">The user for whom the token is generated.</param>
+        /// <returns>The generated JWT token.</returns>
         public async Task<string> TokenGenerater(User user)
         {
-            string key = _config["Jwt:Key"];
-            string issuer = _config["Jwt:Issuer"];
-            string audience = _config["Jwt:Audience"];
+            string key = _config["Jwt:JWT_Key"];
+            string issuer = _config["Jwt:JWT_Issuer"];
+            string audience = _config["Jwt:JWT_Audience"];
             var role = await GetRole(user);
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
@@ -99,6 +99,11 @@ namespace DiscussionForum.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        /// <summary>
+        /// Retrieves the role of the specified user.
+        /// </summary>
+        /// <param name="user">The user whose role is to be retrieved.</param>
+        /// <returns>The role of the user.</returns>
         private async Task<string> GetRole(User user)
         {
             var roleName = await _context.Users
@@ -116,6 +121,12 @@ namespace DiscussionForum.Services
             return roleName;
         }
 
+        /// <summary>
+        /// Performs external authentication using the provided token and provider.
+        /// </summary>
+        /// <param name="token">The token provided by the external authentication provider.</param>
+        /// <param name="provider">The external authentication provider.</param>
+        /// <returns>A service response containing a token if the authentication is successful, or null otherwise.</returns>
         public async Task<TokenDto> ExternalAuthenticationAsync(string token, string provider)
         {
 
@@ -128,7 +139,7 @@ namespace DiscussionForum.Services
                 string[] roles = claims.Where(c => c.Type == "roles").Select(c => c.Value).ToArray();
                 string roleName = roles[0];
                 string email = claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
-
+                
 
                 if (string.IsNullOrEmpty(email))
                 {
@@ -216,6 +227,10 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Logs the login time of the specified user.
+        /// </summary>
+        /// <param name="userId">The ID of the user to log.</param>
         public async Task LogUserLogin(Guid userId)
         {
             var userLog = new UserLog
@@ -231,6 +246,10 @@ namespace DiscussionForum.Services
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Logs the logout time of the specified user.
+        /// </summary>
+        /// <param name="userId">The ID of the user to log out.</param>
         public async Task LogUserLogout(Guid userId)
         {
             try
@@ -243,16 +262,13 @@ namespace DiscussionForum.Services
                     // Update the logout time for the user
                     userLog.LogoutTime = DateTime.Now;
 
-                    // Save the changes to the database
                     await _context.SaveChangesAsync();
                 }
-                // No need to return a value, as it's a void method
             }
             catch (Exception ex)
             {
-                // Log any exceptions if needed
+                // Log exceptions
                 Console.WriteLine($"Error occurred during logout: {ex.Message}");
-                // You might want to handle the exception appropriately or propagate it up
             }
         }
 
