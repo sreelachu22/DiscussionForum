@@ -23,7 +23,12 @@ namespace DiscussionForum.Services
 
 
 
-        //Get All Tags async
+        /// <summary>
+        /// Async get all tags
+        /// </summary>
+        /// <param name="isdel"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<IEnumerable<TagDto>> GetAllTagAsync(Boolean isdel)
         {
             try
@@ -37,7 +42,13 @@ namespace DiscussionForum.Services
         }
 
 
-        //Create tags asyncronously
+        /// <summary>
+        /// Create tags async
+        /// </summary>
+        /// <param name="tagname"></param>
+        /// <param name="createdby"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<Tag> CreateTagAsync(string tagname, Guid createdby)
         {
             try
@@ -49,7 +60,12 @@ namespace DiscussionForum.Services
                 throw new Exception("Error occurred while creating tag.", ex);
             }
         }
-
+        /// <summary>
+        /// Tag create function
+        /// </summary>
+        /// <param name="tagname"></param>
+        /// <param name="createdby"></param>
+        /// <returns></returns>
        
         private Tag CreateTag(string tagname, Guid createdby)
         {
@@ -69,7 +85,12 @@ namespace DiscussionForum.Services
         }
 
         
-
+        /// <summary>
+        /// Retrives all tags which are not deleted
+        /// </summary>
+        /// <param name="isdel"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private IEnumerable<TagDto> GetAllTags(Boolean isdel)
         {
             try {
@@ -93,7 +114,12 @@ namespace DiscussionForum.Services
             }
             
         }
-
+        /// <summary>
+        /// Retrives tags by async based on seacrh keyword
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<IEnumerable<TagDto>> GeAllTagAsync(string keyword)
         {
             try {
@@ -105,6 +131,11 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Retrives all tags synchrounously based on search keyword
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
         private IEnumerable<TagDto> GetAllTags(String keyword)
         { 
             string lowerkeyword=keyword.ToLower();
