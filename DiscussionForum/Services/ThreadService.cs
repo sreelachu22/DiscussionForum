@@ -562,7 +562,10 @@ namespace DiscussionForum.Services
                         Content = thread.Content,
 
                         CreatedBy = thread.CreatedBy,
-                        CreatedByUser = thread.CreatedByUser?.Name,
+                        CreatedByUser = _context.Users
+                                        .Where(u => u.UserID == thread.CreatedBy)
+                                        .Select(u => u.Name)
+                                        .FirstOrDefault(),
                         CreatedAt = (DateTime)thread.CreatedAt,
 
                         ModifiedBy = thread.ModifiedBy,
@@ -577,7 +580,8 @@ namespace DiscussionForum.Services
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == thread.ThreadID
-                                    select tg.TagName).ToList()
+                                    select tg.TagName).ToList(),
+                        ReplyCount = _context.Replies.Count(r => r.ThreadID == thread.ThreadID && !r.IsDeleted)
 
                     };
 
