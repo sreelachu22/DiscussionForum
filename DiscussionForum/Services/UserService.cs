@@ -32,38 +32,31 @@ namespace DiscussionForum.Services
         public async Task<PagedUserResult> GetUsers(string? term, string? sort, int page, int limit)
         {
             try
-            {
-                // Normalize and clean up the search term
-                term = string.IsNullOrWhiteSpace(term) ? null : term.Trim().ToLower();
-                // Build the initial query based on search term
+            {                
+                term = string.IsNullOrWhiteSpace(term) ? null : term.Trim().ToLower();                
 
                 IQueryable<User> usersQuery;
 
                 if (string.IsNullOrWhiteSpace(term))
-                {
-                    // Display all users if term is null or whitespace
+                {                    
                     usersQuery = _userContext.Users.Where(u =>
                          u.Name.ToLower() != "system user"
                      );
                 }
 
                 else
-                {
-                    // Get users containing the value in term
+                {                    
                     usersQuery = _userContext.Users.Where(u =>
                         u.Name.ToLower() != "system user" && u.Name.ToLower().Contains(term)
                     );
                 }
-
-
-                // Apply sorting if specified
+                
                 if (!string.IsNullOrWhiteSpace(sort))
                 {
                     var sortFields = sort.Split(',');
                     var orderQueryBuilder = new StringBuilder();
                     var propertyInfo = typeof(User).GetProperties();
-
-                    // Construct the order-by clause based on sort fields
+                    
                     foreach (var field in sortFields)
                     {
                         var sortOrder = field.StartsWith("-") ? "descending" : "ascending";
@@ -73,11 +66,10 @@ namespace DiscussionForum.Services
                         if (property != null)
                             orderQueryBuilder.Append($"{property.Name} {sortOrder}, ");
                     }
-
-                    // Apply sorting to the query
+                    
                     if (orderQueryBuilder.Length > 0)
                     {
-                        orderQueryBuilder.Length -= 2; // Remove the trailing comma and space
+                        orderQueryBuilder.Length -= 2; 
                         usersQuery = usersQuery.OrderBy(orderQueryBuilder.ToString());
                     }
                     else
@@ -130,15 +122,7 @@ namespace DiscussionForum.Services
                 if (user == null)
                 {
                     return null;
-                }
-
-                /* linq operation and normal opertation for geting rolename*/
-
-                /* var roleName = (from rm in _userContext.UserRoleMapping
-                                 join r in _userContext.Roles on rm.RoleID equals r.RoleID
-                                 where rm.UserID == UserId
-                                 select r.RoleName)
-                                 .FirstOrDefault();*/
+                }     
                 var role = _userContext.UserRoleMapping
                                 .Where(rm => rm.UserID == UserId)
                                 .Join(_userContext.Roles, rm => rm.RoleID, r => r.RoleID, (rm, r) => r.RoleName);

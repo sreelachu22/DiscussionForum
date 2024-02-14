@@ -16,6 +16,13 @@ namespace DiscussionForum.Services
             _dbContext = dbContext;
             _pointService = pointService;
         }
+        // Manages the creation and modification of reply votes in the database.
+        // Input: ReplyVoteDto object representing user's vote on a reply.
+        // Output: None.
+        // Functionality:
+        // - Checks if a vote by the same user on the same reply already exists in the database.
+        // - Updates the existing vote if found, toggling IsDeleted if the new vote matches the existing one, otherwise updating IsUpVote and IsDeleted.        
+        // - Handles point adjustments via _pointService based on the type of vote (upvote or downvote).        
 
         public async Task VoteAsync(ReplyVoteDto voteDto)
         {           
