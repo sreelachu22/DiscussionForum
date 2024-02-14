@@ -10,6 +10,8 @@ using System.Threading;
 using System;
 using System.Reflection.Metadata;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Moq;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 namespace DiscussionForum.Services
 {
@@ -30,22 +32,29 @@ namespace DiscussionForum.Services
         }
 
 
-        /*GetAllThreads retrieves paginated threads for a specific community category mapping.
-        It includes additional logic to obtain the total thread count, category name, and description.
-        The method takes CommunityCategoryMappingID, pageNumber, and pageSize as inputs, returning 
-        a tuple with threads, total count, category name, and description. If an error occurs,
-        a custom exception is thrown.*/
+        /// <summary>
+        /// GetAllThreads retrieves paginated threads for a specific community category mapping.
+        ///It includes additional logic to obtain the total thread count, category name, and description.
+        ///The method takes CommunityCategoryMappingID, pageNumber, and pageSize as inputs, returning
+        ///a tuple with threads, total count, category name, and description. If an error occurs,
+        ///a custom exception is thrown.
+        /// </summary>
+        /// <param name="CommunityCategoryMappingID"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {
             try
             {
-                /* get total count based on query*/
+     
                 var query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
                 .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
                 var totalCount = await query.CountAsync();
 
-                /* to get category related info*/
+ 
 
                 var categoryInfo = await _context.CommunityCategoryMapping
                 .Where(ccm => ccm.CommunityCategoryMappingID == CommunityCategoryMappingID)
@@ -55,7 +64,7 @@ namespace DiscussionForum.Services
 
 
 
-                /* get threads with limit(pagination)*/
+
                 var threads = await _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
                 .ThenInclude(c => c.CommunityCategory)
@@ -161,20 +170,19 @@ namespace DiscussionForum.Services
         {
             try
             {
-                /* get total count based on query*/
+
                 var _query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
                 .Where(t => t.CommunityCategoryMapping.CommunityID == CommunityID && t.ThreadStatusID == 1 && !t.IsDeleted);
                 var _totalCount = await _query.CountAsync();
 
-                /* to get category related info*/
+
 
                 var _communityName = await _context.CommunityCategoryMapping
                 .Where(ccm => ccm.CommunityID == CommunityID)
                 .Select(ccm => ccm.Community.CommunityName)
                 .FirstOrDefaultAsync();
 
-                /* get threads with limit(pagination)*/
                 var _threads = await _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
                 .ThenInclude(c => c.CommunityCategory)
@@ -218,6 +226,7 @@ namespace DiscussionForum.Services
                 throw new Exception("Error  while fetching threads.", ex);
             }
         }
+
 
         public async Task<CategoryThreadDto> GetThreadByIdAsync(long threadId)
         {
@@ -263,12 +272,26 @@ namespace DiscussionForum.Services
             }
         }
 
+
+        /// <summary>
+        /// The CreateThreadAsync method is an asynchronous function responsible for creating a new thread in the discussion forum.
+        /// It performs validation checks for the existence of the community category and user, creates a new thread using the provided data, 
+        /// handles tag creation and mapping, and triggers additional services for point calculation. Any exceptions during the process are 
+        /// caught and rethrown with appropriate error messages.
+        /// </summary>
+        /// <param name="categorythreaddto"></param>
+        /// <param name="communityCategoryId"></param>
+        /// <param name="createdby"></param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException"></exception>
         public async Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto, int communityCategoryId, Guid createdby)
         {
             try
             {
+                
+                bool communityCategoryMappingExists = _context.CommunityCategoryMapping
+                                            .Any(mapping => !mapping.IsDeleted);
 
-                bool communityCategoryMappingExists = await Task.FromResult(_context.CommunityCategoryMapping.Any(mapping => mapping.CommunityCategoryID == communityCategoryId));
                 if (!communityCategoryMappingExists)
                 {
                     throw new Exception("Category does not exists in your community");
@@ -317,6 +340,16 @@ namespace DiscussionForum.Services
             }
         }
 
+
+        /// <summary> 
+        ///The CreateThread method synchronously creates a new thread entity with specified details, adds it to the unit of work, 
+        ///and returns the created thread.If an error occurs during the process, it throws an exception with an appropriate message.
+        /// </summary>
+        /// <param name="categorythreaddto"></param>
+        /// <param name="communityCategoryId"></param>
+        /// <param name="createdby"></param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException"></exception>
         private Threads CreateThread(CategoryThreadDto categorythreaddto, int communityCategoryId, Guid createdby)
         {
             try
@@ -485,6 +518,16 @@ namespace DiscussionForum.Services
             }
         }
 
+
+        /// <summary>
+        /// The GetThreadsFromDatabaseAsync function retrieves and filters threads based on a search term, paginates the results, and returns a tuple containing 
+        /// a list of categorized thread DTOs and the total count of matching threads. It leverages asynchronous queries and includes detailed information about
+        /// each thread, such as creator details, vote counts, and tag names.
+        /// </summary>
+        /// <param name="searchTerm"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public async Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength)> GetThreadsFromDatabaseAsync(string searchTerm,int pageNumber,int pageSize)
         {
             try
@@ -534,7 +577,7 @@ namespace DiscussionForum.Services
                         TotalHits = group.Sum(thread => searchTermsArray.Count(term => thread.Title.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0))
                     })
                     .OrderByDescending(thread => thread.TotalHits)
-                    .ThenByDescending(thread => thread.ThreadID)  // Add additional sorting criteria if needed
+                    .ThenByDescending(thread => thread.ThreadID)  
                     .ToList();
 
                 // Retrieve threads based on the sorted ThreadIDs
