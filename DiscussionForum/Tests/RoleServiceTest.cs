@@ -12,6 +12,9 @@ namespace DiscussionForum.Tests.Services
 {
     public class RoleServiceTests
     {
+        /// <summary>
+        /// Verifies that the GetAllRoles method returns a collection of roles without the SuperAdmin role.
+        /// </summary>
         [Fact]
         public async Task GetAllRoles_Valid_ReturnsRolesCollectionWithoutSuperAdminRole()
         {
@@ -36,6 +39,9 @@ namespace DiscussionForum.Tests.Services
             Assert.DoesNotContain(result, r => r.RoleID == 1); // Ensure SuperAdmin role is filtered out
         }
 
+        /// <summary>
+        /// Verifies that the GetAllRoles method returns an empty roles collection when there are no roles available.
+        /// </summary>
         [Fact]
         public async Task GetAllRoles_Valid_ReturnsEmptyRolesCollection()
         {

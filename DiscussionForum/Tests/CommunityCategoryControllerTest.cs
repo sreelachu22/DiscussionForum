@@ -12,6 +12,9 @@ namespace DiscussionForum.Tests.Controllers
 {
     public class CommunityCategoryControllerTest
     {
+        /// <summary>
+        /// Verifies that the GetCommunityCategories method returns an OkResult with an empty list of community categories.
+        /// </summary>
         [Fact]
         public async Task GetCommunityCategories_ReturnsOkResult()
         {
@@ -30,6 +33,9 @@ namespace DiscussionForum.Tests.Controllers
             Assert.Empty(categories);
         }
 
+        /// <summary>
+        /// Verifies that the GetCommunityCategoryById method returns an OkResult with the correct community category when provided with a valid ID.
+        /// </summary>
         [Fact]
         public async Task GetCommunityCategoryById_WithValidId_ReturnsOkResult()
         {
@@ -50,12 +56,15 @@ namespace DiscussionForum.Tests.Controllers
             Assert.Equal(categoryId, retrievedCategory.CommunityCategoryID);
         }
 
+        /// <summary>
+        /// Verifies that the GetCommunityCategoryById method returns a NotFoundResult when provided with an invalid ID.
+        /// </summary>
         [Fact]
         public async Task GetCommunityCategoryById_WithInvalidId_ReturnsNotFoundResult()
         {
             // Arrange
             var mockService = new Mock<ICommunityCategoryService>();
-            var invalidCategoryId = 999; // An ID that doesn't exist
+            var invalidCategoryId = 999;
             mockService.Setup(service => service.GetCommunityCategoryByIdAsync(invalidCategoryId)).ReturnsAsync((CommunityCategory)null);
 
             var controller = new CommunityCategoryController(mockService.Object);

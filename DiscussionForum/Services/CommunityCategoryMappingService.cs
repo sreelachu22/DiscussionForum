@@ -97,7 +97,12 @@ namespace DiscussionForum.Services
         }
 
 
-        //Get all categories inside a community - community-category Mapping
+        /// <summary>
+        /// Get all categories inside a community - community-category Mapping
+        /// </summary>
+        /// <param name="communityID"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<IEnumerable<CommunityCategoryMappingAPI>> GetAllCategoriesInCommunityAsync(int communityID)
         {
             try
@@ -131,7 +136,12 @@ namespace DiscussionForum.Services
             }
         }
 
-        //Get categories not in community
+        /// <summary>
+        /// Get categories not in community
+        /// </summary>
+        /// <param name="communityID"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<IEnumerable<CommunityCategory>> GetCategoriesNotInCommunityAsync(int communityID)
         {
             try
@@ -160,7 +170,12 @@ namespace DiscussionForum.Services
             }
         }
 
-
+        /// <summary>
+        /// Get CommunityCategoryMapping by id
+        /// </summary>
+        /// <param name="communityCategoryMappingID"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<CommunityCategoryMapping> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID)
         {
             try
@@ -193,9 +208,7 @@ namespace DiscussionForum.Services
                     CommunityCategoryID = result.CommunityCategoryID,
                     Description = result.Description,
                     IsDeleted = result.IsDeleted,
-                    //CreatedBy = result.CreatedBy,
                     CreatedAt = result.CreatedAt,
-                    //ModifiedBy = result.ModifiedBy,
                     ModifiedAt = result.ModifiedAt
                 };
             }
@@ -205,6 +218,13 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Create a new communityCategoryMapping
+        /// </summary>
+        /// <param name="communityID"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<CommunityCategoryMapping> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
             try
@@ -248,6 +268,13 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Update existing communityCategoryMapping
+        /// </summary>
+        /// <param name="communityCategoryMappingID"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<CommunityCategoryMapping> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model)
         {
             try
@@ -269,6 +296,13 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Delete a communityCategoryMapping. Change isDeleted to true when deleting a data.
+        /// </summary>
+        /// <param name="communityCategoryMappingID"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task<CommunityCategoryMapping> DeleteCommunityCategoryMappingAsync(int communityCategoryMappingID)
         {
             try

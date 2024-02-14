@@ -20,6 +20,10 @@ namespace DiscussionForum.Services
         }
 
 
+        /// <summary>
+        /// Retrieves all community categories asynchronously.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation containing the collection of community categories.</returns>
         public async Task<IEnumerable<CommunityCategory>> GetCommunityCategoriesAsync()
         {
             try
@@ -37,6 +41,11 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves a community category by its ID asynchronously.
+        /// </summary>
+        /// <param name="id">The ID of the community category to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation containing the retrieved community category.</returns>
         public async Task<CommunityCategory> GetCommunityCategoryByIdAsync(long id)
         {
             try
@@ -49,6 +58,11 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Creates a new community category asynchronously.
+        /// </summary>
+        /// <param name="communityCategoryName">The name of the community category to create.</param>
+        /// <returns>A task that represents the asynchronous operation containing the created community category.</returns>
         public async Task<CommunityCategory> CreateCommunityCategoryAsync(string communityCategoryName)
         {
             try
@@ -69,6 +83,12 @@ namespace DiscussionForum.Services
             return communityCategory;
         }
 
+        /// <summary>
+        /// Updates a community category asynchronously.
+        /// </summary>
+        /// <param name="id">The ID of the community category to update.</param>
+        /// <param name="communityCategoryDto">The community category data to update.</param>
+        /// <returns>A task that represents the asynchronous operation containing the updated community category.</returns>
         public async Task<CommunityCategory> UpdateCommunityCategoryAsync(long id, CommunityCategory communityCategoryDto)
         {
             try
@@ -93,6 +113,11 @@ namespace DiscussionForum.Services
             }
         }
 
+        /// <summary>
+        /// Deletes a community category asynchronously.
+        /// </summary>
+        /// <param name="communityCategoryId">The ID of the community category to delete.</param>
+        /// <returns>A task that represents the asynchronous operation containing the deleted community category.</returns>
         public async Task<CommunityCategory> DeleteCommunityCategoryAsync(long communityCategoryId)
         {
             try
@@ -106,7 +131,12 @@ namespace DiscussionForum.Services
             }
         }
 
-        //Soft delete - update the isDeleted to true.
+        /// <summary>
+        /// Soft delete - update the isDeleted to true.
+        /// </summary>
+        /// <param name="communityCategoryId"></param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException"></exception>
         private CommunityCategory DeleteCategory(long communityCategoryId)
         {
             var communityCategory = _context.CommunityCategories.Find(communityCategoryId);

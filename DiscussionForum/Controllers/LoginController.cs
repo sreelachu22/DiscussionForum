@@ -54,6 +54,12 @@ namespace DiscussionForum.Controllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Endpoint for logging out a user.
+        /// </summary>
+        /// <param name="userId">The ID of the user to log out.</param>
+        /// <returns>An IActionResult representing the result of the logout operation.</returns>
+        /// POST - /api/Login/Logout
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout(Guid userId)
         {
