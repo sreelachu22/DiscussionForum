@@ -17,6 +17,11 @@ namespace DiscussionForum.Services
             _pointService = pointService;
         }
 
+        // Manages the creation and modification of thread votes in the database.
+        // Input: ThreadVoteDto object representing user's vote on a thread.
+        // Output: None.
+        // Functionality: Handles thread voting operations, including upvoting and downvoting, while managing database transactions.
+
         public async Task CreateThreadVote(ThreadVoteDto threadVoteDto)
         {
             try
@@ -60,8 +65,7 @@ namespace DiscussionForum.Services
                     await _context.SaveChangesAsync();
                 }
                 else
-                {
-                    // Create a new ThreadVote
+                {                    
                     var _newThreadVote = new ThreadVote
                     {
                         UserID = threadVoteDto.UserID,

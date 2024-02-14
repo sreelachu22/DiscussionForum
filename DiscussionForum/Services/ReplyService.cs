@@ -262,9 +262,18 @@ namespace DiscussionForum.Services
             }
         }
 
-        //Returns the all the replies of a post with the option to paginate
-        //The nested replies of a reply is recursively added into the NestedReplies list of the ReplyDTO object
-        //It take the threadId of the post to fetch replies. The replies will be starting from the parentReplyId provided
+        // Retrieves all replies of a post based on the provided threadId and optional parentReplyId.
+        // Input:
+        //   - threadId: The ID of the thread for which replies are to be retrieved.
+        //   - parentReplyId (optional): The ID of the parent reply if retrieving nested replies.
+        //   - page (optional): The page number of results to retrieve (default: 1).
+        //   - pageSize (optional): The number of replies per page (default: 10).
+        // Output: IQueryable<ReplyDTO> representing the replies of the specified post.
+        // Functionality:
+        //   - Executes the query with pagination and materializes the results into a list of Reply entities.
+        //   - calculating upvote and downvote counts.
+        //   - Retrieves nested replies for each reply using the GetNestedReplies method.        
+
         public IQueryable<ReplyDTO> GetAllRepliesOfAPost(long threadId, long? parentReplyId, int page = 1, int pageSize = 10)
         {
             try
@@ -316,16 +325,13 @@ namespace DiscussionForum.Services
         static List<ReplyDTO> GetNestedReplies(List<Reply> replies, long replyId, AppDbContext context)
         {
             try
-            {
-                // Filter the list of replies to find those with the specified replyId as ParentReplyID
+            {                
                 var nestedReplies = replies
                     .Where(r => r.ParentReplyID == replyId)
                     .Select(reply =>
-                    {
-                        // Explicitly load the ReplyVotes collection for each nested reply
+                    {                        
                         context.Entry(reply).Collection(r => r.ReplyVotes).Load();
-
-                        // Map each nested reply to a new ReplyDTO object
+                        
                         return new ReplyDTO
                         {
                             ReplyID = reply.ReplyID,
@@ -355,6 +361,21 @@ namespace DiscussionForum.Services
                 throw;
             }
         }
+
+
+        // Retrieves unviewed replies for a specified user, optionally filtered by category, sorted by creation date.
+        // Input:
+        //   - userId: The ID of the user for whom unviewed replies are to be retrieved.
+        //   - categoryId (optional): The ID of the category to filter replies (default: null).
+        //   - sortDirection: The direction to sort replies ('asc' or 'desc').
+        //   - pageNumber: The page number of results to retrieve.
+        //   - pageSize: The number of replies per page.
+        // Output: Tuple containing a collection of unviewed reply DTOs and the total count of unviewed replies.
+        // Functionality:       
+        //   - Filters replies based on whether the user is the creator of the parent reply or thread.        
+        //   - Sorts replies based on the specified direction ('asc' or 'desc') by creation date.        
+        //   - Paginates the query to retrieve replies for the specified page.                
+
         public (IEnumerable<ReplyNotifyDTO> replies, int totalCount) GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize)
         {
             IQueryable<Reply> query = _context.Replies
@@ -404,6 +425,13 @@ namespace DiscussionForum.Services
 
             return (repliesForUser, totalCount);
         }
+
+        // Updates the 'HasViewed' status of a reply to mark it as viewed.
+        // Input: The ID of the reply to update.
+        // Output: A boolean indicating whether the operation was successful.
+        // Functionality:       
+        //   - Checks if the reply exists; returns false if not found.
+        //   - Sets the 'HasViewed' property of the reply to true.                
 
         public async Task<bool> UpdateHasViewed(long replyId)
         {
