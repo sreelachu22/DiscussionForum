@@ -29,22 +29,32 @@ namespace DiscussionForum.Services
                 {
                     // If the existing vote and the incoming vote are the same, set IsDeleted to true
                     existingReplyVote.IsDeleted = !existingReplyVote.IsDeleted;
+
+                    if (existingReplyVote.IsUpVote)
+                    {
+                        await _pointService.RemoveReplyUpvote(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                    else
+                    {
+                        await _pointService.RemoveReplyDownvote(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
                 }
                 else
                 {                    
                     existingReplyVote.IsUpVote = voteDto.IsUpVote;
                     existingReplyVote.IsDeleted = voteDto.IsDeleted;
+
+                    if (existingReplyVote.IsUpVote)
+                    {
+                        await _pointService.ReplyUpvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                    else
+                    {
+                        await _pointService.ReplyDownvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
                 }
                 existingReplyVote.ModifiedAt = DateTime.Now;
                 
-                if(existingReplyVote.IsUpVote)
-                {
-                    await _pointService.ReplyUpvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
-                }
-                else
-                {
-                    await _pointService.ReplyDownvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
-                }
                 await _dbContext.SaveChangesAsync();
             }
             else
