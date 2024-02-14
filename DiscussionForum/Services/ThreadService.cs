@@ -9,6 +9,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Threading;
 using System;
 using System.Reflection.Metadata;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace DiscussionForum.Services
 {
@@ -53,6 +54,7 @@ namespace DiscussionForum.Services
 
 
 
+
                 /* get threads with limit(pagination)*/
                 var threads = await _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
@@ -68,6 +70,7 @@ namespace DiscussionForum.Services
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
+                        Title = t.Title,
                         Content = t.Content,
                         CreatedBy = t.CreatedBy,
                         CreatedByUser = t.CreatedByUser.Name,
@@ -82,7 +85,8 @@ namespace DiscussionForum.Services
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == t.ThreadID
-                                    select tg.TagName).ToList()
+                                    select tg.TagName).ToList(),
+                        ReplyCount = _context.Replies.Count(r => r.ThreadID == t.ThreadID && !r.IsDeleted)
 
                     })
                     .ToListAsync();
@@ -558,7 +562,10 @@ namespace DiscussionForum.Services
                         Content = thread.Content,
 
                         CreatedBy = thread.CreatedBy,
-                        CreatedByUser = thread.CreatedByUser?.Name,
+                        CreatedByUser = _context.Users
+                                        .Where(u => u.UserID == thread.CreatedBy)
+                                        .Select(u => u.Name)
+                                        .FirstOrDefault(),
                         CreatedAt = (DateTime)thread.CreatedAt,
 
                         ModifiedBy = thread.ModifiedBy,
@@ -573,14 +580,15 @@ namespace DiscussionForum.Services
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == thread.ThreadID
-                                    select tg.TagName).ToList()
+                                    select tg.TagName).ToList(),
+                        ReplyCount = _context.Replies.Count(r => r.ThreadID == thread.ThreadID && !r.IsDeleted)
 
                     };
 
                     searchThreadDtoList.Add(searchThreadDto);
                 }
 
-                return (searchThreadDtoList, searchThreadDtoList.Count);
+                return (searchThreadDtoList, sortedThreads.Count);
 
             }
             catch (Exception ex)

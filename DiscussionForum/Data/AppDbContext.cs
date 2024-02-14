@@ -105,10 +105,12 @@ namespace DiscussionForum.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Relationships for User entity
+            //this is a new edit
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedByUser)
                 .WithOne()
                 .HasForeignKey<User>(u => u.CreatedBy)
+                .IsRequired(false) // Make the relationship optional
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
