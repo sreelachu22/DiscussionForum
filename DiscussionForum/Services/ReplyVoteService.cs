@@ -24,9 +24,17 @@ namespace DiscussionForum.Services
 
             if (existingReplyVote != null)
             {
-                // Update the existing ReplyVote with the data from the DTO
-                existingReplyVote.IsUpVote = voteDto.IsUpVote;
-                existingReplyVote.IsDeleted = voteDto.IsDeleted;
+                // Update the existing ReplyVote with the data from the DTO                
+                if (existingReplyVote.IsUpVote == voteDto.IsUpVote)
+                {
+                    // If the existing vote and the incoming vote are the same, set IsDeleted to true
+                    existingReplyVote.IsDeleted = !existingReplyVote.IsDeleted;
+                }
+                else
+                {                    
+                    existingReplyVote.IsUpVote = voteDto.IsUpVote;
+                    existingReplyVote.IsDeleted = voteDto.IsDeleted;
+                }
                 existingReplyVote.ModifiedAt = DateTime.Now;
                 
                 if(existingReplyVote.IsUpVote)
