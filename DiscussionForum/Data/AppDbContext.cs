@@ -6,8 +6,7 @@ using DiscussionForum.Models.APIModels;
 
 namespace DiscussionForum.Data
 {
-    public class AppDbContext : DbContext
-    {
+    public class AppDbContext : DbContext {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         // Define DbSet for each entity
@@ -17,7 +16,7 @@ namespace DiscussionForum.Data
         public DbSet<CommunityStatus> CommunityStatus { get; set; }
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
-        public DbSet<User> Users{ get; set; }
+        public DbSet<User> Users { get; set; }
 
         /*public DbSet<UserLog> UserLog { get; set; }*/
         public DbSet<Threads> Threads { get; set; }

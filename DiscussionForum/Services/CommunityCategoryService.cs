@@ -4,6 +4,7 @@ using DiscussionForum.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.Services
 {
@@ -12,11 +13,12 @@ namespace DiscussionForum.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDbContext _context;
 
-        public CommunityCategoryService(IUnitOfWork unitOfWork, AppDbContext context)
+        public CommunityCategoryService(IUnitOfWork unitOfWork,AppDbContext context)
         {
             _unitOfWork = unitOfWork;
             _context = context;
         }
+
 
         public async Task<IEnumerable<CommunityCategory>> GetCommunityCategoriesAsync()
         {
@@ -113,6 +115,7 @@ namespace DiscussionForum.Services
             {
                 communityCategory.IsDeleted = true;
                 _context.SaveChanges();
+
                 return communityCategory; // Return the deleted category
             }
             else

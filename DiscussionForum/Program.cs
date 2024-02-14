@@ -65,6 +65,7 @@ builder.Services.AddAuthorization(options =>
 
 
 
+
 // Add services to the container.
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();

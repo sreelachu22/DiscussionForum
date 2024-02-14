@@ -10,11 +10,9 @@ namespace DiscussionForum.Services
     public class RoleService : IRoleService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly AppDbContext _context;
 
-        public RoleService(IUnitOfWork unitOfWork,AppDbContext context) { 
+        public RoleService(IUnitOfWork unitOfWork) { 
             _unitOfWork = unitOfWork;
-            _context = context;
         }
 
 
