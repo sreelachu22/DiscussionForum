@@ -137,7 +137,7 @@ namespace DiscussionForum.Controllers
         /// <param name="CommunityCategoryMappingId">he mapping ID of the category in a community where threads must be posted.</param>
         /// <param name="CreatorId">The ID of the user posting the thread.</param>
         [HttpPost]
-        public async Task<IActionResult> CreateThread(int communityMappingId,Guid userId, [FromBody] ThreadContent threadcontent)
+        public async Task<IActionResult> CreateThread(int communityMappingId, Guid userId, [FromBody] ThreadContent threadcontent)
         {
             try
             {
@@ -263,6 +263,35 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [HttpPut("ReopenThread/{threadId}")]
+        public async Task<IActionResult> ReopenThread(long threadId, Guid ModifierId)
+        {
+            try
+            {
+                if (threadId <= 0)
+                {
+                    throw new Exception("Invalid threadId. It should be greater than zero.");
+                }
+                else if (ModifierId == Guid.Empty)
+                {
+                    throw new Exception("Invalid modifierId. It cannot be null or empty.");
+                }
+
+                Threads _thread = await _threadService.ReopenThreadAsync(threadId, ModifierId);
+                return Ok(_thread);
+            }
+            catch (Exception ex)
+            {
+                //Checks for an inner exception and returns corresponding error message
+                if (ex.InnerException != null)
+                {
+                    return StatusCode(500, $"Error while reopening thread with ID = {threadId} \nError: {ex.InnerException.Message}");
+                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error while reopening thread with ID = {threadId} \nError: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// Deletes a thread based on the given thread ID.
         /// </summary>
@@ -314,7 +343,7 @@ namespace DiscussionForum.Controllers
                     return BadRequest("Search term cannot be empty");
                 }
 
-                var (searchThreadDtoList, searchThreadDtoListLength) = await _threadService.GetThreadsFromDatabaseAsync(searchTerm,pageNumber,pageSize);
+                var (searchThreadDtoList, searchThreadDtoListLength) = await _threadService.GetThreadsFromDatabaseAsync(searchTerm, pageNumber, pageSize);
 
                 // You can return the results as needed, for example:
                 return Ok(new { SearchThreadDtoList = searchThreadDtoList, SearchThreadDtoListLength = searchThreadDtoListLength });
