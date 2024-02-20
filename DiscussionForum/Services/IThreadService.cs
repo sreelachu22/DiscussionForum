@@ -22,7 +22,7 @@ namespace DiscussionForum.Services
         /// <param name="communityCategoryMappingId">The mapping ID of the category in a community where threads must be posted.</param>
         /// <param name="creatorId">The ID of the user posting the thread.</param>
         /// <param name="content">The content of the thread.</param>
-        Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto,int communityCategoryId, Guid createdby);
+        Task<Threads> CreateThreadAsync(CategoryThreadDto categorythreaddto, int communityCategoryId, Guid createdby);
         /// <summary>
         /// Updates a thread with content from request body based on the given thread ID.
         /// </summary>
@@ -31,6 +31,7 @@ namespace DiscussionForum.Services
         /// <param name="content">The content of the thread.</param>
         Task<Threads> UpdateThreadAsync(long threadId, Guid modifierId, string? title, string? content);
         Task<Threads> CloseThreadAsync(long threadId, Guid modifierId);
+        Task<Threads> ReopenThreadAsync(long threadId, Guid modifierId);
         /// <summary>
         /// Deletes a thread based on the given thread ID.
         /// </summary>
