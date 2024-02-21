@@ -16,6 +16,7 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+.env
 # Mono auto generated files
 mono_crash.*
 
@@ -242,6 +243,9 @@ ClientBin/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
+
+#Environment values
+.env
 
 # Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)

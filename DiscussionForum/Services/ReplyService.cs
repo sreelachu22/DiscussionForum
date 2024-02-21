@@ -52,22 +52,22 @@ namespace DiscussionForum.Services
                 {
                     return _reply
                         .Select(r => new ReplyDTO
-                    {
-                        ReplyID = r.ReplyID,
-                        ThreadID = r.ThreadID,
-                        ParentReplyID = r.ParentReplyID,
-                        Content = r.Content,
-                        IsDeleted = r.IsDeleted,
-                        CreatedBy = r.CreatedBy,
-                        CreatedAt = r.CreatedAt,
-                        ModifiedBy = r.ModifiedBy,
-                        ModifiedAt = r.ModifiedAt,
-                        HasViewed = r.HasViewed,
-                        ThreadOwnerEmail = r.Threads.CreatedByUser.Email,
+                        {
+                            ReplyID = r.ReplyID,
+                            ThreadID = r.ThreadID,
+                            ParentReplyID = r.ParentReplyID,
+                            Content = r.Content,
+                            IsDeleted = r.IsDeleted,
+                            CreatedBy = r.CreatedBy,
+                            CreatedAt = r.CreatedAt,
+                            ModifiedBy = r.ModifiedBy,
+                            ModifiedAt = r.ModifiedAt,
+                            HasViewed = r.HasViewed,
+                            ThreadOwnerEmail = r.Threads.CreatedByUser.Email,
 
-                    });
+                        });
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -169,7 +169,7 @@ namespace DiscussionForum.Services
             //Creates a new reply and saves it to the database
             try
             {
-                Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, HasViewed= false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
+                Reply _reply = new Reply { ThreadID = threadID, Content = content, ParentReplyID = parentReplyId, IsDeleted = false, HasViewed = false, CreatedBy = creatorID, CreatedAt = DateTime.Now };
 
                 _pointService.ReplyCreated(creatorID);
 
@@ -303,13 +303,13 @@ namespace DiscussionForum.Services
                         UpvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
                         DownvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
                         IsDeleted = r.IsDeleted,
-                        CreatedUserName = r.CreatedByUser != null ? r.CreatedByUser.Name : "",
                         CreatedBy = r.CreatedBy,
+                        CreatedUserName = r.CreatedByUser != null ? r.CreatedByUser.Name : "",
                         CreatedAt = r.CreatedAt,
                         ModifiedBy = r.ModifiedBy,
                         ModifiedAt = r.ModifiedAt,
                         HasViewed = r.HasViewed,
-                        NestedReplies = GetNestedReplies(_context.Replies.ToList(), r.ReplyID, _context)
+                        NestedReplies = GetNestedReplies(_context.Replies.Include(x => x.CreatedByUser).ToList(), r.ReplyID, _context)
                     }); ;
 
                 return replyDTOs.AsQueryable();
@@ -325,13 +325,13 @@ namespace DiscussionForum.Services
         static List<ReplyDTO> GetNestedReplies(List<Reply> replies, long replyId, AppDbContext context)
         {
             try
-            {                
+            {
                 var nestedReplies = replies
                     .Where(r => r.ParentReplyID == replyId)
                     .Select(reply =>
-                    {                        
+                    {
                         context.Entry(reply).Collection(r => r.ReplyVotes).Load();
-                        
+
                         return new ReplyDTO
                         {
                             ReplyID = reply.ReplyID,
@@ -341,14 +341,16 @@ namespace DiscussionForum.Services
                             UpvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
                             DownvoteCount = reply.ReplyVotes != null ? reply.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
                             IsDeleted = reply.IsDeleted,
-                            CreatedUserName = reply.CreatedByUser != null ? reply.CreatedByUser.Name : "",
                             CreatedBy = reply.CreatedBy,
+                            //replies.FirstOrDefault()?.CreatedByUser?.Name ?? "";
+                            CreatedUserName = reply.CreatedByUser != null ? reply.CreatedByUser.Name : "",
                             CreatedAt = reply.CreatedAt,
                             ModifiedBy = reply.ModifiedBy,
                             ModifiedAt = reply.ModifiedAt,
                             HasViewed = reply.HasViewed,
                             // Recursively call GetNestedReplies to retrieve nested replies of the current reply
                             NestedReplies = GetNestedReplies(replies, reply.ReplyID, context)
+
                         };
                     })
                     .ToList();

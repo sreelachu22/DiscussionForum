@@ -42,13 +42,13 @@ namespace DiscussionForum.Services
         {
             try
             {
-     
+
                 var query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
-                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
-                var totalCount = await query.CountAsync();
+                //.Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
+                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted);
 
- 
+                var totalCount = await query.CountAsync(); 
 
                 var categoryInfo = await _context.CommunityCategoryMapping
                 .Where(ccm => ccm.CommunityCategoryMappingID == CommunityCategoryMappingID)
@@ -66,7 +66,8 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2)
+                    //.Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2)
+                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted)
                     .OrderByDescending(t => t.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
@@ -115,7 +116,8 @@ namespace DiscussionForum.Services
                     .Include(t => t.CreatedByUser)
                     .Include(t => t.ModifiedByUser)
                     .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
+                    //.Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
+                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted);
 
                 switch (sortBy.ToLower())
                 {
@@ -233,7 +235,8 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
-                    .Where(t => t.ThreadID == threadId && t.ThreadStatusID == 2)
+                    //.Where(t => t.ThreadID == threadId && t.ThreadStatusID == 2)
+                    .Where(t => t.ThreadID == threadId)
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
@@ -282,7 +285,7 @@ namespace DiscussionForum.Services
         {
             try
             {
-                
+
                 bool communityCategoryMappingExists = _context.CommunityCategoryMapping
                                             .Any(mapping => !mapping.IsDeleted);
 
@@ -445,6 +448,11 @@ namespace DiscussionForum.Services
                 //Checks if thread is valid and not deleted
                 else if (_thread != null && !_thread.IsDeleted)
                 {
+                    if (_thread.ThreadStatusID == 1)
+                    {
+                        throw new Exception("Thread is already closed");
+                    }
+
                     _thread.ThreadStatusID = 1;
                     _thread.ModifiedBy = modifierId;
                     _thread.ModifiedAt = DateTime.Now;
@@ -454,7 +462,7 @@ namespace DiscussionForum.Services
                     _context.SaveChanges();
 
                     return _thread;
-                    
+
                 }
                 //Checks if the thread is valid but deleted
                 else if (_thread != null && _thread.IsDeleted)
@@ -469,6 +477,52 @@ namespace DiscussionForum.Services
             catch (Exception ex)
             {
                 throw new ApplicationException($"Error occurred while closing a thread with ID {threadId}.", ex);
+            }
+        }
+
+        public async Task<Threads> ReopenThreadAsync(long threadId, Guid modifierId)
+        {
+            try
+            {
+                Threads _thread = await Task.FromResult(_context.Threads.Find(threadId));
+                User _modifier = await Task.FromResult(_context.Users.Find(modifierId));
+                //Checks if modifier is valid
+                if (_modifier == null)
+                {
+                    throw new Exception("Modifier not found");
+                }
+                //Checks if thread is valid and not deleted
+                else if (_thread != null && !_thread.IsDeleted)
+                {
+                    if (_thread.ThreadStatusID == 2)
+                    {
+                        throw new Exception("Thread is already open");
+                    }
+
+                    _thread.ThreadStatusID = 2;
+                    _thread.ModifiedBy = modifierId;
+                    _thread.ModifiedAt = DateTime.Now;
+
+                    await _pointService.ThreadUpdated(modifierId);
+
+                    _context.SaveChanges();
+
+                    return _thread;
+
+                }
+                //Checks if the thread is valid but deleted
+                else if (_thread != null && _thread.IsDeleted)
+                {
+                    throw new Exception("Thread has been deleted.");
+                }
+                else
+                {
+                    throw new Exception("Thread not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while reopening a thread with ID {threadId}.", ex);
             }
         }
 
@@ -522,7 +576,7 @@ namespace DiscussionForum.Services
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public async Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength)> GetThreadsFromDatabaseAsync(string searchTerm,int pageNumber,int pageSize)
+        public async Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength)> GetThreadsFromDatabaseAsync(string searchTerm, int pageNumber, int pageSize)
         {
             try
             {
