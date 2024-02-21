@@ -51,10 +51,10 @@ namespace DiscussionForum.Services
 
                 var query = _context.Threads
                 .Include(t => t.CommunityCategoryMapping)
-                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
-                var totalCount = await query.CountAsync();
+                //.Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
+                .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted);
 
-
+                var totalCount = await query.CountAsync(); 
 
                 var categoryInfo = await _context.CommunityCategoryMapping
                 .Where(ccm => ccm.CommunityCategoryMappingID == CommunityCategoryMappingID)
@@ -72,6 +72,7 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
+                    //.Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2)
                     .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted)
                     .OrderByDescending(t => t.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
@@ -121,7 +122,8 @@ namespace DiscussionForum.Services
                     .Include(t => t.CreatedByUser)
                     .Include(t => t.ModifiedByUser)
                     .Include(t => t.ThreadVotes)
-                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
+                    //.Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted && t.ThreadStatusID == 2);
+                    .Where(t => t.CommunityCategoryMapping.CommunityCategoryMappingID == CommunityCategoryMappingID && !t.IsDeleted);
 
                 switch (sortBy.ToLower())
                 {
@@ -239,6 +241,7 @@ namespace DiscussionForum.Services
                 .Include(t => t.CreatedByUser)
                 .Include(t => t.ModifiedByUser)
                 .Include(t => t.ThreadVotes)
+                    //.Where(t => t.ThreadID == threadId && t.ThreadStatusID == 2)
                     .Where(t => t.ThreadID == threadId)
                     .Select(t => new CategoryThreadDto
                     {
