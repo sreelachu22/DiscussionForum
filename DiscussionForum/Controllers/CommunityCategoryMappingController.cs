@@ -45,8 +45,11 @@ namespace DiscussionForum.Controllers
             return Ok(categoryResult);
         }
 
-        //GetByID
-
+        /// <summary>
+        /// Retrieves a community category mapping by its ID.
+        /// </summary>
+        /// <param name="communityCategoryMappingID">The ID of the community category mapping.</param>
+        /// <returns>An action result containing the community category mapping.</returns>
         [HttpGet("/{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMappingAPI>> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID)
         {
@@ -66,8 +69,11 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        //Get all categories inside a community (categories mapped to a specified community)
-
+        /// <summary>
+        /// Retrieves all categories mapped to a specified community.
+        /// </summary>
+        /// <param name="communityID">The ID of the community.</param>
+        /// <returns>An action result containing the list of categories mapped to the community.</returns>
         [HttpGet("InCommunity/{communityID}")]
         public async Task<ActionResult<IEnumerable<CommunityCategoryMappingAPI>>> GetAllCategoriesInCommunityAsync(int communityID)
         {
@@ -83,8 +89,11 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        //Get all categories not in community. (Super admin created, but not used in any community
-
+        /// <summary>
+        /// Retrieves all categories not mapped to a specified community.
+        /// </summary>
+        /// <param name="communityID">The ID of the community.</param>
+        /// <returns>An action result containing the list of categories not mapped to the community.</returns>
         [HttpGet("GetCategoriesNotInCommunity/{communityID}")]
         public async Task<ActionResult<IEnumerable<CommunityCategoryMappingAPI>>> GetCategoriesNotInCommunityAsync(int communityID)
         {
@@ -109,8 +118,12 @@ namespace DiscussionForum.Controllers
         }
 
 
-        //Post
-
+        /// <summary>
+        /// Creates a new community category mapping.
+        /// </summary>
+        /// <param name="communityID">The ID of the community.</param>
+        /// <param name="model">The data for creating the community category mapping.</param>
+        /// <returns>An action result containing the ID of the created mapping.</returns>
         [HttpPost("CreateCategoryMapping/{communityID}")]
         public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
@@ -126,8 +139,12 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        //Put
-
+        /// <summary>
+        /// Updates the description of a community category mapping.
+        /// </summary>
+        /// <param name="communityCategoryMappingID">The ID of the community category mapping to update.</param>
+        /// <param name="model">The updated data for the community category mapping.</param>
+        /// <returns>An action result containing the updated community category mapping.</returns>
         [HttpPut("UpdateCategoryDescription/{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMapping>> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model)
         {
@@ -142,8 +159,11 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        //Delete
-
+        /// <summary>
+        /// Deletes a community category mapping.
+        /// </summary>
+        /// <param name="communityCategoryMappingID">The ID of the community category mapping to delete.</param>
+        /// <returns>An action result containing the deleted community category mapping.</returns>
         [HttpDelete("{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMapping>> DeleteCommunityCategoryMappingAsync(int communityCategoryMappingID)
         {

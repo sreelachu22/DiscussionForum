@@ -20,9 +20,12 @@ namespace DiscussionForum.Controllers
             _communityCategoryService = communityCategoryService;
         }
 
-        // Get all categories in the discussion forum (created by super admin.
-        // Community head will use these categories inside the community for community-category mapping.
-
+        
+        /// <summary>
+        /// Get all categories in the discussion forum (created by super admin.
+        /// Community head will use these categories inside the community for community-category mapping.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetCommunityCategories()
         {
@@ -38,7 +41,11 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        // GetByID
+        /// <summary>
+        /// Get a community category by id
+        /// </summary>
+        /// <param name="communityCategoryId"></param>
+        /// <returns></returns>
 
         [HttpGet("{communityCategoryId}")]
         public async Task<IActionResult> GetCommunityCategoryById(long communityCategoryId)
@@ -59,8 +66,11 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        // Post
-
+        /// <summary>
+        /// Create a new communityCategory by giving communitycategoryName
+        /// </summary>
+        /// <param name="communityCategoryName"></param>
+        /// <returns></returns>
         [HttpPost("{communityCategoryName}")]
         public async Task<IActionResult> CreateCommunityCategory(string communityCategoryName)
         {
@@ -76,8 +86,12 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        // Put
-
+        /// <summary>
+        /// Updates an existing community category.
+        /// </summary>
+        /// <param name="id">The ID of the community category to update.</param>
+        /// <param name="communityCategoryDto">The updated community category data.</param>
+        /// <returns>An action result containing the updated community category.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCommunityCategory(long id, [FromBody] CommunityCategory communityCategoryDto)
         {
@@ -97,6 +111,11 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a community category.
+        /// </summary>
+        /// <param name="communityCategoryId">The ID of the community category to delete.</param>
+        /// <returns>An action result indicating the success of the operation.</returns>
         [HttpDelete("{communityCategoryId}")]
         public async Task<IActionResult> DeleteCommunityCategory(long communityCategoryId)
         {
