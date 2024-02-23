@@ -7,12 +7,12 @@ namespace DiscussionForum.Models.EntityModels
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long UserRequestLogId { get; set; }
-        public long UserLogId { get; set; }
+        public long UserRequestLogID { get; set; }
+        public long UserLogID { get; set; }
         public DateTime RequestTime { get; set; }
         public string RequestMethod { get; set; }
         public string RequestPath { get; set; }
-        public string ResponseStatus { get; set; }
+        public int ResponseStatusCode { get; set; }
         public bool? IsDeleted { get; set; }
         public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
