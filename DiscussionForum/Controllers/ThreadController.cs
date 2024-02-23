@@ -340,8 +340,8 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="searchTerm">The term to search for in reply content.</param>
         [CustomAuth("User")]
-        [HttpGet("SearchThreads")]
-        public async Task<IActionResult> SearchThread(string searchTerm, int pageNumber, int pageSize)
+        [HttpGet("SearchThreadsByTitle")]
+        public async Task<IActionResult> SearchThreadsTitle(string searchTerm, int pageNumber, int pageSize)
         {
             try
             {
@@ -350,11 +350,65 @@ namespace DiscussionForum.Controllers
                 {
                     return BadRequest("Search term cannot be empty");
                 }
+                searchTerm = searchTerm.Trim();
+                var (searchThreadDtoList, searchThreadDtoListLength, isSearchTag) = await _threadService.ThreadTitleSearch(searchTerm, pageNumber, pageSize);
 
-                var (searchThreadDtoList, searchThreadDtoListLength) = await _threadService.GetThreadsFromDatabaseAsync(searchTerm, pageNumber, pageSize);
 
-                // You can return the results as needed, for example:
-                return Ok(new { SearchThreadDtoList = searchThreadDtoList, SearchThreadDtoListLength = searchThreadDtoListLength });
+                return Ok(new { SearchThreadDtoList = searchThreadDtoList, SearchThreadDtoListLength = searchThreadDtoListLength, IsSearchTag = isSearchTag });
+
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [CustomAuth("User")]
+        [HttpGet("SearchThreadsByTags")]
+        public async Task<IActionResult> SearchThreadsTag(string searchTerm)
+        {
+            try
+            {
+
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return BadRequest("Search term cannot be empty");
+                }
+                searchTerm = searchTerm.Trim();
+                var (searchTagList, isSearchTag) = await _threadService.ThreadTagSearch(searchTerm);
+
+                return Ok(new { SearchTagList = searchTagList, IsSearchTag = isSearchTag });
+
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [CustomAuth("User")]
+        [HttpGet("displayThreadsByTags")]
+        public async Task<IActionResult> DisplayThreadsTag(string searchTerm,int pageNumber, int pageSize) {
+            try
+            {
+
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return BadRequest("Search term cannot be empty");
+                }
+                searchTerm = searchTerm.Trim();
+                var (threadDtoList, threadDtoListCount) = await _threadService.DisplayThreadByTag(searchTerm,pageNumber,pageSize);
+
+
+
+
+                return Ok(new { searchThreadDtoList = threadDtoList, searchThreadDtoListLength = threadDtoListCount });
+
+
             }
             catch (Exception ex)
             {
