@@ -1,10 +1,8 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DiscussionForum.Controllers
 {
@@ -20,12 +18,13 @@ namespace DiscussionForum.Controllers
             _communityCategoryService = communityCategoryService;
         }
 
-        
+
         /// <summary>
         /// Get all categories in the discussion forum (created by super admin.
         /// Community head will use these categories inside the community for community-category mapping.
         /// </summary>
         /// <returns></returns>
+        [CustomAuth(["SuperAdmin"])]
         [HttpGet]
         public async Task<IActionResult> GetCommunityCategories()
         {
@@ -46,7 +45,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryId"></param>
         /// <returns></returns>
-
+        [CustomAuth(["SuperAdmin"])]
         [HttpGet("{communityCategoryId}")]
         public async Task<IActionResult> GetCommunityCategoryById(long communityCategoryId)
         {
@@ -71,6 +70,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryName"></param>
         /// <returns></returns>
+        [CustomAuth(["SuperAdmin"])]
         [HttpPost("{communityCategoryName}")]
         public async Task<IActionResult> CreateCommunityCategory(string communityCategoryName)
         {
@@ -92,6 +92,7 @@ namespace DiscussionForum.Controllers
         /// <param name="id">The ID of the community category to update.</param>
         /// <param name="communityCategoryDto">The updated community category data.</param>
         /// <returns>An action result containing the updated community category.</returns>
+        [CustomAuth(["SuperAdmin"])]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCommunityCategory(long id, [FromBody] CommunityCategory communityCategoryDto)
         {
@@ -116,6 +117,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryId">The ID of the community category to delete.</param>
         /// <returns>An action result indicating the success of the operation.</returns>
+        [CustomAuth(["SuperAdmin"])]
         [HttpDelete("{communityCategoryId}")]
         public async Task<IActionResult> DeleteCommunityCategory(long communityCategoryId)
         {

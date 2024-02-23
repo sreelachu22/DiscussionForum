@@ -1,11 +1,10 @@
 using DiscussionForum.Data;
 using DiscussionForum.Services;
 using DiscussionForum.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 

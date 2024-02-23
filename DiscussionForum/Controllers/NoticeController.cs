@@ -1,10 +1,7 @@
 ﻿using DiscussionForum.Models.APIModels;
-using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DiscussionForum.Controllers
 {

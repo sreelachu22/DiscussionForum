@@ -31,11 +31,11 @@ namespace DiscussionForum.Controllers
         }
     }
 
-        public class EmailModel
-        {
-            public string ToEmail { get; set; }
-            public string Subject { get; set; }
-            public string Body { get; set; }
-        }
- }
+    public class EmailModel
+    {
+        public string ToEmail { get; set; }
+        public string Subject { get; set; }
+        public string Body { get; set; }
+    }
+}
 

@@ -1,5 +1,4 @@
-﻿using DiscussionForum.Models.APIModels;
-using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

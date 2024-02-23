@@ -1,7 +1,5 @@
-﻿using DiscussionForum.Models.APIModels;
-using DiscussionForum.Services;
+﻿using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
@@ -60,8 +58,8 @@ namespace DiscussionForum.Controllers
         }
 
 
-        [HttpPost] 
-        public async Task<IActionResult> CreateTag([FromBody] string tagname,Guid createdby)
+        [HttpPost]
+        public async Task<IActionResult> CreateTag([FromBody] string tagname, Guid createdby)
         {
             var notice = await _tagService.CreateTagAsync(tagname, createdby);
             return Ok(notice);

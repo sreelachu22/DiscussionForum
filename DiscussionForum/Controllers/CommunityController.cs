@@ -1,6 +1,6 @@
-﻿using DiscussionForum.Models.APIModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +21,7 @@ namespace DiscussionForum.Controllers
         /// <summary>
         /// Retrieves all communities.
         /// </summary>
+        [CustomAuth(["SuperAdmin"])]
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
@@ -45,6 +46,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a specific community.
         /// </summary>
         /// <param name="communityId">The ID of the community to be retrieved</param>
+        [CustomAuth(["SuperAdmin"])]
         [HttpGet("{communityId}")]
         public async Task<IActionResult> GetCommunityById(int communityId)
         {

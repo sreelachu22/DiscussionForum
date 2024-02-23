@@ -1,7 +1,6 @@
 ﻿using DiscussionForum.Models.APIModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
