@@ -93,7 +93,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityID">The ID of the community.</param>
         /// <returns>An action result containing the list of categories not mapped to the community.</returns>
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpGet("GetCategoriesNotInCommunity/{communityID}")]
         public async Task<ActionResult<IEnumerable<CommunityCategoryMappingAPI>>> GetCategoriesNotInCommunityAsync(int communityID)
         {
@@ -124,7 +124,7 @@ namespace DiscussionForum.Controllers
         /// <param name="communityID">The ID of the community.</param>
         /// <param name="model">The data for creating the community category mapping.</param>
         /// <returns>An action result containing the ID of the created mapping.</returns>
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpPost("CreateCategoryMapping/{communityID}")]
         public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
@@ -146,7 +146,7 @@ namespace DiscussionForum.Controllers
         /// <param name="communityCategoryMappingID">The ID of the community category mapping to update.</param>
         /// <param name="model">The updated data for the community category mapping.</param>
         /// <returns>An action result containing the updated community category mapping.</returns>
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpPut("UpdateCategoryDescription/{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMapping>> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model)
         {
@@ -166,7 +166,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryMappingID">The ID of the community category mapping to delete.</param>
         /// <returns>An action result containing the deleted community category mapping.</returns>
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpDelete("{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMapping>> DeleteCommunityCategoryMappingAsync(int communityCategoryMappingID)
         {

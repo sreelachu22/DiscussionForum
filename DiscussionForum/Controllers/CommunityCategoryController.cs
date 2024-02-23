@@ -24,7 +24,7 @@ namespace DiscussionForum.Controllers
         /// Community head will use these categories inside the community for community-category mapping.
         /// </summary>
         /// <returns></returns>
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpGet]
         public async Task<IActionResult> GetCommunityCategories()
         {

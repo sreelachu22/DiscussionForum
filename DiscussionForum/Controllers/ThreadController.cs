@@ -64,7 +64,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpGet("ClosedThreads")]
         public async Task<IActionResult> GetClosedThreads(int CommunityID, int pageNumber, int pageSize)
         {

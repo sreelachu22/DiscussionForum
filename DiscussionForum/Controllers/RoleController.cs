@@ -18,7 +18,7 @@ namespace DiscussionForum.Controllers
         }
 
         /* get all roles*/
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpGet]
         public async Task<IActionResult> GetRoles()
         {

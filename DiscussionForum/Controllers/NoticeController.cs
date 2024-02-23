@@ -26,7 +26,7 @@ namespace DiscussionForum.Controllers
             return Ok(notices);
         }
 
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpPost] // Call the notice service to create a notice using the provided data from the NoticeDto.
         public async Task<IActionResult> CreateNotice([FromBody] NoticeDto NoticeDto)
         {
@@ -34,7 +34,7 @@ namespace DiscussionForum.Controllers
             return Ok(notice);
         }
 
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateNotice(int id, [FromBody] NoticeDto NoticeDto)
         {
@@ -47,7 +47,7 @@ namespace DiscussionForum.Controllers
         }
 
 
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNotice(int id)
         {

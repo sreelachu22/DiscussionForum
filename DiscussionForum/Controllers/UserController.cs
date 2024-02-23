@@ -26,7 +26,7 @@ namespace DiscussionForum.Controllers
         //page is for defining the page to return after pagination
         //limit is to specify the number of users needed to show in a page
 
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpGet("GetAllUsersWithPagination")]
         public async Task<IActionResult> GetAllUsers(string term = "", string sort = "name", int page = 1, int limit = 10)
         {
@@ -70,7 +70,7 @@ namespace DiscussionForum.Controllers
 
 
         /* edit single user role*/
-        [CustomAuth("Admin")]
+        [CustomAuth("Head")]
         [HttpPut("{UserId}")]
         public async Task<IActionResult> PutUserByIDAsync(Guid UserId, int RoleID, Guid AdminID)
         {
