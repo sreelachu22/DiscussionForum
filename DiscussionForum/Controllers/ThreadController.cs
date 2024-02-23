@@ -339,6 +339,7 @@ namespace DiscussionForum.Controllers
         /// Searches for threads based on the entered search term in the "Content" column.
         /// </summary>
         /// <param name="searchTerm">The term to search for in reply content.</param>
+        [CustomAuth("User")]
         [HttpGet("SearchThreadsByTitle")]
         public async Task<IActionResult> SearchThreadsTitle(string searchTerm, int pageNumber, int pageSize)
         {
@@ -364,7 +365,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
-
+        [CustomAuth("User")]
         [HttpGet("SearchThreadsByTags")]
         public async Task<IActionResult> SearchThreadsTag(string searchTerm)
         {
@@ -389,8 +390,8 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [CustomAuth("User")]
         [HttpGet("displayThreadsByTags")]
-
         public async Task<IActionResult> DisplayThreadsTag(string searchTerm,int pageNumber, int pageSize) {
             try
             {
