@@ -29,6 +29,7 @@ namespace DiscussionForum.Data
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
 
         public DbSet<UserLog> UserLog { get; set; }
+        public DbSet<UserRequestLog> UserRequestLog { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and delete behaviors
@@ -235,6 +236,30 @@ namespace DiscussionForum.Data
                 .WithMany()
                 .HasForeignKey(ul => ul.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade); // Corrected from Restrict to Cascade
+
+            modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.UserLog)
+                .WithMany()
+                .HasForeignKey(url => url.UserLogId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.User)
+                .WithMany()
+                .HasForeignKey(url => url.UserLog.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(url => url.CreatedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(url => url.ModifiedBy)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }
