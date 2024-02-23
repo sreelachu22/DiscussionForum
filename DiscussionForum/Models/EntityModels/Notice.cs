@@ -1,7 +1,5 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -40,12 +38,12 @@ namespace DiscussionForum.Models.EntityModels
         [ForeignKey("CommunityID")]
         public virtual Community Community { get; set; }
 
-   
+
 
         [ForeignKey("CreatedBy")]
         public virtual User CreatedByUser { get; set; }
 
-       
+
         [ForeignKey("ModifiedBy")]
         public virtual User ModifiedByUser { get; set; }
     }

@@ -3,7 +3,7 @@
     public class CategoryThreadDto
     {
 
-        public CategoryThreadDto(string title,string content,List<string> tagnames)
+        public CategoryThreadDto(string title, string content, List<string> tagnames)
         {
             this.Title = title;
             this.Content = content;

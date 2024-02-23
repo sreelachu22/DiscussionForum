@@ -1,11 +1,10 @@
 using DiscussionForum.Data;
 using DiscussionForum.Services;
 using DiscussionForum.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,12 +54,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-builder.Services.AddAuthorization(options =>
+/*builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("SuperAdmin", policy => policy.RequireRole("SuperAdmin"));
-    options.AddPolicy("CommunityHead", policy => policy.RequireRole("CommunityHead"));
-    options.AddPolicy("User", policy => policy.RequireRole("User"));
-});
+    options.AddPolicy("Admin", policy => policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("Head", policy => policy.RequireRole("SuperAdmin", "CommunityHead"));
+    options.AddPolicy("User", policy => policy.RequireRole("SuperAdmin", "CommunityHead", "User"));
+});*/
 
 
 
