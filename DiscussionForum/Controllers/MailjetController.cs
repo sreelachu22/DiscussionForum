@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace DiscussionForum.Controllers
             _mailjetService = mailjetService;
         }
 
+        [CustomAuth("User")]
         [HttpPost]
         public async Task<IActionResult> SendEmailAsync([FromBody] EmailModel emailModel)
         {

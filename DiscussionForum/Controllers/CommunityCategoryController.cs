@@ -24,7 +24,7 @@ namespace DiscussionForum.Controllers
         /// Community head will use these categories inside the community for community-category mapping.
         /// </summary>
         /// <returns></returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpGet]
         public async Task<IActionResult> GetCommunityCategories()
         {
@@ -45,7 +45,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryId"></param>
         /// <returns></returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpGet("{communityCategoryId}")]
         public async Task<IActionResult> GetCommunityCategoryById(long communityCategoryId)
         {
@@ -70,7 +70,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryName"></param>
         /// <returns></returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpPost("{communityCategoryName}")]
         public async Task<IActionResult> CreateCommunityCategory(string communityCategoryName)
         {
@@ -92,7 +92,7 @@ namespace DiscussionForum.Controllers
         /// <param name="id">The ID of the community category to update.</param>
         /// <param name="communityCategoryDto">The updated community category data.</param>
         /// <returns>An action result containing the updated community category.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCommunityCategory(long id, [FromBody] CommunityCategory communityCategoryDto)
         {
@@ -117,7 +117,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryId">The ID of the community category to delete.</param>
         /// <returns>An action result indicating the success of the operation.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpDelete("{communityCategoryId}")]
         public async Task<IActionResult> DeleteCommunityCategory(long communityCategoryId)
         {

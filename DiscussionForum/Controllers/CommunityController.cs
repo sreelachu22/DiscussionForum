@@ -21,7 +21,7 @@ namespace DiscussionForum.Controllers
         /// <summary>
         /// Retrieves all communities.
         /// </summary>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("User")]
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
@@ -46,7 +46,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a specific community.
         /// </summary>
         /// <param name="communityId">The ID of the community to be retrieved</param>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpGet("{communityId}")]
         public async Task<IActionResult> GetCommunityById(int communityId)
         {

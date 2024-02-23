@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace DiscussionForum.Controllers
             _threadStatusService = ThreadStatusService;
         }
 
+        [CustomAuth("Admin")]
         [HttpGet]
         public async Task<IActionResult> GetThreadStatus()
         {
@@ -23,6 +25,7 @@ namespace DiscussionForum.Controllers
             return Ok(threadStatus);
         }
 
+        [CustomAuth("Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetThreadStatusById(int id)
         {

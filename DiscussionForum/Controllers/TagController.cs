@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace DiscussionForum.Controllers
             _tagService = TagService;
         }
 
+        [CustomAuth("User")]
         [HttpGet]
         public async Task<IActionResult> GetTags(Boolean isdel)
         {
@@ -33,6 +35,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [CustomAuth("Admin")]
         [HttpGet("Search")]
 
         public async Task<IActionResult> SearchTags(string keyword)
@@ -58,6 +61,7 @@ namespace DiscussionForum.Controllers
         }
 
 
+        [CustomAuth("Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateTag([FromBody] string tagname, Guid createdby)
         {

@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.APIModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,7 @@ namespace DiscussionForum.Controllers
         //page is for defining the page to return after pagination
         //limit is to specify the number of users needed to show in a page
 
+        [CustomAuth("Admin")]
         [HttpGet("GetAllUsersWithPagination")]
         public async Task<IActionResult> GetAllUsers(string term = "", string sort = "name", int page = 1, int limit = 10)
         {
@@ -46,6 +48,7 @@ namespace DiscussionForum.Controllers
 
 
         /* get single user*/
+        [CustomAuth("User")]
         [HttpGet("{UserId}")]
         public async Task<IActionResult> GetUserById(Guid UserId)
         {
@@ -67,6 +70,7 @@ namespace DiscussionForum.Controllers
 
 
         /* edit single user role*/
+        [CustomAuth("Admin")]
         [HttpPut("{UserId}")]
         public async Task<IActionResult> PutUserByIDAsync(Guid UserId, int RoleID, Guid AdminID)
         {
@@ -84,6 +88,7 @@ namespace DiscussionForum.Controllers
 
         //leaderboard
 
+        [CustomAuth("User")]
         [HttpGet("TopUsersByScore/{limit}")]
         public async Task<ActionResult<List<SingleUserDTO>>> GetTop5UsersByScore(int limit)
         {

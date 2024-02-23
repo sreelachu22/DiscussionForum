@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.APIModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
@@ -23,6 +24,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves all threads in a category.
         /// </summary>
         /// <param name="CommunityCategoryMappingID">The mapping ID of the category in a community whose threads must be fetched.</param>
+        [CustomAuth("User")]
         [HttpGet]
         public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
         {
@@ -47,6 +49,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [CustomAuth("User")]
         [HttpGet("top-threads")]
         public async Task<IActionResult> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount)
         {
@@ -61,6 +64,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [CustomAuth("Admin")]
         [HttpGet("ClosedThreads")]
         public async Task<IActionResult> GetClosedThreads(int CommunityID, int pageNumber, int pageSize)
         {
@@ -88,6 +92,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a thread based on the given thread ID.
         /// </summary>
         /// <param name="threadId">The ID of the thread to search for in threads.</param>
+        [CustomAuth("User")]
         [HttpGet("{threadId}")]
         public async Task<IActionResult> GetThreadById(long threadId)
         {
@@ -133,6 +138,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="CommunityCategoryMappingId">he mapping ID of the category in a community where threads must be posted.</param>
         /// <param name="CreatorId">The ID of the user posting the thread.</param>
+        [CustomAuth("User")]
         [HttpPost]
         public async Task<IActionResult> CreateThread(int communityMappingId, Guid userId, [FromBody] ThreadContent threadcontent)
         {
@@ -186,6 +192,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="threadId">The ID of the thread to be updated.</param>
         /// <param name="ModifierId">The ID of the user editing the thread.</param>
+        [CustomAuth("User")]
         [HttpPut("{threadId}")]
         public async Task<IActionResult> UpdateThread(long threadId, Guid ModifierId, [FromBody] ThreadContent titleContent)
         {
@@ -231,6 +238,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [CustomAuth("User")]
         [HttpPut("CloseThread/{threadId}")]
         public async Task<IActionResult> CloseThread(long threadId, Guid ModifierId)
         {
@@ -260,6 +268,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [CustomAuth("User")]
         [HttpPut("ReopenThread/{threadId}")]
         public async Task<IActionResult> ReopenThread(long threadId, Guid ModifierId)
         {
@@ -294,6 +303,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="threadId">The ID of the thread to be deleted.</param>
         /// <param name="ModifierId">The ID of the user deleting the thread.</param>
+        [CustomAuth("Admin")]
         [HttpDelete("{threadId}")]
         public async Task<IActionResult> DeleteThread(long threadId, Guid ModifierId)
         {
@@ -329,6 +339,7 @@ namespace DiscussionForum.Controllers
         /// Searches for threads based on the entered search term in the "Content" column.
         /// </summary>
         /// <param name="searchTerm">The term to search for in reply content.</param>
+        [CustomAuth("User")]
         [HttpGet("SearchThreads")]
         public async Task<IActionResult> SearchThread(string searchTerm, int pageNumber, int pageSize)
         {

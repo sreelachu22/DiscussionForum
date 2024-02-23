@@ -29,7 +29,7 @@ namespace DiscussionForum.Controllers
         /// <param name="page">The page number for pagination.</param>
         /// <param name="limit">The limit for the number of items per page.</param>
         /// <returns>Paginated categories inside a community with total count and total pages.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("User")]
         [HttpGet]
         public async Task<IActionResult> GetAllCategories(int communityID, string term = "", string sort = "communityCategoryName", int page = 1, int limit = 10)
         {
@@ -47,7 +47,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryMappingID">The ID of the community category mapping.</param>
         /// <returns>An action result containing the community category mapping.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpGet("/{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMappingAPI>> GetCommunityCategoryMappingByIdAsync(int communityCategoryMappingID)
         {
@@ -72,7 +72,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityID">The ID of the community.</param>
         /// <returns>An action result containing the list of categories mapped to the community.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("User")]
         [HttpGet("InCommunity/{communityID}")]
         public async Task<ActionResult<IEnumerable<CommunityCategoryMappingAPI>>> GetAllCategoriesInCommunityAsync(int communityID)
         {
@@ -93,7 +93,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityID">The ID of the community.</param>
         /// <returns>An action result containing the list of categories not mapped to the community.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpGet("GetCategoriesNotInCommunity/{communityID}")]
         public async Task<ActionResult<IEnumerable<CommunityCategoryMappingAPI>>> GetCategoriesNotInCommunityAsync(int communityID)
         {
@@ -124,7 +124,7 @@ namespace DiscussionForum.Controllers
         /// <param name="communityID">The ID of the community.</param>
         /// <param name="model">The data for creating the community category mapping.</param>
         /// <returns>An action result containing the ID of the created mapping.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpPost("CreateCategoryMapping/{communityID}")]
         public async Task<ActionResult<int>> CreateCommunityCategoryMappingAsync(int communityID, CommunityCategoryMappingAPI model)
         {
@@ -146,7 +146,7 @@ namespace DiscussionForum.Controllers
         /// <param name="communityCategoryMappingID">The ID of the community category mapping to update.</param>
         /// <param name="model">The updated data for the community category mapping.</param>
         /// <returns>An action result containing the updated community category mapping.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpPut("UpdateCategoryDescription/{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMapping>> UpdateCommunityCategoryMappingAsync(int communityCategoryMappingID, CommunityCategoryMappingAPI model)
         {
@@ -166,7 +166,7 @@ namespace DiscussionForum.Controllers
         /// </summary>
         /// <param name="communityCategoryMappingID">The ID of the community category mapping to delete.</param>
         /// <returns>An action result containing the deleted community category mapping.</returns>
-        [CustomAuth(["SuperAdmin"])]
+        [CustomAuth("Admin")]
         [HttpDelete("{communityCategoryMappingID}")]
         public async Task<ActionResult<CommunityCategoryMapping>> DeleteCommunityCategoryMappingAsync(int communityCategoryMappingID)
         {

@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.APIModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ namespace DiscussionForum.Controllers
             _noticeService = NoticeService;
         }
 
+        [CustomAuth("User")]
         [HttpGet]
         public async Task<IActionResult> GetNotices()
         {
@@ -24,6 +26,7 @@ namespace DiscussionForum.Controllers
             return Ok(notices);
         }
 
+        [CustomAuth("Admin")]
         [HttpPost] // Call the notice service to create a notice using the provided data from the NoticeDto.
         public async Task<IActionResult> CreateNotice([FromBody] NoticeDto NoticeDto)
         {
@@ -31,6 +34,7 @@ namespace DiscussionForum.Controllers
             return Ok(notice);
         }
 
+        [CustomAuth("Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateNotice(int id, [FromBody] NoticeDto NoticeDto)
         {
@@ -43,6 +47,7 @@ namespace DiscussionForum.Controllers
         }
 
 
+        [CustomAuth("Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNotice(int id)
         {

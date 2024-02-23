@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Services;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ namespace DiscussionForum.Controllers
         }
 
         /* get all roles*/
+        [CustomAuth("Admin")]
         [HttpGet]
         public async Task<IActionResult> GetRoles()
         {
@@ -33,6 +35,7 @@ namespace DiscussionForum.Controllers
         }
 
         /* get single role*/
+        [CustomAuth("Admin")]
         [HttpGet("{RoleID}")]
         public async Task<IActionResult> GetRoleByID(int RoleID)
         {
