@@ -2,7 +2,6 @@
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace DiscussionForum.Controllers
 {

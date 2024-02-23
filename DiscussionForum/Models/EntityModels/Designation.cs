@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -13,7 +12,7 @@ namespace DiscussionForum.Models.EntityModels
 
         public virtual ICollection<User> Users { get; set; }
         public bool IsDeleted { get; set; }
-        
+
     }
 
 }

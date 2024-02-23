@@ -8,7 +8,7 @@ namespace DiscussionForum.Models.EntityModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int DepartmentID { get; set; }
-        public string DepartmentName { get; set;}
+        public string DepartmentName { get; set; }
         public virtual ICollection<User> Users { get; set; }
 
         public bool IsDeleted { get; set; }

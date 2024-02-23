@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -17,7 +17,7 @@ namespace DiscussionForum.Models.EntityModels
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation properties
-        public virtual Community Community{ get; set; }
+        public virtual Community Community { get; set; }
         public virtual User User { get; set; }
         public virtual User CreatedByUser { get; set; }
         public virtual User ModifiedByUser { get; set; }
