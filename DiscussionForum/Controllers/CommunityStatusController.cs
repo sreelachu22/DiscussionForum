@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,7 @@ namespace DiscussionForum.Controllers
         }
 
         // Get all community statuses.       
+        [CustomAuth("Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CommunityStatus>>> GetCommunityStatus()
         {
@@ -34,6 +36,7 @@ namespace DiscussionForum.Controllers
         }
 
         // Get community status by ID.    
+        [CustomAuth("Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<CommunityStatus>> GetCommunityStatusById(int id)
         {

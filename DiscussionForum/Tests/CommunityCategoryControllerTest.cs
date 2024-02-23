@@ -3,9 +3,6 @@ using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace DiscussionForum.Tests.Controllers

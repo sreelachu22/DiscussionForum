@@ -10,12 +10,13 @@
 *.userosscache
 *.sln.docstates
 
-# dotenv files
+#DotNetEnv file
 .env
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+.env
 # Mono auto generated files
 mono_crash.*
 
