@@ -17,6 +17,7 @@ namespace DiscussionForum.UnitOfWork
             _context = context;
 
             Role = new RoleRepository(_context);
+            /*Rolee = new Repository<Role>(_context);*/
             CommunityCategory = new CommunityCategoryRepository(_context);
             CommunityStatus = new CommunityStatusRepository(_context);
             ThreadStatus = new ThreadStatusRepository(_context);
