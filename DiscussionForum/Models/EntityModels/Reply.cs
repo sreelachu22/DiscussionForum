@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using DiscussionForum.Models.APIModels;
 
 namespace DiscussionForum.Models.EntityModels
 {
@@ -22,7 +21,7 @@ namespace DiscussionForum.Models.EntityModels
         [ForeignKey("ModifiedBy")]
         public Guid? ModifiedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
-        public bool? HasViewed { get; set; } 
+        public bool? HasViewed { get; set; }
 
         // Navigation properties
         [ForeignKey("ThreadID")]

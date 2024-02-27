@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using DiscussionForum.UnitOfWork;
 using Moq;
