@@ -1,1 +1,20 @@
-﻿
+﻿27-02-2024 12:19:42 - OPTIONS /api/Reply/unviewed
+27-02-2024 12:19:42 - GET /api/Reply/unviewed
+27-02-2024 12:19:58 - GET /swagger/index.html
+27-02-2024 12:20:05 - GET /swagger/v1/swagger.json
+27-02-2024 12:20:47 - OPTIONS /api/users/60957573-b544-463f-b105-4d6dfe85d503
+27-02-2024 12:20:47 - GET /api/users/60957573-b544-463f-b105-4d6dfe85d503
+27-02-2024 12:20:54 - OPTIONS /api/Community
+27-02-2024 12:20:54 - GET /api/Community
+27-02-2024 12:20:55 - GET /swagger/index.html
+27-02-2024 12:20:56 - GET /swagger/v1/swagger.json
+27-02-2024 12:21:00 - OPTIONS /api/CommunityCategoryMapping
+27-02-2024 12:21:00 - GET /api/CommunityCategoryMapping
+27-02-2024 12:21:10 - OPTIONS /api/Login/Logout
+27-02-2024 12:21:10 - POST /api/Login/Logout
+27-02-2024 12:21:28 - OPTIONS /api/Login/ExternalLogin
+27-02-2024 12:21:28 - POST /api/Login/ExternalLogin
+27-02-2024 12:21:28 - OPTIONS /api/users/60957573-b544-463f-b105-4d6dfe85d503
+27-02-2024 12:21:28 - GET /api/users/60957573-b544-463f-b105-4d6dfe85d503
+27-02-2024 12:21:28 - OPTIONS /api/Community
+27-02-2024 12:21:28 - GET /api/Community

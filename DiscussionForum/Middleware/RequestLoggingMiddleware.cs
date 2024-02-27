@@ -1,5 +1,6 @@
 ﻿using DiscussionForum.Data;
 using DiscussionForum.Models.EntityModels;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Dynamic.Core;
 using System.Security.Claims;
@@ -50,12 +51,10 @@ public class RequestLoggingMiddleware
     }
 
     /// <summary>
-    /// 
+    /// Logs the request details according to the UserLog to the database
     /// </summary>
-    /// <param name="httpContext"></param>
-    /// <param name="dbContext"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
+    /// <param name="httpContext">The HttpContext representing the incoming HTTP request.</param>
+    /// <param name="dbContext">The AppDbContext representing the database connection.</param>
     private async Task LogRequestToDb(HttpContext httpContext, AppDbContext dbContext)
     {
         // Retrieve the authorization header from the request
@@ -94,26 +93,36 @@ public class RequestLoggingMiddleware
                 throw new Exception("Error decoding token or retrieving user ID from claims", ex);
             }
 
-            // Perform logging with the retrieved user ID
-            long _lastUserLogId = dbContext.UserLog
-                .OrderByDescending(ul => ul.LoginTime)
-                .FirstOrDefault(ul => ul.UserID == _userId)
-                .UserLogID;
-
-            UserRequestLog _userRequestLog = new UserRequestLog
+            try
             {
-                UserLogID = _lastUserLogId,
-                RequestTime = DateTime.Now,
-                RequestMethod = httpContext.Request.Method,
-                RequestPath = httpContext.Request.Path,
-                ResponseStatusCode = httpContext.Response.StatusCode,
-                IsDeleted = false,
-                CreatedBy = _userId,
-                CreatedAt = DateTime.Now,
-            };
+                // Perform logging with the retrieved user ID
+                long _lastUserLogId = dbContext.UserLog
+                    .OrderByDescending(ul => ul.LoginTime)
+                    .FirstOrDefault(ul => ul.UserID == _userId)
+                    .UserLogID;
 
-            dbContext.UserRequestLog.Add(_userRequestLog);
-            await dbContext.SaveChangesAsync();
+                UserRequestLog _userRequestLog = new UserRequestLog
+                {
+                    UserLogID = _lastUserLogId,
+                    RequestTime = DateTime.Now,
+                    RequestMethod = httpContext.Request.Method,
+                    RequestPath = httpContext.Request.Path,
+                    ResponseStatusCode = httpContext.Response.StatusCode,
+                    IsDeleted = false,
+                    CreatedBy = _userId,
+                    CreatedAt = DateTime.Now,
+                };
+
+                dbContext.UserRequestLog.Add(_userRequestLog);
+                await dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error logging request to the database: {ex.Message}");
+                // Optionally rethrow the exception or handle it as needed
+                throw new Exception($"Error logging request to the database{ex.Message}");
+            }
         }
     }
 

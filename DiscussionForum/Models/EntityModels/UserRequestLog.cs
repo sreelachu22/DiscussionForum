@@ -21,7 +21,6 @@ namespace DiscussionForum.Models.EntityModels
 
         //Navigation properties
         public virtual UserLog UserLog { get; set; }
-        public virtual User User { get; set; }
         public virtual User CreatedByUser { get; set; }
         public virtual User ModifiedByUser { get; set; }
     }
