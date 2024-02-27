@@ -33,6 +33,8 @@
 
         public List<String> TagNames { get; set; }
 
+        public string ThreadOwnerEmail { get; set; }
+
         //public int RepliesCount { get; set; }
     }
 }
