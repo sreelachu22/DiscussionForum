@@ -41,7 +41,11 @@ namespace DiscussionForum.Services
         /// <summary>
         /// Retrieves all threads.
         /// </summary>
-        Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength)> GetThreadsFromDatabaseAsync(string searchTerm, int pageNumber, int pageSize);
+        Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength, bool isSearchTag)> ThreadTitleSearch(string searchTerm, int pageNumber, int pageSize);
+
+        Task<(IEnumerable<TagDto> SearchTagList, bool isSearchTag)> ThreadTagSearch(string searchTerm);
+
+        Task<(IEnumerable<CategoryThreadDto> threadDtoList, int threadDtoListCount)> DisplayThreadByTag(string searchTerm, int pageNumber, int pageSize);
         Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount);
         Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CommunityName)> GetClosedThreads(int CommunityID, int pageNumber, int pageSize);
     }
