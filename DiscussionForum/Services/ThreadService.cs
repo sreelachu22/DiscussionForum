@@ -255,7 +255,8 @@ namespace DiscussionForum.Services
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == t.ThreadID
-                                    select tg.TagName).ToList()
+                                    select tg.TagName).ToList(),
+                        ThreadOwnerEmail = t.CreatedByUser.Email,
 
                     })
                     .FirstOrDefaultAsync();
