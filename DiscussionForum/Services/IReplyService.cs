@@ -23,7 +23,16 @@ namespace DiscussionForum.Services
         /// Retrieves a list of replies based on the given parent reply ID.
         /// </summary>
         /// <param name="parentReplyID">The ID of the parent reply to search for in replies.</param>
-        Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long parentReplyID);
+        /// 
+
+
+
+        /*Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long parentReplyID);*/
+
+        Task<IEnumerable<ReplyDTO>> GetRepliesByParentReplyIdAsync(long parentReplyID);
+
+
+
         /// <summary>
         /// Creates a new reply with content from request body.
         /// </summary>

@@ -167,7 +167,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a list of replies based on the given parent reply ID.
         /// </summary>
         /// <param name="parentReplyId">The ID of the parent reply to search for in replies.</param>
-        [HttpGet("ByParentReplyID/{parentReplyId}")]
+        /*[HttpGet("ByParentReplyID/{parentReplyId}")]
         public async Task<IActionResult> GetRepliesByParentReplyId(long parentReplyId)
         {
             try
@@ -198,8 +198,20 @@ namespace DiscussionForum.Controllers
                 Console.WriteLine(ex.Message);
                 return StatusCode(500, $"Error while retrieving replies from reply with ID = {parentReplyId} \nError: {ex.Message}");
             }
+        }*/
+        [HttpGet("parentReply/{parentReplyID}")]
+        public async Task<IActionResult> GetRepliesByParentReplyIdAsync(long parentReplyID)
+        {
+            try
+            {
+                var replies = await _replyService.GetRepliesByParentReplyIdAsync(parentReplyID);
+                return Ok(replies);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
-
         /// <summary>
         /// Creates a new reply with content from request body.
         /// </summary>
