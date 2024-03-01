@@ -26,11 +26,11 @@ namespace DiscussionForum.Controllers
         /// <param name="CommunityCategoryMappingID">The mapping ID of the category in a community whose threads must be fetched.</param>
         [CustomAuth("User")]
         [HttpGet]
-        public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize)
+        public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize,int filterOption,int sortOption)
         {
             try
             {
-                var result = await _threadService.GetAllThreads(CommunityCategoryMappingID, pageNumber, pageSize);
+                var result = await _threadService.GetAllThreads(CommunityCategoryMappingID, pageNumber, pageSize, filterOption, sortOption);
 
                 var response = new
                 {
@@ -391,8 +391,8 @@ namespace DiscussionForum.Controllers
         }
 
         [CustomAuth("User")]
-        [HttpGet("displayThreadsByTags")]
-        public async Task<IActionResult> DisplayThreadsTag(string searchTerm,int pageNumber, int pageSize) {
+        [HttpGet("displaySearchedThreads")]
+        public async Task<IActionResult> DisplaySearchedThreads(string searchTerm,int pageNumber, int pageSize, int filterOption, int sortOption) {
             try
             {
 
@@ -401,7 +401,7 @@ namespace DiscussionForum.Controllers
                     return BadRequest("Search term cannot be empty");
                 }
                 searchTerm = searchTerm.Trim();
-                var (threadDtoList, threadDtoListCount) = await _threadService.DisplayThreadByTag(searchTerm,pageNumber,pageSize);
+                var (threadDtoList, threadDtoListCount) = await _threadService.DisplaySearchedThreads(searchTerm,pageNumber,pageSize,filterOption,sortOption);
 
 
 
