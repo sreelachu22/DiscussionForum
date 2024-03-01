@@ -417,5 +417,29 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [HttpGet("mythreads")]
+        public async Task<IActionResult> GetMyThreads(int communityId, Guid userId, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var result = await _threadService.GetMyThreads(communityId, userId, pageNumber, pageSize);
+
+                var response = new
+                {
+                    Threads = result.Threads,
+                    TotalCount = result.TotalCount,
+                    CategoryName = result.CategoryName,
+                    CategoryDescription = result.CategoryDescription
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in GetMyThreads: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
     }
 }

@@ -15,8 +15,6 @@ namespace DiscussionForum.Data
         public DbSet<CommunityCategory> CommunityCategories { get; set; }
         public DbSet<ThreadStatus> ThreadStatus { get; set; }
         public DbSet<User> Users { get; set; }
-
-        /*public DbSet<UserLog> UserLog { get; set; }*/
         public DbSet<Threads> Threads { get; set; }
         public DbSet<ThreadVote> ThreadVotes { get; set; }
         public DbSet<ReplyVote> ReplyVotes { get; set; }
@@ -27,8 +25,8 @@ namespace DiscussionForum.Data
         public DbSet<UserRoleMapping> UserRoleMapping { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
-
         public DbSet<UserLog> UserLog { get; set; }
+        public DbSet<UserRequestLog> UserRequestLog { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and delete behaviors
@@ -175,10 +173,10 @@ namespace DiscussionForum.Data
 
             //Relationships for Reply entity
             modelBuilder.Entity<Reply>()
-            .HasOne(r => r.CreatedByUser)
-            .WithMany()
-            .HasForeignKey(r => r.CreatedBy)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(r => r.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(r => r.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Reply>()
                 .HasOne(r => r.ModifiedByUser)
@@ -199,6 +197,7 @@ namespace DiscussionForum.Data
                 .HasForeignKey(rv => rv.ModifiedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //Relationships and properties for UserLog entity
             modelBuilder.Entity<UserLog>()
                 .HasKey(ul => ul.UserLogID);
 
@@ -235,6 +234,58 @@ namespace DiscussionForum.Data
                 .WithMany()
                 .HasForeignKey(ul => ul.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade); // Corrected from Restrict to Cascade
+            
+            //Relationships and properties for UserRequestLog entity
+            modelBuilder.Entity<UserRequestLog>()
+                .HasKey(url => url.UserRequestLogID);
+
+            modelBuilder.Entity<UserRequestLog>()
+                .Property(url => url.UserRequestLogID)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<UserRequestLog>()
+                .Property(url => url.RequestTime)
+                .IsRequired();
+
+            modelBuilder.Entity<UserRequestLog>()
+                .Property(url => url.RequestMethod)
+                .IsRequired();
+
+            modelBuilder.Entity<UserRequestLog>()
+                .Property(url => url.RequestPath)
+                .IsRequired();
+
+            modelBuilder.Entity<UserRequestLog>()
+                .Property(url => url.IsDeleted)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<UserRequestLog>()
+                .Property(url => url.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.UserLog)
+                .WithMany()
+                .HasForeignKey(url => url.UserLogID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            /*modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.User)
+                .WithMany()
+                .HasForeignKey(url => url.UserLog.UserID)
+                .OnDelete(DeleteBehavior.Cascade);*/
+
+            modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(url => url.CreatedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRequestLog>()
+                .HasOne(url => url.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(url => url.ModifiedBy)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }
