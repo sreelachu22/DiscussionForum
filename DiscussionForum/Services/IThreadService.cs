@@ -1,6 +1,7 @@
 ﻿using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Models.APIModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace DiscussionForum.Services
 {
@@ -10,7 +11,7 @@ namespace DiscussionForum.Services
         /// Retrieves all threads in a category.
         /// </summary>
         /// <param name="CommunityCategoryMappingID">The mapping ID of the category in a community whose threads must be fetched.</param>
-        Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize);
+        Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize,int filterOption,int sortOption);
         /// <summary>
         /// Retrieves a thread based on the given thread ID.
         /// </summary>
@@ -45,7 +46,7 @@ namespace DiscussionForum.Services
 
         Task<(IEnumerable<TagDto> SearchTagList, bool isSearchTag)> ThreadTagSearch(string searchTerm);
 
-        Task<(IEnumerable<CategoryThreadDto> threadDtoList, int threadDtoListCount)> DisplayThreadByTag(string searchTerm, int pageNumber, int pageSize);
+        Task<(IEnumerable<CategoryThreadDto> threadDtoList, int threadDtoListCount)> DisplaySearchedThreads(string searchTerm, int pageNumber, int pageSize,int filterOption,int sortOption);
         Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount);
         Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CommunityName)> GetClosedThreads(int CommunityID, int pageNumber, int pageSize);
         Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetMyThreads(int communityId, Guid userId, int pageNumber, int pageSize);
