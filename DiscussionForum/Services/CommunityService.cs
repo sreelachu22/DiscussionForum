@@ -78,6 +78,7 @@ namespace DiscussionForum.Services
                         );
                 }
 
+                throw new Exception("Retrieved all communities");
                 return _communitiesDTO;
 
             }
