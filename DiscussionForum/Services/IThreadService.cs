@@ -49,7 +49,7 @@ namespace DiscussionForum.Services
         Task<(IEnumerable<CategoryThreadDto> threadDtoList, int threadDtoListCount)> DisplaySearchedThreads(string searchTerm, int pageNumber, int pageSize,int filterOption,int sortOption);
         Task<IEnumerable<CategoryThreadDto>> GetTopThreads(int CommunityCategoryMappingID, string sortBy, int topCount);
         Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CommunityName)> GetClosedThreads(int CommunityID, int pageNumber, int pageSize);
-        Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetMyThreads(int communityId, Guid userId, int pageNumber, int pageSize);
+        Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetMyThreads(Guid userId, int pageNumber, int pageSize, int filterOption, int sortOption);
     }
 }
 
