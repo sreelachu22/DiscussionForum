@@ -134,14 +134,18 @@ namespace DiscussionForum.Services
 
         public async Task<Reply> CreateReplyAsync(long threadID, Guid creatorID, string content, long? parentReplyId)
         {
-            try
-            {
+            /*try
+            {*/
                 Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
                 User _creator = await Task.FromResult(_context.Users.Find(creatorID));
                 //Checks if the thread is valid
                 if (_thread == null)
                 {
                     throw new Exception("Thread not found");
+                }
+                else if(_thread.ThreadStatusID == 1)
+                {
+                    throw new Exception("Thread is closed");
                 }
                 //Checks if the creator is valid
                 else if (_creator == null)
@@ -158,11 +162,11 @@ namespace DiscussionForum.Services
                     }
                 }
                 return await Task.FromResult(CreateReply(threadID, creatorID, content, parentReplyId));
-            }
+            /*}
             catch (Exception ex)
             {
                 throw new ApplicationException($"Error occurred while creating a reply.", ex);
-            }
+            }*/
         }
         private Reply CreateReply(long threadID, Guid creatorID, string content, long? parentReplyId)
         {
