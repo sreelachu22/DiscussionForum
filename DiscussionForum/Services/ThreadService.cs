@@ -826,31 +826,18 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetMyThreads(int communityId, Guid userId, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetMyThreads(Guid UserID, int pageNumber, int pageSize, int filterOption, int sortOption)
         {
             try
             {
-                var query = _context.Threads
-                    .Include(t => t.CommunityCategoryMapping)
-                    .Where(t => t.CommunityCategoryMapping.CommunityID == communityId && t.CreatedBy == userId && !t.IsDeleted);
-
-                var totalCount = await query.CountAsync();
-
-                var categoryInfo = await _context.CommunityCategoryMapping
-                    .Where(ccm => ccm.CommunityID == communityId)
-                    .Select(ccm => new { CategoryName = ccm.CommunityCategory.CommunityCategoryName, CategoryDescription = ccm.Description })
-                    .FirstOrDefaultAsync();
-
-                var threads = await query
+                IEnumerable<CategoryThreadDto> threads = _context.Threads
                     .Include(t => t.CommunityCategoryMapping)
                     .ThenInclude(c => c.CommunityCategory)
                     .Include(t => t.ThreadStatus)
                     .Include(t => t.CreatedByUser)
                     .Include(t => t.ModifiedByUser)
                     .Include(t => t.ThreadVotes)
-                    .OrderByDescending(t => t.CreatedAt)
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
+                    .Where(t => t.CreatedBy == UserID && !t.IsDeleted)
                     .Select(t => new CategoryThreadDto
                     {
                         ThreadID = t.ThreadID,
@@ -872,17 +859,39 @@ namespace DiscussionForum.Services
                                     select tg.TagName).ToList(),
                         ReplyCount = _context.Replies.Count(r => r.ThreadID == t.ThreadID && !r.IsDeleted)
                     })
-                    .ToListAsync();
+                    .ToList();
 
-                return (threads, totalCount, categoryInfo?.CategoryName ?? string.Empty, categoryInfo?.CategoryDescription ?? string.Empty);
+                // Apply sorting based on filterOption and sortOption
+                switch (filterOption)
+                {
+                    case 0:
+                        threads = sortOption == 1 ? threads.OrderBy(t => t.ReplyCount) : threads.OrderByDescending(t => t.ReplyCount);
+                        break;
+                    case 1:
+                        threads = sortOption == 1 ? threads.OrderBy(t => t.UpVoteCount) : threads.OrderByDescending(t => t.UpVoteCount);
+                        break;
+                    case 2:
+                        threads = sortOption == 1 ? threads.OrderBy(t => t.DownVoteCount) : threads.OrderByDescending(t => t.DownVoteCount);
+                        break;
+                    case 3:
+                        threads = sortOption == 1 ? threads.OrderBy(t => t.CreatedAt) : threads.OrderByDescending(t => t.CreatedAt);
+                        break;
+                }
+
+                var totalCount = threads.Count();
+
+                threads = threads
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                return (threads, totalCount, string.Empty, string.Empty);
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while fetching threads.", ex);
             }
         }
-
-
 
     }
 }

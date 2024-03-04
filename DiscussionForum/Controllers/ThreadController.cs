@@ -417,12 +417,13 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        [HttpGet("mythreads")]
-        public async Task<IActionResult> GetMyThreads(int communityId, Guid userId, int pageNumber, int pageSize)
+        [CustomAuth("User")]
+        [HttpGet("MyThreads")]
+        public async Task<IActionResult> GetMyThreads(Guid userId, int pageNumber, int pageSize, int filterOption, int sortOption)
         {
             try
             {
-                var result = await _threadService.GetMyThreads(communityId, userId, pageNumber, pageSize);
+                var result = await _threadService.GetMyThreads(userId, pageNumber, pageSize, filterOption, sortOption);
 
                 var response = new
                 {
@@ -440,6 +441,7 @@ namespace DiscussionForum.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
 
     }
 }
