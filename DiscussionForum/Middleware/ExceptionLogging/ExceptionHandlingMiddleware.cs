@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using DiscussionForum.Models.APIModels;
+using Newtonsoft.Json;
+using Serilog;
 
 namespace DiscussionForum.Middleware.ExceptionLogging
 {
@@ -19,19 +21,25 @@ namespace DiscussionForum.Middleware.ExceptionLogging
             }
             catch (Exception ex)
             {
-                 HandleException(ex, httpContext);
+                await HandleException(ex, httpContext);
             }
         }
 
         private async Task HandleException(Exception ex, HttpContext httpContext)
         {
-
-            Log.Error(ex, "Error happened!"); // serilog
+            if(ex.InnerException != null)
+            {
+                Log.Error(ex.InnerException.Message);
+            }
+            else
+            {
+                Log.Error(ex.Message);
+            }
 
             if (ex is InvalidOperationException)
             {
                 httpContext.Response.StatusCode = 400;
-                await httpContext.Response.WriteAsJsonAsync(new
+                await httpContext.Response.WriteAsJsonAsync(new ErrorDTO
                 {
                     Message = "Invalid operation",
                     StatusCode = 400,
@@ -42,9 +50,21 @@ namespace DiscussionForum.Middleware.ExceptionLogging
             {
                 await httpContext.Response.WriteAsync("Invalid argument");
             }
+            else if(ex.Message.Contains("closed"))
+            {
+                httpContext.Response.ContentType = "application/json";
+                httpContext.Response.StatusCode = 444;
+                await httpContext.Response.WriteAsJsonAsync(new ErrorDTO
+                {
+                    Message = "Thread is closed",
+                    StatusCode = 444,
+                    Success = false
+                });
+            }
             else
             {
-                await httpContext.Response.WriteAsync("Unknown error");
+                httpContext.Response.ContentType = "application/json";
+                httpContext.Response.StatusCode = 409;
             }
         }
     }
