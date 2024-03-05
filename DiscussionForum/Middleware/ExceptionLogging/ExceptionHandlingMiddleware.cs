@@ -1,6 +1,5 @@
 ﻿using DiscussionForum.ExceptionFilter;
 using DiscussionForum.Models.APIModels;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace DiscussionForum.Middleware.ExceptionLogging
@@ -28,7 +27,7 @@ namespace DiscussionForum.Middleware.ExceptionLogging
 
         private async Task HandleException(Exception ex, HttpContext httpContext)
         {
-            if(ex.InnerException != null)
+            if (ex.InnerException != null)
             {
                 Log.Error(ex.InnerException.Message);
             }
