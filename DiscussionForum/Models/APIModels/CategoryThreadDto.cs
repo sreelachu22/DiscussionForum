@@ -3,7 +3,7 @@
     public class CategoryThreadDto
     {
 
-        public CategoryThreadDto(string title,string content,List<string> tagnames)
+        public CategoryThreadDto(string title, string content, List<string> tagnames)
         {
             this.Title = title;
             this.Content = content;
@@ -32,6 +32,8 @@
         public int ReplyCount { get; set; }
 
         public List<String> TagNames { get; set; }
+
+        public string ThreadOwnerEmail { get; set; }
 
         //public int RepliesCount { get; set; }
     }

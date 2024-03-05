@@ -1,6 +1,4 @@
-﻿using DiscussionForum.Models.EntityModels;
-
-namespace DiscussionForum.Models.APIModels
+﻿namespace DiscussionForum.Models.APIModels
 {
     public class CommunityDTO
     {

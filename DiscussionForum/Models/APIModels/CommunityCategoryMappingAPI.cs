@@ -1,7 +1,4 @@
-﻿using DiscussionForum.Models.EntityModels;
-using System.Text.Json.Serialization;
-
-namespace DiscussionForum.Models.APIModels
+﻿namespace DiscussionForum.Models.APIModels
 {
     public class CommunityCategoryMappingAPI
     {
@@ -20,7 +17,7 @@ namespace DiscussionForum.Models.APIModels
 
         public Guid? ModifiedBy { get; set; }
 
-        public DateTime? ModifiedAt { get; set; }    
+        public DateTime? ModifiedAt { get; set; }
         public int? ThreadCount { get; set; }
     }
 }

@@ -132,7 +132,7 @@ namespace DiscussionForum.Services
             }
         }*/
 
-        public async Task<IEnumerable<ReplyDTO>> GetRepliesByParentReplyIdAsync(long parentReplyID)
+        public async Task<IEnumerable<ReplyDTO>> GetRepliesByParentReplyIdAsync(long threadID, long? parentReplyID)
         {
             try
             {
@@ -140,7 +140,7 @@ namespace DiscussionForum.Services
                 var replies = await _context.Replies
                     .Include(r => r.ReplyVotes)
                     .Include(r => r.CreatedByUser)
-                    .Where(r => r.ParentReplyID == parentReplyID)
+                    .Where(r => r.ParentReplyID == parentReplyID && r.ThreadID == threadID)
                     .ToListAsync();
 
                 // Map entities to DTOs
@@ -158,16 +158,19 @@ namespace DiscussionForum.Services
                     CreatedAt = r.CreatedAt,
                     ModifiedBy = r.ModifiedBy,
                     ModifiedAt = r.ModifiedAt,
-                    HasViewed = r.HasViewed
+                    HasViewed = r.HasViewed,
+                    ChildReplyCount = _context.Replies.Count(cr => cr.ParentReplyID == r.ReplyID) // Count of child replies
                 });
 
                 return replyDTOs;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error occurred while retrieving replies for parent reply ID {parentReplyID}.", ex);
+                throw new ApplicationException($"Error occurred while retrieving replies for parent reply ID {parentReplyID} and thread ID {threadID}.", ex);
             }
         }
+
+
 
         public async Task<Reply> CreateReplyAsync(long threadID, Guid creatorID, string content, long? parentReplyId)
         {

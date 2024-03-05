@@ -1,10 +1,9 @@
 ﻿using DiscussionForum.Repositories;
-using DiscussionForum.Services;
 
 namespace DiscussionForum.UnitOfWork
 {
     public interface IUnitOfWork
-    {   
+    {
         IDesignationRepository Designations { get; }
         IRoleRepository Role { get; }
         ICommunityCategoryRepository CommunityCategory { get; }
@@ -17,7 +16,7 @@ namespace DiscussionForum.UnitOfWork
         IReplyRepository Reply { get; }
         IThreadVoteRepository ThreadVote { get; }
 
-        ITagRepository Tag { get; } 
+        ITagRepository Tag { get; }
         int Complete();
 
     }

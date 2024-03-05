@@ -1,7 +1,5 @@
 ﻿using DiscussionForum.Data;
 using DiscussionForum.Repositories;
-using DiscussionForum.Models.EntityModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.UnitOfWork
 {
@@ -23,13 +21,13 @@ namespace DiscussionForum.UnitOfWork
             // Initialize other repositories.
             Designations = new DesignationRepository(_context);
             Notice = new NoticeRepository(_context);
-            User= new UserRepository(_context);
+            User = new UserRepository(_context);
             Community = new CommunityRepository(_context);
-            Threads=new ThreadRepository(_context);
+            Threads = new ThreadRepository(_context);
             Reply = new ReplyRepository(_context);
             ThreadVote = new ThreadVoteRepository(_context);
             ReplyVote = new ReplyVoteRepository(_context);
-            Tag=new TagRepository(_context);
+            Tag = new TagRepository(_context);
         }
 
         public IDesignationRepository Designations { get; }
@@ -51,7 +49,7 @@ namespace DiscussionForum.UnitOfWork
         {
             return _context.SaveChanges();
         }
-        public void Dispose(){}
+        public void Dispose() { }
 
         /*int IUnitOfWork.Complete()
         {

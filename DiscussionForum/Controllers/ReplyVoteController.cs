@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.APIModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ namespace DiscussionForum.Controllers
             _replyVoteService = replyVoteService;
         }
 
+        [CustomAuth("User")]
         [HttpPost("vote")]
         public async Task<IActionResult> Vote([FromBody] ReplyVoteDto voteDto)
         {

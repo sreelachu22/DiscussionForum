@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.EntityModels;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ namespace DiscussionForum.Controllers
         /// <summary>
         /// Retrieves all designations.
         /// </summary>
+        [CustomAuth("Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllDesignations()
         {
@@ -44,6 +46,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a designation based on the given designation ID.
         /// </summary>
         /// <param name="designationId">The ID of the designation to search for in designations.</param>
+        [CustomAuth("Admin")]
         [HttpGet("{designationId}")]
         public async Task<IActionResult> GetDesignationById(long designationId)
         {
@@ -81,6 +84,7 @@ namespace DiscussionForum.Controllers
         /// Creates a new designation.
         /// </summary>
         /// <param name="designationName">The name of the new designation.</param>
+        [CustomAuth("Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateDesignation([FromBody] string designationName)
         {
@@ -111,6 +115,7 @@ namespace DiscussionForum.Controllers
         /// Deletes a designation based on the given designation ID.
         /// </summary>
         /// <param name="designationId">The ID of the designation to delete.</param>
+        [CustomAuth("Admin")]
         [HttpDelete("{designationId}")]
         public async Task<IActionResult> DeleteDesignation(long designationId)
         {

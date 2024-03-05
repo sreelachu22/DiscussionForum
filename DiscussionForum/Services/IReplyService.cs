@@ -29,7 +29,8 @@ namespace DiscussionForum.Services
 
         /*Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long parentReplyID);*/
 
-        Task<IEnumerable<ReplyDTO>> GetRepliesByParentReplyIdAsync(long parentReplyID);
+        Task<IEnumerable<ReplyDTO>> GetRepliesByParentReplyIdAsync(long threadID, long? parentReplyID);
+
 
 
 

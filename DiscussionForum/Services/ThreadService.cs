@@ -3,15 +3,9 @@ using DiscussionForum.Services;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Threading;
-using System;
-using System.Reflection.Metadata;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Moq;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Sprache;
+
 
 namespace DiscussionForum.Services
 {
@@ -261,7 +255,8 @@ namespace DiscussionForum.Services
                         TagNames = (from ttm in _context.ThreadTagsMapping
                                     join tg in _context.Tags on ttm.TagID equals tg.TagID
                                     where ttm.ThreadID == t.ThreadID
-                                    select tg.TagName).ToList()
+                                    select tg.TagName).ToList(),
+                        ThreadOwnerEmail = t.CreatedByUser.Email,
 
                     })
                     .FirstOrDefaultAsync();
@@ -572,6 +567,48 @@ namespace DiscussionForum.Services
             }
         }
 
+        public async Task<(IEnumerable<TagDto> SearchTagList,bool isSearchTag)> ThreadTagSearch(string searchTerm)
+        {
+            try {
+                searchTerm = searchTerm.Trim();
+                System.String[] searchTermsArray = [];
+                searchTermsArray = searchTerm.Split("#", StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < searchTermsArray.Length; i++)
+                {
+                    searchTermsArray[i] = new string(searchTermsArray[i].Where(c => !char.IsWhiteSpace(c)).ToArray());
+
+                }
+
+                var SearchTagList = _context.Tags
+                    .Where(tag => searchTermsArray.Any(term => tag.TagName.Contains(term) && !tag.IsDeleted))
+                    .Select(tag => new TagDto
+                    {
+                        TagId = tag.TagID,
+                        TagName = tag.TagName,
+                        TagCount = _context.ThreadTagsMapping
+                                        .Count(tt => tt.TagID == tag.TagID && !tt.IsDeleted)
+                    })
+                    .GroupBy(tagDto => tagDto.TagId)
+                    .Select(group => group.First())
+                    .ToList();
+
+
+
+
+
+                return (SearchTagList, true);
+
+
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"Error in GetThreadsFromDatabaseAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+
+
+
 
         /// <summary>
         /// The GetThreadsFromDatabaseAsync function retrieves and filters threads based on a search term, paginates the results, and returns a tuple containing 
@@ -582,15 +619,19 @@ namespace DiscussionForum.Services
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public async Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength)> GetThreadsFromDatabaseAsync(string searchTerm, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<CategoryThreadDto> SearchThreadDtoList, int SearchThreadDtoListLength, bool isSearchTag)> ThreadTitleSearch(string searchTerm, int pageNumber, int pageSize)
         {
             try
             {
 
-                List<int> CommunityCategoryMappingIDs = await _context.CommunityCategoryMapping
-                                                        .Where(ccm => !ccm.IsDeleted)
-                                                        .Select(ccm => ccm.CommunityCategoryMappingID)
-                                                        .ToListAsync();
+               
+                searchTerm = searchTerm.Trim();
+                System.String[] searchTermsArray=[];
+                var filteredThreads = new List<Threads>();
+                var sortedThreads = new List<Threads>();
+                var searchThreadDtoList = new List<CategoryThreadDto>();
+                
+
 
                 List<Threads> threads = await _context.Threads
                     .Include(t => t.CommunityCategoryMapping)
@@ -599,56 +640,39 @@ namespace DiscussionForum.Services
                     .Include(t => t.CreatedByUser)
                     .Include(t => t.ModifiedByUser)
                     .Include(t => t.ThreadVotes)
-                    .Where(t => CommunityCategoryMappingIDs.Contains(t.CommunityCategoryMappingID))
+                    .Where(t => t.CommunityCategoryMapping.IsDeleted == false)
                     .OrderByDescending(t => t.CreatedAt)
                     .ToListAsync();
 
+                                                                 
+                searchTermsArray = searchTerm.Split(' ');
 
-                // Split the search term into individual words
-                var searchTermsArray = searchTerm.Split(' ');
+                sortedThreads = threads
+                                .Select(thread => new
+                                {
+                                    Thread = thread,
+                                    TotalHits = searchTermsArray.Count(term => thread.Title.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                                })
+                                .Where(result => result.TotalHits > 0)
+                                .GroupBy(result => result.Thread.ThreadID)
+                                .Select(group => new
+                                {
+                                    ThreadID = group.Key,
+                                    TotalHits = group.Sum(result => result.TotalHits),
+                                    Thread = group.OrderByDescending(result => result.TotalHits).ThenByDescending(result => result.Thread.ThreadID).First().Thread
+                                })
+                                .OrderByDescending(thread => thread.TotalHits)
+                                .ThenByDescending(thread => thread.Thread.ThreadID)
+                                .Select(thread => thread.Thread)
+                                .ToList();
 
-                // Create a list to store the filtered threads
-                var filteredThreads = new List<Threads>();
 
-                foreach (var term in searchTermsArray)
-                {
-                    // Filtering based on a search term
-                    var termFilteredData = threads
-                        .Where(thread => thread.Title.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
-                        .ToList();
-
-                    // Add the filtered threads to the result list
-                    filteredThreads.AddRange(termFilteredData);
-                }
-
-                // Remove duplicate threads based on threadID
-                // Group threads by ID and calculate the total hit count for each thread title
-                var groupedThreads = filteredThreads
-                    .GroupBy(thread => thread.ThreadID)
-                    .Select(group => new
-                    {
-                        ThreadID = group.Key,
-                        TotalHits = group.Sum(thread => searchTermsArray.Count(term => thread.Title.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0))
-                    })
-                    .OrderByDescending(thread => thread.TotalHits)
-                    .ThenByDescending(thread => thread.ThreadID)
-                    .ToList();
-
-                // Retrieve threads based on the sorted ThreadIDs
-                var sortedThreads = groupedThreads
-                    .Select(thread => threads.FirstOrDefault(t => t.ThreadID == thread.ThreadID))
-                    .ToList();
-
-                // Remove duplicate threads based on threadID
                 var uniqueThreads = sortedThreads
-                    .GroupBy(thread => thread.ThreadID)
-                    .Select(group => group.First())
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-
-
-                var searchThreadDtoList = new List<CategoryThreadDto>();
+                       .GroupBy(thread => thread.ThreadID)
+                       .Select(group => group.First())
+                       .Skip((pageNumber - 1) * pageSize)
+                       .Take(pageSize)
+                       .ToList();
 
                 foreach (var thread in uniqueThreads)
                 {
@@ -685,15 +709,74 @@ namespace DiscussionForum.Services
                     searchThreadDtoList.Add(searchThreadDto);
                 }
 
-                return (searchThreadDtoList, sortedThreads.Count);
+                return (searchThreadDtoList, sortedThreads.Count,false);
+
 
             }
+
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in GetThreadsFromDatabaseAsync: {ex.Message}");
                 throw;
             }
         }
+
+
+        public async Task<(IEnumerable<CategoryThreadDto> threadDtoList,int threadDtoListCount)> DisplayThreadByTag(string searchTerm, int pageNumber, int pageSize)
+        {
+            try
+            {
+                searchTerm = searchTerm.Trim();
+                string[] searchTermsArray = searchTerm.Split("#", StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < searchTermsArray.Length; i++)
+                {
+                    searchTermsArray[i] = new string(searchTermsArray[i].Where(c => !char.IsWhiteSpace(c)).ToArray());
+                }
+
+                var threadDtoList = await (
+                    from tag in _context.Tags
+                    where searchTermsArray.Any(term => tag.TagName.Contains(term) && !tag.IsDeleted)
+                    join threadTag in _context.ThreadTagsMapping
+                    on tag.TagID equals threadTag.TagID
+                    join thread in _context.Threads
+                    on threadTag.ThreadID equals thread.ThreadID
+                    where !thread.CommunityCategoryMapping.IsDeleted
+                    orderby thread.CreatedAt descending
+                    select new CategoryThreadDto
+                    {
+                        ThreadID = thread.ThreadID,
+                        Title = thread.Title,
+                        Content = thread.Content,
+                        CreatedBy = thread.CreatedBy,
+                        CreatedByUser = thread.CreatedByUser.Name, 
+                        CreatedAt = thread.CreatedAt,
+                        ModifiedBy = thread.ModifiedBy,
+                        ModifiedByUser = thread.ModifiedByUser.Name,
+                        ModifiedAt = thread.ModifiedAt,
+                        ThreadStatusName = thread.ThreadStatus.ThreadStatusName,
+                        IsAnswered = thread.IsAnswered,
+                        UpVoteCount = thread.ThreadVotes != null ? thread.ThreadVotes.Count(tv => !tv.IsDeleted && tv.IsUpVote) : 0,
+                        DownVoteCount = thread.ThreadVotes != null ? thread.ThreadVotes.Count(tv => !tv.IsDeleted && !tv.IsUpVote) : 0,
+                        ReplyCount = _context.Replies.Count(r => r.ThreadID == thread.ThreadID && !r.IsDeleted),
+                        TagNames = _context.ThreadTagsMapping
+                                        .Where(tt => tt.ThreadID == thread.ThreadID && !tt.IsDeleted)
+                                        .Select(tt => tt.Tag.TagName)
+                                        .ToList()
+                    })
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                return (threadDtoList, threadDtoList.Count);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DisplayThreadByTag: {ex.Message}");
+                throw;
+            }
+        }
+
 
     }
 }
