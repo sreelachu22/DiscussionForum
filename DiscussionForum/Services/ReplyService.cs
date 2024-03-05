@@ -1,11 +1,9 @@
 ﻿using DiscussionForum.Data;
+using DiscussionForum.ExceptionFilter;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
 
 namespace DiscussionForum.Services
 {
@@ -136,32 +134,32 @@ namespace DiscussionForum.Services
         {
             /*try
             {*/
-                Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
-                User _creator = await Task.FromResult(_context.Users.Find(creatorID));
-                //Checks if the thread is valid
-                if (_thread == null)
+            Threads _thread = await Task.FromResult(_context.Threads.Find(threadID));
+            User _creator = await Task.FromResult(_context.Users.Find(creatorID));
+            //Checks if the thread is valid
+            if (_thread == null)
+            {
+                throw new Exception("Thread not found");
+            }
+            else if (_thread.ThreadStatusID == 1)
+            {
+                throw new CustomException(444, "Thread is closed");
+            }
+            //Checks if the creator is valid
+            else if (_creator == null)
+            {
+                throw new Exception("Creator not found");
+            }
+            //Checks if the parent reply is valid
+            else if (parentReplyId != null)
+            {
+                Reply _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
+                if (_parentReply == null)
                 {
-                    throw new Exception("Thread not found");
+                    throw new Exception("Parent reply not found");
                 }
-                else if(_thread.ThreadStatusID == 1)
-                {
-                    throw new Exception("Thread is closed");
-                }
-                //Checks if the creator is valid
-                else if (_creator == null)
-                {
-                    throw new Exception("Creator not found");
-                }
-                //Checks if the parent reply is valid
-                else if (parentReplyId != null)
-                {
-                    Reply _parentReply = await Task.FromResult(_context.Replies.Find(parentReplyId));
-                    if (_parentReply == null)
-                    {
-                        throw new Exception("Parent reply not found");
-                    }
-                }
-                return await Task.FromResult(CreateReply(threadID, creatorID, content, parentReplyId));
+            }
+            return await Task.FromResult(CreateReply(threadID, creatorID, content, parentReplyId));
             /*}
             catch (Exception ex)
             {
@@ -453,14 +451,27 @@ namespace DiscussionForum.Services
             return true;
         }
 
+        public async Task<bool> UpdateAllHasViewedAsync(long[] replyIDs)
+        {
+            // Assuming userId is the primary key for the user entity associated with replies
+            Reply[] replies = await _context.Replies
+                .Where(reply => replyIDs.Contains(reply.ReplyID) && reply.HasViewed == false)
+                .ToArrayAsync();
 
-
-
-
-
-
-
-
+            if (replies == null)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (var reply in replies)
+                {
+                    reply.HasViewed = true;
+                }
+                await _context.SaveChangesAsync();
+                return true;
+            }
+        }
 
     }
 }
