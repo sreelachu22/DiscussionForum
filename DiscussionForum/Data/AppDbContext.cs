@@ -27,6 +27,7 @@ namespace DiscussionForum.Data
         public DbSet<ThreadTagsMapping> ThreadTagsMapping { get; set; }
         public DbSet<UserLog> UserLog { get; set; }
         public DbSet<UserRequestLog> UserRequestLog { get; set; }
+        public DbSet<SavedPosts> SavedPosts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and delete behaviors
@@ -285,6 +286,18 @@ namespace DiscussionForum.Data
                 .HasOne(url => url.ModifiedByUser)
                 .WithMany()
                 .HasForeignKey(url => url.ModifiedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SavedPosts>()
+                .HasOne(sp => sp.User)
+                .WithMany()
+                .HasForeignKey(sp => sp.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SavedPosts>()
+                .HasOne(sp => sp.Thread)
+                .WithMany()
+                .HasForeignKey(sp => sp.ThreadID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);

@@ -84,7 +84,7 @@ builder.Services.AddScoped<IReplyVoteService, ReplyVoteService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IMailjetService, MailjetService>();
-
+builder.Services.AddScoped<ISavedPostService, SavedPostService>();
 
 
 builder.Services.AddControllers();
