@@ -451,14 +451,27 @@ namespace DiscussionForum.Services
             return true;
         }
 
+        public async Task<bool> UpdateAllHasViewedAsync(long[] replyIDs)
+        {
+            // Assuming userId is the primary key for the user entity associated with replies
+            Reply[] replies = await _context.Replies
+                .Where(reply => replyIDs.Contains(reply.ReplyID) && reply.HasViewed == false)
+                .ToArrayAsync();
 
-
-
-
-
-
-
-
+            if (replies == null)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (var reply in replies)
+                {
+                    reply.HasViewed = true;
+                }
+                await _context.SaveChangesAsync();
+                return true;
+            }
+        }
 
     }
 }
