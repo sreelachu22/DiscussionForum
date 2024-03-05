@@ -228,8 +228,8 @@ namespace DiscussionForum.Controllers
         [HttpPost("{threadId}")]
         public async Task<IActionResult> CreateReply(long threadId, Guid creatorId, [FromBody] string content, long? parentReplyId = null)
         {
-            try
-            {
+            /*try
+            {*/
                 //Validates the request data
                 if (threadId <= 0)
                 {
@@ -250,7 +250,7 @@ namespace DiscussionForum.Controllers
 
                 Reply _reply = await _replyService.CreateReplyAsync(threadId, creatorId, content, parentReplyId);
                 return Ok(_reply);
-            }
+            /*}
             catch (Exception ex)
             {
                 //Checks for an inner exception and returns corresponding error message
@@ -260,7 +260,7 @@ namespace DiscussionForum.Controllers
                 }
                 Console.WriteLine(ex.Message);
                 return StatusCode(500, $"Error while creating reply \nError: {ex.Message}");
-            }
+            }*/
         }
 
         /// <summary>

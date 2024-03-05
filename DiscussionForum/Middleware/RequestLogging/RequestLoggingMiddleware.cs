@@ -24,7 +24,6 @@ public class RequestLoggingMiddleware
     {
         // Log the request details
         string _logMessage = $"{DateTime.Now} - {httpContext.Request.Method} {httpContext.Request.Path}";
-        Console.WriteLine(_logMessage);
         await LogRequestToFile(_logMessage);
 
         await LogRequestToDb(httpContext, dbContext);
@@ -41,7 +40,7 @@ public class RequestLoggingMiddleware
     private async Task LogRequestToFile(string logMessage)
     {
         // Specify the file path where you want to log the requests
-        string _filePath = Path.Combine(Directory.GetCurrentDirectory(), "Middleware", "requestlog.txt");
+        string _filePath = Path.Combine(Directory.GetCurrentDirectory(), "Middleware", "RequestLogging", $"RequestLog{DateTime.Today.ToString("yyyyMMdd")}.txt");
 
         // Ensure the directory exists
         Directory.CreateDirectory(Path.GetDirectoryName(_filePath));
@@ -118,9 +117,6 @@ public class RequestLoggingMiddleware
             }
             catch (Exception ex)
             {
-                // Log the exception
-                Console.WriteLine($"Error logging request to the database: {ex.Message}");
-                // Optionally rethrow the exception or handle it as needed
                 throw new Exception($"Error logging request to the database{ex.Message}");
             }
         }
