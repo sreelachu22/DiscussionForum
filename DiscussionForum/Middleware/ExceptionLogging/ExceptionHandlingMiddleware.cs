@@ -1,4 +1,5 @@
-﻿using DiscussionForum.Models.APIModels;
+﻿using DiscussionForum.ExceptionFilter;
+using DiscussionForum.Models.APIModels;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -50,14 +51,14 @@ namespace DiscussionForum.Middleware.ExceptionLogging
             {
                 await httpContext.Response.WriteAsync("Invalid argument");
             }
-            else if(ex.Message.Contains("closed"))
+            else if (ex is CustomException _customException)
             {
                 httpContext.Response.ContentType = "application/json";
-                httpContext.Response.StatusCode = 444;
+                httpContext.Response.StatusCode = _customException.statusCode;
                 await httpContext.Response.WriteAsJsonAsync(new ErrorDTO
                 {
-                    Message = "Thread is closed",
-                    StatusCode = 444,
+                    Message = _customException.message,
+                    StatusCode = _customException.statusCode,
                     Success = false
                 });
             }

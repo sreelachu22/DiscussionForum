@@ -395,6 +395,19 @@ namespace DiscussionForum.Controllers
 
             return NotFound();
         }
+/*
+        [CustomAuth("User")]*/
+        [HttpPost("updateAllHasViewed")]
+        public async Task<IActionResult> UpdateAllHasViewed([FromBody] long[] replyIDs)
+        {
+            var success = await _replyService.UpdateAllHasViewedAsync(replyIDs);
+            if (success)
+            {
+                return Ok();
+            }
+
+            return NotFound();
+        }
 
     }
 }

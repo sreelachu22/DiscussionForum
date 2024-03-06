@@ -59,6 +59,7 @@ namespace DiscussionForum.Services
         (IEnumerable<ReplyNotifyDTO> replies, int totalCount) GetUnviewedReplies(Guid userId, int? categoryId, string sortDirection, int pageNumber, int pageSize);
 
         Task<bool> UpdateHasViewed(long replyId);
+        Task<bool> UpdateAllHasViewedAsync(long[] replyIDs);
 
     }
 }
