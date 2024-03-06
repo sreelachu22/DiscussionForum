@@ -24,7 +24,7 @@ namespace DiscussionForum.Services
         // - Updates the existing vote if found, toggling IsDeleted if the new vote matches the existing one, otherwise updating IsUpVote and IsDeleted.        
         // - Handles point adjustments via _pointService based on the type of vote (upvote or downvote).        
 
-        public async Task VoteAsync(ReplyVoteDto voteDto)
+        /*public async Task VoteAsync(ReplyVoteDto voteDto)
         {           
             var existingReplyVote = await _dbContext.ReplyVotes
                 .FirstOrDefaultAsync(rv => rv.UserID == voteDto.UserID && rv.ReplyID == voteDto.ReplyID);
@@ -90,7 +90,100 @@ namespace DiscussionForum.Services
 
                 await _dbContext.SaveChangesAsync();
             }
+        }*/
+
+        public async Task<ReplyVoteDto> VoteAsync(ReplyVoteDto voteDto)
+        {
+            var existingReplyVote = await _dbContext.ReplyVotes
+                .FirstOrDefaultAsync(rv => rv.UserID == voteDto.UserID && rv.ReplyID == voteDto.ReplyID);
+
+            int upvoteCount = 0;
+            int downvoteCount = 0;
+
+            if (existingReplyVote != null)
+            {
+                // Update the existing ReplyVote with the data from the DTO                
+                if (existingReplyVote.IsUpVote == voteDto.IsUpVote)
+                {
+                    // If the existing vote and the incoming vote are the same, set IsDeleted to true
+                    existingReplyVote.IsDeleted = !existingReplyVote.IsDeleted;
+
+                    if (existingReplyVote.IsUpVote)
+                    {
+                        await _pointService.RemoveReplyUpvote(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                    else
+                    {
+                        await _pointService.RemoveReplyDownvote(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                }
+                else
+                {
+                    existingReplyVote.IsUpVote = voteDto.IsUpVote;
+                    existingReplyVote.IsDeleted = voteDto.IsDeleted;
+
+                    if (existingReplyVote.IsUpVote)
+                    {
+                        await _pointService.ReplyUpvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                    else
+                    {
+                        await _pointService.ReplyDownvoted(existingReplyVote.UserID, existingReplyVote.ReplyID);
+                    }
+                }
+                existingReplyVote.ModifiedAt = DateTime.Now;
+
+                await _dbContext.SaveChangesAsync();
+
+                // Calculate upvote and downvote counts
+                upvoteCount = await _dbContext.ReplyVotes.CountAsync(rv => rv.ReplyID == voteDto.ReplyID && !rv.IsDeleted && rv.IsUpVote);
+                downvoteCount = await _dbContext.ReplyVotes.CountAsync(rv => rv.ReplyID == voteDto.ReplyID && !rv.IsDeleted && !rv.IsUpVote);
+            }
+            else
+            {
+                // Create a new ReplyVote
+                var newReplyVote = new ReplyVote
+                {
+                    UserID = voteDto.UserID,
+                    ReplyID = voteDto.ReplyID,
+                    IsUpVote = voteDto.IsUpVote,
+                    IsDeleted = voteDto.IsDeleted,
+                    CreatedBy = voteDto.UserID,
+                    CreatedAt = DateTime.Now,
+                };
+
+                _dbContext.ReplyVotes.Add(newReplyVote);
+
+                if (newReplyVote.IsUpVote)
+                {
+                    await _pointService.ReplyUpvoted(newReplyVote.UserID, newReplyVote.ReplyID);
+                }
+                else
+                {
+                    await _pointService.ReplyDownvoted(newReplyVote.UserID, newReplyVote.ReplyID);
+                }
+
+                await _dbContext.SaveChangesAsync();
+
+                // Calculate upvote and downvote counts
+                upvoteCount = await _dbContext.ReplyVotes.CountAsync(rv => rv.ReplyID == voteDto.ReplyID && !rv.IsDeleted && rv.IsUpVote);
+                downvoteCount = await _dbContext.ReplyVotes.CountAsync(rv => rv.ReplyID == voteDto.ReplyID && !rv.IsDeleted && !rv.IsUpVote);
+            }
+
+            // Create and return ReplyVoteDto with upvote and downvote counts
+            var replyVoteDto = new ReplyVoteDto
+            {
+                UserID = voteDto.UserID,
+                ReplyID = voteDto.ReplyID,
+                IsUpVote = voteDto.IsUpVote,
+                IsDeleted = voteDto.IsDeleted,
+                UpvoteCount = upvoteCount,
+                DownvoteCount = downvoteCount
+            };
+
+            return replyVoteDto;
         }
+
 
     }
 }

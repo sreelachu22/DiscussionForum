@@ -101,7 +101,7 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long parentReplyID)
+        /*public async Task<IEnumerable<Reply>> GetRepliesByParentReplyIdAsync(long parentReplyID)
         {
             try
             {
@@ -128,7 +128,47 @@ namespace DiscussionForum.Services
             {
                 throw new ApplicationException($"Error occurred while retrieving replies for parent reply ID {parentReplyID}.", ex);
             }
+        }*/
+
+        public async Task<IEnumerable<ReplyDTO>> GetRepliesByParentReplyIdAsync(long threadID, long? parentReplyID)
+        {
+            try
+            {
+                // Include related entities
+                var replies = await _context.Replies
+                    .Include(r => r.ReplyVotes)
+                    .Include(r => r.CreatedByUser)
+                    .Where(r => r.ParentReplyID == parentReplyID && r.ThreadID == threadID)
+                    .ToListAsync();
+
+                // Map entities to DTOs
+                var replyDTOs = replies.Select(r => new ReplyDTO
+                {
+                    ReplyID = r.ReplyID,
+                    ThreadID = r.ThreadID,
+                    ParentReplyID = r.ParentReplyID,
+                    Content = r.Content,
+                    UpvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && rv.IsUpVote) : 0,
+                    DownvoteCount = r.ReplyVotes != null ? r.ReplyVotes.Count(rv => !rv.IsDeleted && !rv.IsUpVote) : 0,
+                    IsDeleted = r.IsDeleted,
+                    CreatedBy = r.CreatedBy,
+                    CreatedUserName = r.CreatedByUser != null ? r.CreatedByUser.Name : "",
+                    CreatedAt = r.CreatedAt,
+                    ModifiedBy = r.ModifiedBy,
+                    ModifiedAt = r.ModifiedAt,
+                    HasViewed = r.HasViewed,
+                    ChildReplyCount = _context.Replies.Count(cr => cr.ParentReplyID == r.ReplyID) // Count of child replies
+                });
+
+                return replyDTOs;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error occurred while retrieving replies for parent reply ID {parentReplyID} and thread ID {threadID}.", ex);
+            }
         }
+
+
 
         public async Task<Reply> CreateReplyAsync(long threadID, Guid creatorID, string content, long? parentReplyId)
         {

@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Authorization;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
 using Microsoft.AspNetCore.Cors;
@@ -22,7 +23,7 @@ namespace DiscussionForum.Controllers
         /// Searches for replies based on the entered search term in the "Content" column.
         /// </summary>
         /// <param name="searchTerm">The term to search for in reply content.</param>
-        [CustomAuth("User")]
+        //[CustomAuth("User")]
         [HttpGet("SearchReplies")]
         public async Task<IActionResult> SearchReplies(string searchTerm)
         {
@@ -70,7 +71,7 @@ namespace DiscussionForum.Controllers
         /// <summary>
         /// Retrieves all replies.
         /// </summary>
-        [CustomAuth("Admin")]
+       // [CustomAuth("Admin")]
         [HttpGet]
         public async Task<IActionResult> GetReplies()
         {
@@ -95,7 +96,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a reply based on the given reply ID.
         /// </summary>
         /// <param name="replyId">The ID of the reply to search for in replies.</param>
-        [CustomAuth("User")]
+        //[CustomAuth("User")]
         [HttpGet("{replyId}")]
         public async Task<IActionResult> GetReplyById(long replyId)
         {
@@ -133,7 +134,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a list of replies based on the given thread ID.
         /// </summary>
         /// <param name="threadId">The ID of the thread to search for in replies.</param>
-        [CustomAuth("Admin")]
+        //[CustomAuth("Admin")]
         [HttpGet("ByThreadID/{threadId}")]
         public async Task<IActionResult> GetRepliesByThreadId(long threadId)
         {
@@ -171,7 +172,7 @@ namespace DiscussionForum.Controllers
         /// Retrieves a list of replies based on the given parent reply ID.
         /// </summary>
         /// <param name="parentReplyId">The ID of the parent reply to search for in replies.</param>
-        [CustomAuth("Admin")]
+        /*[CustomAuth("Admin")]
         [HttpGet("ByParentReplyID/{parentReplyId}")]
         public async Task<IActionResult> GetRepliesByParentReplyId(long parentReplyId)
         {
@@ -203,8 +204,20 @@ namespace DiscussionForum.Controllers
                 Console.WriteLine(ex.Message);
                 return StatusCode(500, $"Error while retrieving replies from reply with ID = {parentReplyId} \nError: {ex.Message}");
             }
+        }*/
+        [HttpGet("GetRepliesByParentReplyId/{threadID}")]
+        public async Task<ActionResult<IEnumerable<ReplyDTO>>> GetRepliesByParentReplyId(long threadID, long? parentReplyID = null)
+        {
+            try
+            {
+                var replies = await _replyService.GetRepliesByParentReplyIdAsync(threadID, parentReplyID);
+                return Ok(replies);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-
         /// <summary>
         /// Creates a new reply with content from request body.
         /// </summary>
@@ -329,7 +342,7 @@ namespace DiscussionForum.Controllers
         // Http Get Method to get all the replies of a post in a nested manner.
         // We can get all the replies from a specific parent by providing the parentReplyId.
         // ParentReplyId of the first reply is null
-        [CustomAuth("User")]
+        //[CustomAuth("User")]
         [HttpGet("getAllNestedRepliesOfaPost/{threadId}")]
         public IActionResult GetAllRepliesOfAPost(long threadId, long? parentReplyId = null, int page = 1, int pageSize = 10)
         {

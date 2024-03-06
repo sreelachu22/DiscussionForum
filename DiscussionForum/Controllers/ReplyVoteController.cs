@@ -20,12 +20,25 @@ namespace DiscussionForum.Controllers
 
         [CustomAuth("User")]
         [HttpPost("vote")]
-        public async Task<IActionResult> Vote([FromBody] ReplyVoteDto voteDto)
+        /*public async Task<IActionResult> Vote([FromBody] ReplyVoteDto voteDto)
         {
             try
             {
                 await _replyVoteService.VoteAsync(voteDto);
                 return Ok("Vote recorded successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                return StatusCode(500, "An error occurred while processing the request.");
+            }
+        }*/
+        public async Task<IActionResult> Vote([FromBody] ReplyVoteDto voteDto)
+        {
+            try
+            {
+                var resultDto = await _replyVoteService.VoteAsync(voteDto);
+                return Ok(resultDto);
             }
             catch (Exception ex)
             {
