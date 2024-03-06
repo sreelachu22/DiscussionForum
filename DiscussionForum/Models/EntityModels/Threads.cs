@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.Text.Json.Serialization;
 namespace DiscussionForum.Models.EntityModels
 {
     public class Threads
@@ -39,7 +39,7 @@ namespace DiscussionForum.Models.EntityModels
         [ForeignKey("ModifiedBy")]
         public virtual User ModifiedByUser { get; set; }
         public virtual ICollection<ThreadVote> ThreadVotes { get; set; }
-
+        
 
 
 
