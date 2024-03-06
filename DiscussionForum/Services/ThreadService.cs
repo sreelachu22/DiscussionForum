@@ -1,11 +1,10 @@
 ﻿using DiscussionForum.Data;
-using DiscussionForum.Services;
+using DiscussionForum.ExceptionFilter;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Sprache;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 
 namespace DiscussionForum.Services
@@ -39,7 +38,7 @@ namespace DiscussionForum.Services
         /// <param name="pageSize"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize,int filterOption, int sortOption)
+        public async Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetAllThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize, int filterOption, int sortOption)
         {
             try
             {
@@ -584,9 +583,10 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<(IEnumerable<TagDto> SearchTagList,bool isSearchTag)> ThreadTagSearch(string searchTerm)
+        public async Task<(IEnumerable<TagDto> SearchTagList, bool isSearchTag)> ThreadTagSearch(string searchTerm)
         {
-            try {
+            try
+            {
                 searchTerm = searchTerm.Trim();
                 System.String[] searchTermsArray = [];
                 searchTermsArray = searchTerm.Split("#", StringSplitOptions.RemoveEmptyEntries);
@@ -617,7 +617,8 @@ namespace DiscussionForum.Services
 
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Error in GetThreadsFromDatabaseAsync: {ex.Message}");
                 throw;
             }
@@ -641,13 +642,13 @@ namespace DiscussionForum.Services
             try
             {
 
-               
+
                 searchTerm = searchTerm.Trim();
-                System.String[] searchTermsArray=[];
+                System.String[] searchTermsArray = [];
                 var filteredThreads = new List<Threads>();
                 var sortedThreads = new List<Threads>();
                 var searchThreadDtoList = new List<CategoryThreadDto>();
-                
+
 
 
                 List<Threads> threads = await _context.Threads
@@ -661,7 +662,7 @@ namespace DiscussionForum.Services
                     .OrderByDescending(t => t.CreatedAt)
                     .ToListAsync();
 
-                                                                 
+
                 searchTermsArray = searchTerm.Split(' ');
 
                 sortedThreads = threads
@@ -724,7 +725,7 @@ namespace DiscussionForum.Services
                     searchThreadDtoList.Add(searchThreadDto);
                 }
 
-                return (searchThreadDtoList, sortedThreads.Count,false);
+                return (searchThreadDtoList, sortedThreads.Count, false);
 
 
             }
@@ -737,12 +738,12 @@ namespace DiscussionForum.Services
         }
 
 
-        public async Task<(IEnumerable<CategoryThreadDto> threadDtoList,int threadDtoListCount)> DisplaySearchedThreads(string searchTerm, int pageNumber, int pageSize, int filterOption, int sortOption)
+        public async Task<(IEnumerable<CategoryThreadDto> threadDtoList, int threadDtoListCount)> DisplaySearchedThreads(string searchTerm, int pageNumber, int pageSize, int filterOption, int sortOption)
         {
             try
             {
                 searchTerm = searchTerm.Trim();
-                IEnumerable<CategoryThreadDto> threads=new List<CategoryThreadDto>();
+                IEnumerable<CategoryThreadDto> threads = new List<CategoryThreadDto>();
                 int totalCount;
                 bool isSearchTag;
                 if (searchTerm[0] == '#')
@@ -789,7 +790,8 @@ namespace DiscussionForum.Services
                     totalCount = threads.Count();
 
                 }
-                else {
+                else
+                {
 
                     (threads, totalCount, isSearchTag) = await ThreadTitleSearch(searchTerm, pageNumber, pageSize);
 
@@ -892,6 +894,56 @@ namespace DiscussionForum.Services
             {
                 throw new Exception("Error while fetching threads.", ex);
             }
+        }
+
+        public async Task<DuplicateThreads> GetDuplicateThreadAsync(long threadId)
+        {
+            Threads _thread = await _context.Threads.FindAsync(threadId);
+            if (_thread == null)
+            {
+                throw new CustomException(446, "Thread not found");
+            }
+
+            DuplicateThreads _duplicateThread = await _context.DuplicateThreads.Where(dt => dt.DuplicateThreadId == threadId).FirstOrDefaultAsync();
+            if (_duplicateThread == null)
+            {
+                throw new CustomException(445, "Duplicate not found");
+            }
+            return _duplicateThread;
+        }
+
+        public async Task<DuplicateThreads> MarkDuplicateThreadAsync(long duplicateThreadId, long originalThreadId, Guid createdBy)
+        {
+            Threads _duplicateThread = await _context.Threads.FindAsync(duplicateThreadId);
+            Threads _originalThread = await _context.Threads.FindAsync(originalThreadId);
+            User _creator = await _context.Users.FindAsync(createdBy);
+
+            if (_duplicateThread == null)
+            {
+                throw new CustomException(446, "Thread not found");
+            }
+            else if (_originalThread == null)
+            {
+                throw new CustomException(446, "Thread not found");
+            }
+            else if (_creator == null)
+            {
+                throw new CustomException(445, "User not found");
+            }
+
+            DuplicateThreads _duplicatedThread = new DuplicateThreads
+            {
+                DuplicateThreadId = _duplicateThread.ThreadID,
+                OriginalThreadId = _originalThread.ThreadID,
+                IsDeleted = false,
+                CreatedBy = _creator.UserID,
+                CreatedAt = DateTime.Now
+            };
+
+            await _context.DuplicateThreads.AddAsync(_duplicatedThread);
+            await _context.SaveChangesAsync();
+
+            return _duplicatedThread;
         }
 
     }

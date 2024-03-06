@@ -10,7 +10,7 @@ namespace DiscussionForum.Models.EntityModels
         public int DuplicateId { get; set; }
         public long DuplicateThreadId { get; set; }
         public long OriginalThreadId { get; set; }
-        public bool IsDeleted { get; set; }
+        public bool? IsDeleted { get; set; }
         public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid? ModifiedBy { get; set; }
