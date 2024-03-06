@@ -20,5 +20,9 @@
         public DateTime? ModifiedAt { get; set; }
         public string ThreadOwnerEmail { get; set; }
         public List<ReplyDTO> NestedReplies { get; set; }
+
+
+        //new additions
+        public int ChildReplyCount { get; set; }
     }
 }

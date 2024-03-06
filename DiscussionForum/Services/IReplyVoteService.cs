@@ -3,7 +3,9 @@
 namespace DiscussionForum.Services
 {
     public interface IReplyVoteService
-    {        
-        Task VoteAsync(ReplyVoteDto voteDto);
+    {
+        //Task VoteAsync(ReplyVoteDto voteDto);
+        Task<ReplyVoteDto> VoteAsync(ReplyVoteDto voteDto);
+
     }
 }
