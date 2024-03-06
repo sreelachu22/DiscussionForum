@@ -273,6 +273,7 @@ namespace DiscussionForum.Services
                                     where ttm.ThreadID == t.ThreadID
                                     select tg.TagName).ToList(),
                         ThreadOwnerEmail = t.CreatedByUser.Email,
+                        ReplyCount = _context.Replies.Count(r => r.ThreadID == t.ThreadID && !r.IsDeleted)
 
                     })
                     .FirstOrDefaultAsync();
