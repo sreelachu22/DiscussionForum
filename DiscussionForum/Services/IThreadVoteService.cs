@@ -4,6 +4,6 @@ namespace DiscussionForum.Services
 {
     public interface IThreadVoteService
     {
-        Task CreateThreadVote(ThreadVoteDto threadVoteDto);
+        Task<ThreadVoteDto> CreateThreadVote(ThreadVoteDto threadVoteDto);
     }
 }
