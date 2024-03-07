@@ -6,5 +6,7 @@
         public long ThreadID { get; set; }
         public bool IsUpVote { get; set; }
         public bool IsDeleted { get; set; }
+        public int UpvoteCount { get; set; }
+        public int DownvoteCount { get; set; }
     }
 }
