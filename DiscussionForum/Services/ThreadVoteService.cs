@@ -22,12 +22,16 @@ namespace DiscussionForum.Services
         // Output: None.
         // Functionality: Handles thread voting operations, including upvoting and downvoting, while managing database transactions.
 
-        public async Task CreateThreadVote(ThreadVoteDto threadVoteDto)
+        public async Task<ThreadVoteDto> CreateThreadVote(ThreadVoteDto threadVoteDto)
         {
             try
             {
                 var _existingThreadVote = await _context.ThreadVotes
                 .FirstOrDefaultAsync(tv => tv.UserID == threadVoteDto.UserID && tv.ThreadID == threadVoteDto.ThreadID);
+
+
+                int upvoteCount = 0;
+                int downvoteCount = 0;
 
                 if (_existingThreadVote != null)
                 {
@@ -63,9 +67,12 @@ namespace DiscussionForum.Services
                     _existingThreadVote.ModifiedAt = DateTime.Now;
 
                     await _context.SaveChangesAsync();
+
+                    upvoteCount = await _context.ThreadVotes.CountAsync(tv => tv.ThreadID == threadVoteDto.ThreadID && !tv.IsDeleted && tv.IsUpVote);
+                    downvoteCount = await _context.ThreadVotes.CountAsync(tv => tv.ThreadID == threadVoteDto.ThreadID && !tv.IsDeleted && !tv.IsUpVote);
                 }
                 else
-                {                    
+                {
                     var _newThreadVote = new ThreadVote
                     {
                         UserID = threadVoteDto.UserID,
@@ -78,7 +85,7 @@ namespace DiscussionForum.Services
 
                     _context.ThreadVotes.Add(_newThreadVote);
 
-                    if (threadVoteDto.IsUpVote)
+                    if (_newThreadVote.IsUpVote)
                     {
                         await _pointService.ThreadUpvoted(_newThreadVote.UserID, _newThreadVote.ThreadID);
                     }
@@ -88,7 +95,22 @@ namespace DiscussionForum.Services
                     }
 
                     await _context.SaveChangesAsync();
+
+                    // Calculate upvote and downvote counts
+                    upvoteCount = await _context.ThreadVotes.CountAsync(tv => tv.ThreadID == threadVoteDto.ThreadID && !tv.IsDeleted && tv.IsUpVote);
+                    downvoteCount = await _context.ThreadVotes.CountAsync(tv => tv.ThreadID == threadVoteDto.ThreadID && !tv.IsDeleted && !tv.IsUpVote);
                 }
+                var threadvoteDto = new ThreadVoteDto
+                {
+                    UserID = threadVoteDto.UserID,
+                    ThreadID = threadVoteDto.ThreadID,
+                    IsUpVote = threadVoteDto.IsUpVote,
+                    IsDeleted = threadVoteDto.IsDeleted,
+                    UpvoteCount = upvoteCount,
+                    DownvoteCount = downvoteCount
+                };
+
+                return threadvoteDto;
             }
             catch (Exception ex)
             {
