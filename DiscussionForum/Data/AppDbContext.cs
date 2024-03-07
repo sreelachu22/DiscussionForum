@@ -28,6 +28,7 @@ namespace DiscussionForum.Data
         public DbSet<UserLog> UserLog { get; set; }
         public DbSet<UserRequestLog> UserRequestLog { get; set; }
         public DbSet<SavedPosts> SavedPosts { get; set; }
+        public DbSet<DuplicateThreads> DuplicateThreads { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and delete behaviors
@@ -235,7 +236,7 @@ namespace DiscussionForum.Data
                 .WithMany()
                 .HasForeignKey(ul => ul.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade); // Corrected from Restrict to Cascade
-            
+
             //Relationships and properties for UserRequestLog entity
             modelBuilder.Entity<UserRequestLog>()
                 .HasKey(url => url.UserRequestLogID);
@@ -298,6 +299,58 @@ namespace DiscussionForum.Data
                 .HasOne(sp => sp.Thread)
                 .WithMany()
                 .HasForeignKey(sp => sp.ThreadID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //Relationships and properties for DuplicateThreads entity
+            modelBuilder.Entity<DuplicateThreads>()
+               .HasKey(dt => dt.DuplicateId);
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .Property(dt => dt.DuplicateId)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .Property(dt => dt.DuplicateThreadId)
+                .IsRequired();
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .Property(dt => dt.OriginalThreadId)
+                .IsRequired();
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .Property(dt => dt.CreatedBy)
+                .IsRequired();
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .Property(dt => dt.IsDeleted)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .Property(url => url.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .HasOne(dt => dt.DuplicateThread)
+                .WithMany()
+                .HasForeignKey(dt => dt.DuplicateThreadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .HasOne(dt => dt.OriginalThread)
+                .WithMany()
+                .HasForeignKey(dt => dt.OriginalThreadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .HasOne(dt => dt.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(dt => dt.CreatedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DuplicateThreads>()
+                .HasOne(dt => dt.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(dt => dt.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);

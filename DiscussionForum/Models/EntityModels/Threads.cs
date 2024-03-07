@@ -42,6 +42,5 @@ namespace DiscussionForum.Models.EntityModels
         
 
 
-
     }
 }

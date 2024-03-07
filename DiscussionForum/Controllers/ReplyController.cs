@@ -230,26 +230,26 @@ namespace DiscussionForum.Controllers
         {
             /*try
             {*/
-                //Validates the request data
-                if (threadId <= 0)
-                {
-                    throw new Exception("Invalid threadId. It should be greater than zero.");
-                }
-                else if (parentReplyId != null && parentReplyId <= 0)
-                {
-                    throw new Exception("Invalid parentReplyId. It should be greater than zero.");
-                }
-                else if (string.IsNullOrWhiteSpace(content))
-                {
-                    throw new Exception("Invalid content. It cannot be null or empty.");
-                }
-                else if (creatorId == Guid.Empty)
-                {
-                    throw new Exception("Invalid creatorId. It cannot be null or empty.");
-                }
+            //Validates the request data
+            if (threadId <= 0)
+            {
+                throw new Exception("Invalid threadId. It should be greater than zero.");
+            }
+            else if (parentReplyId != null && parentReplyId <= 0)
+            {
+                throw new Exception("Invalid parentReplyId. It should be greater than zero.");
+            }
+            else if (string.IsNullOrWhiteSpace(content))
+            {
+                throw new Exception("Invalid content. It cannot be null or empty.");
+            }
+            else if (creatorId == Guid.Empty)
+            {
+                throw new Exception("Invalid creatorId. It cannot be null or empty.");
+            }
 
-                Reply _reply = await _replyService.CreateReplyAsync(threadId, creatorId, content, parentReplyId);
-                return Ok(_reply);
+            Reply _reply = await _replyService.CreateReplyAsync(threadId, creatorId, content, parentReplyId);
+            return Ok(_reply);
             /*}
             catch (Exception ex)
             {
@@ -395,8 +395,8 @@ namespace DiscussionForum.Controllers
 
             return NotFound();
         }
-/*
-        [CustomAuth("User")]*/
+
+        [CustomAuth("User")]
         [HttpPost("updateAllHasViewed")]
         public async Task<IActionResult> UpdateAllHasViewed([FromBody] long[] replyIDs)
         {

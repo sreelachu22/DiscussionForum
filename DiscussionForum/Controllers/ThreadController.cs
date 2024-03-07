@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Authorization;
+using DiscussionForum.ExceptionFilter;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
@@ -26,7 +27,7 @@ namespace DiscussionForum.Controllers
         /// <param name="CommunityCategoryMappingID">The mapping ID of the category in a community whose threads must be fetched.</param>
         [CustomAuth("User")]
         [HttpGet]
-        public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize,int filterOption,int sortOption)
+        public async Task<IActionResult> GetThreads(int CommunityCategoryMappingID, int pageNumber, int pageSize, int filterOption, int sortOption)
         {
             try
             {
@@ -392,7 +393,8 @@ namespace DiscussionForum.Controllers
 
         [CustomAuth("User")]
         [HttpGet("displaySearchedThreads")]
-        public async Task<IActionResult> DisplaySearchedThreads(string searchTerm,int pageNumber, int pageSize, int filterOption, int sortOption) {
+        public async Task<IActionResult> DisplaySearchedThreads(string searchTerm, int pageNumber, int pageSize, int filterOption, int sortOption)
+        {
             try
             {
 
@@ -401,7 +403,7 @@ namespace DiscussionForum.Controllers
                     return BadRequest("Search term cannot be empty");
                 }
                 searchTerm = searchTerm.Trim();
-                var (threadDtoList, threadDtoListCount) = await _threadService.DisplaySearchedThreads(searchTerm,pageNumber,pageSize,filterOption,sortOption);
+                var (threadDtoList, threadDtoListCount) = await _threadService.DisplaySearchedThreads(searchTerm, pageNumber, pageSize, filterOption, sortOption);
 
 
 
@@ -442,6 +444,38 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        [CustomAuth("User")]
+        [HttpGet("CheckDuplicate/{threadId}")]
+        public async Task<IActionResult> GetOriginalThreadId(long threadId)
+        {
+            if(threadId < 0) 
+            {
+                throw new CustomException(449, "Invalid thread ID");
+            }
 
+            long _originalThreadId = await _threadService.GetOriginalThreadIdAsync(threadId);
+            return Ok(_originalThreadId);
+        }
+
+        [CustomAuth("User")]
+        [HttpPost("MarkDuplicate/{duplicateThreadId}/{originalThreadId}")]
+        public async Task<IActionResult> MarkDuplicateThread(long duplicateThreadId, long originalThreadId, Guid createdBy)
+        {
+            if (duplicateThreadId < 0 || originalThreadId < 0)
+            {
+                throw new CustomException(449, "Invalid thread ID");
+            }
+            else if (createdBy == Guid.Empty)
+            {
+                throw new CustomException(448, "Invalid creator ID");
+            }
+
+            DuplicateThreads _duplicateThread = await _threadService.MarkDuplicateThreadAsync(duplicateThreadId, originalThreadId, createdBy);
+            if (_duplicateThread == null)
+            {
+                throw new CustomException(447, $"Could not mark thread with ID : {duplicateThreadId} as duplicate of thread with ID : {originalThreadId}");
+            }
+            return Ok(_duplicateThread);
+        }
     }
 }
