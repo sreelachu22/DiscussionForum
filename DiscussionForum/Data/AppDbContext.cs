@@ -337,7 +337,7 @@ namespace DiscussionForum.Data
 
             modelBuilder.Entity<DuplicateThreads>()
                 .HasOne(dt => dt.OriginalThread)
-                .WithMany(t => t.DuplicateThreads)
+                .WithMany()
                 .HasForeignKey(dt => dt.OriginalThreadId)
                 .OnDelete(DeleteBehavior.Cascade);
 

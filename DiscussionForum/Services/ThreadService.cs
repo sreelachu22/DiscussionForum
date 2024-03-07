@@ -896,7 +896,7 @@ namespace DiscussionForum.Services
             }
         }
 
-        public async Task<DuplicateThreads> GetDuplicateThreadAsync(long threadId)
+        public async Task<long> GetOriginalThreadIdAsync(long threadId)
         {
             Threads _thread = await _context.Threads.FindAsync(threadId);
             if (_thread == null)
@@ -904,12 +904,12 @@ namespace DiscussionForum.Services
                 throw new CustomException(446, "Thread not found");
             }
 
-            DuplicateThreads _duplicateThread = await _context.DuplicateThreads.Where(dt => dt.DuplicateThreadId == threadId).FirstOrDefaultAsync();
+            DuplicateThreads _duplicateThread = await _context.DuplicateThreads.Where(dt => dt.DuplicateThreadId == threadId && dt.IsDeleted == false).FirstOrDefaultAsync();
             if (_duplicateThread == null)
             {
-                throw new CustomException(445, "Duplicate not found");
+                return 0;
             }
-            return _duplicateThread;
+            return _duplicateThread.OriginalThreadId;
         }
 
         public async Task<DuplicateThreads> MarkDuplicateThreadAsync(long duplicateThreadId, long originalThreadId, Guid createdBy)

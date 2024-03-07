@@ -444,7 +444,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        /*[CustomAuth("User")]*/
+        [CustomAuth("User")]
         [HttpGet("CheckDuplicate/{threadId}")]
         public async Task<IActionResult> GetOriginalThreadId(long threadId)
         {
@@ -453,15 +453,11 @@ namespace DiscussionForum.Controllers
                 throw new CustomException(449, "Invalid thread ID");
             }
 
-            DuplicateThreads _duplicateThread = await _threadService.GetDuplicateThreadAsync(threadId);
-            if(_duplicateThread == null)
-            {
-                return NotFound();
-            }
-            return Ok(_duplicateThread);
+            long _originalThreadId = await _threadService.GetOriginalThreadIdAsync(threadId);
+            return Ok(_originalThreadId);
         }
 
-        /*[CustomAuth("User")]*/
+        [CustomAuth("User")]
         [HttpPost("MarkDuplicate/{duplicateThreadId}/{originalThreadId}")]
         public async Task<IActionResult> MarkDuplicateThread(long duplicateThreadId, long originalThreadId, Guid createdBy)
         {
