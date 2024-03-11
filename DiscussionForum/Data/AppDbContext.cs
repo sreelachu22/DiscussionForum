@@ -29,6 +29,7 @@ namespace DiscussionForum.Data
         public DbSet<UserRequestLog> UserRequestLog { get; set; }
         public DbSet<SavedPosts> SavedPosts { get; set; }
         public DbSet<DuplicateThreads> DuplicateThreads { get; set; }
+        public DbSet<BestAnswer> BestAnswers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and delete behaviors
@@ -326,7 +327,7 @@ namespace DiscussionForum.Data
                 .HasDefaultValue(false);
 
             modelBuilder.Entity<DuplicateThreads>()
-                .Property(url => url.CreatedAt)
+                .Property(dt => dt.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
 
             modelBuilder.Entity<DuplicateThreads>()
@@ -351,6 +352,58 @@ namespace DiscussionForum.Data
                 .HasOne(dt => dt.ModifiedByUser)
                 .WithMany()
                 .HasForeignKey(dt => dt.ModifiedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //Relationships and properties for BestAnswer entity
+            modelBuilder.Entity<BestAnswer>()
+               .HasKey(ba => ba.BestAnswerId);
+
+            modelBuilder.Entity<BestAnswer>()
+                .Property(ba => ba.BestAnswerId)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<BestAnswer>()
+                .Property(ba => ba.ThreadID)
+                .IsRequired();
+
+            modelBuilder.Entity<BestAnswer>()
+                .Property(ba => ba.ReplyID)
+                .IsRequired();
+
+            modelBuilder.Entity<BestAnswer>()
+                .Property(ba => ba.CreatedBy)
+                .IsRequired();
+
+            modelBuilder.Entity<BestAnswer>()
+                .Property(ba => ba.IsDeleted)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<BestAnswer>()
+                .Property(ba => ba.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<BestAnswer>()
+                .HasOne(ba => ba.Thread)
+                .WithMany()
+                .HasForeignKey(ba => ba.ThreadID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BestAnswer>()
+                .HasOne(ba => ba.Reply)
+                .WithMany()
+                .HasForeignKey(ba => ba.ReplyID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BestAnswer>()
+                .HasOne(ba => ba.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(ba => ba.CreatedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BestAnswer>()
+                .HasOne(ba => ba.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(ba => ba.ModifiedBy)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
