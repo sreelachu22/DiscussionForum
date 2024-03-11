@@ -550,7 +550,7 @@ namespace DiscussionForum.Services
             }
             else if(_creator.UserID != _thread.CreatedBy)
             {
-                throw new CustomException(441, "User not authenticated to mark reply as best answer of this thread");
+                throw new CustomException(441, "User not authorized to mark reply as best answer of this thread");
             }
 
             BestAnswer _bestAnswer = new BestAnswer
