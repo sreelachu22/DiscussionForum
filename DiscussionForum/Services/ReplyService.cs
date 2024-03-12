@@ -3,6 +3,7 @@ using DiscussionForum.ExceptionFilter;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace DiscussionForum.Services
@@ -57,6 +58,7 @@ namespace DiscussionForum.Services
                             Content = r.Content,
                             IsDeleted = r.IsDeleted,
                             CreatedBy = r.CreatedBy,
+                            CreatedUserName = r.CreatedByUser != null ? r.CreatedByUser.Name : "",
                             CreatedAt = r.CreatedAt,
                             ModifiedBy = r.ModifiedBy,
                             ModifiedAt = r.ModifiedAt,
@@ -511,6 +513,60 @@ namespace DiscussionForum.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
+        }
+
+        public async Task<long> GetBestAnswerIdAsync(long threadId)
+        {
+            Threads _thread = await _context.Threads.FindAsync(threadId);
+            if (_thread == null)
+            {
+                throw new CustomException(446, "Thread not found");
+            }
+
+            BestAnswer _bestAnswer = await _context.BestAnswers.Where(ba => ba.ThreadID == threadId && ba.IsDeleted == false).FirstOrDefaultAsync();
+            if (_bestAnswer == null)
+            {
+                return 0;
+            }
+            return _bestAnswer.ReplyID;
+        }
+
+        public async Task<BestAnswer> MarkReplyAsBestAnswerAsync(long replyId, Guid createdBy)
+        {
+            Reply _reply = await _context.Replies.FindAsync(replyId);
+            Threads _thread = await _context.Threads.FindAsync(_reply.ThreadID);
+            User _creator = await _context.Users.FindAsync(createdBy);
+
+            if (_reply == null)
+            {
+                throw new CustomException(442, "Reply not found");
+            }
+            else if(_thread == null)
+            {
+                throw new CustomException(446, "Thread not found");
+            }
+            else if (_creator == null)
+            {
+                throw new CustomException(445, "User not found");
+            }
+            else if(_creator.UserID != _thread.CreatedBy)
+            {
+                throw new CustomException(441, "User not authorized to mark reply as best answer of this thread");
+            }
+
+            BestAnswer _bestAnswer = new BestAnswer
+            {
+                ThreadID = _reply.ThreadID,
+                ReplyID = _reply.ReplyID,
+                IsDeleted = false,
+                CreatedBy = _creator.UserID,
+                CreatedAt = DateTime.Now
+            };
+
+            await _context.BestAnswers.AddAsync(_bestAnswer);
+            await _context.SaveChangesAsync();
+
+            return _bestAnswer;
         }
 
     }
