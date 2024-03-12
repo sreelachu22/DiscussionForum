@@ -1,4 +1,5 @@
 ﻿using DiscussionForum.Authorization;
+using DiscussionForum.ExceptionFilter;
 using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.Services;
@@ -407,6 +408,40 @@ namespace DiscussionForum.Controllers
             }
 
             return NotFound();
+        }
+
+        [CustomAuth("User")]
+        [HttpGet("GetBestAnswer/{threadId}")]
+        public async Task<IActionResult> GetBestAnswerId(long threadId)
+        {
+            if (threadId < 0)
+            {
+                throw new CustomException(449, "Invalid thread ID");
+            }
+
+            long _bestAnswerId = await _replyService.GetBestAnswerIdAsync(threadId);
+            return Ok(_bestAnswerId);
+        }
+
+        [CustomAuth("User")]
+        [HttpPost("MarkAsBestAnswer/{replyId}")]
+        public async Task<IActionResult> MarkReplyAsBestAnswer(long replyId, Guid createdBy)
+        {
+            if(replyId < 0)
+            {
+                throw new CustomException(444, "Invalid Reply ID");
+            }
+            else if (createdBy == Guid.Empty)
+            {
+                throw new CustomException(448, "Invalid creator ID");
+            }
+
+            BestAnswer _bestAnswer = await _replyService.MarkReplyAsBestAnswerAsync(replyId, createdBy);
+            if(_bestAnswer == null)
+            {
+                throw new CustomException(443, $"Could not mark reply with ID: {replyId} as best answer");
+            }
+            return Ok(_bestAnswer);
         }
 
     }
