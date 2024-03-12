@@ -58,6 +58,7 @@ namespace DiscussionForum.Services
                             Content = r.Content,
                             IsDeleted = r.IsDeleted,
                             CreatedBy = r.CreatedBy,
+                            CreatedUserName = r.CreatedByUser != null ? r.CreatedByUser.Name : "",
                             CreatedAt = r.CreatedAt,
                             ModifiedBy = r.ModifiedBy,
                             ModifiedAt = r.ModifiedAt,
