@@ -35,6 +35,22 @@ namespace DiscussionForum.Controllers
             }
         }
 
+        //[CustomAuth("User")]
+        [HttpGet("PaginatedTagsWithSearchAndSort")]
+        public async Task<IActionResult> GetAllTags(bool isdel, string? sortOrder = "asc", string? searchKeyword = "", int pageNumber = 1, int pageSize = 15)
+        {
+            try
+            {
+                var (tagDtos, totalPages) = await _tagService.GetAllPaginatedTagsAsync(isdel, sortOrder, searchKeyword, pageNumber, pageSize);
+                return Ok(new { tagDtos, totalPages });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+
         [CustomAuth("Admin")]
         [HttpGet("Search")]
 
