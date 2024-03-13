@@ -410,7 +410,7 @@ namespace DiscussionForum.Controllers
             return NotFound();
         }
 
-        /*[CustomAuth("User")]*/
+        [CustomAuth("User")]
         [HttpGet("GetBestAnswer/{threadId}")]
         public async Task<IActionResult> GetBestAnswerId(long threadId)
         {
@@ -444,7 +444,7 @@ namespace DiscussionForum.Controllers
             return Ok(_bestAnswer);
         }
 
-        /*[CustomAuth("User")]*/
+        [CustomAuth("User")]
         [HttpPost("UnmarkBestAnswer/{replyId}")]
         public async Task<IActionResult> UnmarkReplyAsBestAnswer(long replyId, Guid modifiedBy)
         {
