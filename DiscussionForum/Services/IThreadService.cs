@@ -53,7 +53,7 @@ namespace DiscussionForum.Services
         Task<long> GetOriginalThreadIdAsync(long threadId);
         Task<DuplicateThreads> MarkDuplicateThreadAsync(long duplicateThreadId, long originalThreadId, Guid createdBy);
         Task<DuplicateThreads> EditDuplicateThreadAsync(long duplicateThreadId, long originalThreadId, Guid modifiedBy);
-        Task<DuplicateThreads> DeleteDuplicateThreadAsync(long duplicateThreadId, Guid modifiedBy);
+        Task<DuplicateThreads> UnmarkDuplicateThreadAsync(long duplicateThreadId, Guid modifiedBy);
     }
 }
 

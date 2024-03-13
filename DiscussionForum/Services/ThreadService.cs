@@ -974,7 +974,7 @@ namespace DiscussionForum.Services
             return _duplicatedThread;
         }
 
-        public async Task<DuplicateThreads> DeleteDuplicateThreadAsync(long duplicateThreadId, Guid modifiedBy)
+        public async Task<DuplicateThreads> UnmarkDuplicateThreadAsync(long duplicateThreadId, Guid modifiedBy)
         {
             DuplicateThreads _duplicatedThread = await _context.DuplicateThreads.Where(dt => dt.DuplicateThreadId == duplicateThreadId && dt.IsDeleted == false).FirstOrDefaultAsync();
             User _modifier = await _context.Users.FindAsync(modifiedBy);

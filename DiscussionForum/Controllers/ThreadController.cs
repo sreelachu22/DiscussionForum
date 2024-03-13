@@ -500,8 +500,8 @@ namespace DiscussionForum.Controllers
         }
 
         [CustomAuth("User")]
-        [HttpPut("DeleteDuplicate/{duplicateThreadId}")]
-        public async Task<IActionResult> DeleteDuplicateThread(long duplicateThreadId, Guid modifiedBy)
+        [HttpDelete("UnmarkDuplicate/{duplicateThreadId}")]
+        public async Task<IActionResult> UnmarkDuplicateThread(long duplicateThreadId, Guid modifiedBy)
         {
             if (duplicateThreadId < 0)
             {
@@ -512,7 +512,7 @@ namespace DiscussionForum.Controllers
                 throw new CustomException(448, "Invalid modifier ID");
             }
 
-            DuplicateThreads _duplicateThread = await _threadService.DeleteDuplicateThreadAsync(duplicateThreadId, modifiedBy);
+            DuplicateThreads _duplicateThread = await _threadService.UnmarkDuplicateThreadAsync(duplicateThreadId, modifiedBy);
             if (_duplicateThread == null)
             {
                 throw new CustomException(447, $"Could not unmark thread with ID : {duplicateThreadId} as duplicate");
