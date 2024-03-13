@@ -20,6 +20,7 @@ namespace DiscussionForum.Services
                     From = new MailAddress("merinjose127@gmail.com", "Admin"),
                     Subject = subject,
                     Body = body,
+                    IsBodyHtml = true
                 };
 
                 mailMessage.To.Add(new MailAddress(toEmail));
