@@ -1,6 +1,8 @@
 ﻿using DiscussionForum.Data;
+using DiscussionForum.Models.APIModels;
 using DiscussionForum.Models.EntityModels;
 using DiscussionForum.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace DiscussionForum.Services
@@ -12,6 +14,80 @@ namespace DiscussionForum.Services
         public PointService(AppDbContext context)
         {
             _context = context;
+        }
+
+
+        public async Task<PointDto> GetPointsByCommunityId(int communityID)
+        {
+            var point = await _context.Points.FirstOrDefaultAsync(p => p.CommunityID == communityID);
+            if (point == null)
+            {
+                throw new Exception("No points found for the specified community.");
+            }
+
+            return new PointDto
+            {
+                // Map properties from the retrieved point entity to PointDto
+                ThreadCreated = point.ThreadCreated,
+                ThreadUpdated = point.ThreadUpdated,
+                ThreadDeleted = point.ThreadDeleted,
+                ThreadUpvotedBy = point.ThreadUpvotedBy,
+                ThreadUpvotedOn = point.ThreadUpvotedOn,
+                ThreadDownvotedBy = point.ThreadDownvotedBy,
+                ThreadDownvotedOn = point.ThreadDownvotedOn,
+                RemoveThreadUpvoteBy = point.RemoveThreadUpvoteBy,
+                RemoveThreadUpvoteOn = point.RemoveThreadUpvoteOn,
+                RemoveThreadDownvoteBy = point.RemoveThreadDownvoteBy,
+                RemoveThreadDownvoteOn = point.RemoveThreadDownvoteOn,
+                ReplyCreated = point.ReplyCreated,
+                ReplyUpdated = point.ReplyUpdated,
+                ReplyDeleted = point.ReplyDeleted,
+                ReplyUpvotedBy = point.ReplyUpvotedBy,
+                ReplyUpvotedOn = point.ReplyUpvotedOn,
+                ReplyDownvotedBy = point.ReplyDownvotedBy,
+                ReplyDownvotedOn = point.ReplyDownvotedOn,
+                RemoveReplyUpvoteBy = point.RemoveReplyUpvoteBy,
+                RemoveReplyUpvoteOn = point.RemoveReplyUpvoteOn,
+                RemoveReplyDownvoteBy = point.RemoveReplyDownvoteBy,
+                RemoveReplyDownvoteOn = point.RemoveReplyDownvoteOn,
+        };
+    }
+        public async Task<string> UpdatePoint(int communityID, PointDto pointDto)
+        {
+            var point = await _context.Points.FirstOrDefaultAsync(p => p.CommunityID == communityID);
+
+            if (point == null)
+            {
+                return "No record found for the specified community.";
+            }
+
+            point.ThreadCreated = pointDto.ThreadCreated;
+            point.ThreadUpdated = pointDto.ThreadUpdated;
+            point.ThreadDeleted = pointDto.ThreadDeleted;
+            point.ThreadUpvotedBy = pointDto.ThreadUpvotedBy;
+            point.ThreadUpvotedOn = pointDto.ThreadUpvotedOn;
+            point.ThreadDownvotedBy = pointDto.ThreadDownvotedBy;
+            point.ThreadDownvotedOn = pointDto.ThreadDownvotedOn;
+            point.RemoveThreadUpvoteBy = pointDto.RemoveThreadUpvoteBy;
+            point.RemoveThreadUpvoteOn = pointDto.RemoveThreadUpvoteOn;
+            point.RemoveThreadDownvoteBy = pointDto.RemoveThreadDownvoteBy;
+            point.RemoveThreadDownvoteOn = pointDto.RemoveThreadDownvoteOn;
+            point.ReplyCreated = pointDto.ReplyCreated;
+            point.ReplyUpdated  = pointDto.ReplyUpdated;
+            point.ReplyDeleted = pointDto.ReplyDeleted;
+            point.ReplyUpvotedBy = pointDto.ReplyUpvotedBy;
+            point.ReplyUpvotedOn = pointDto.ReplyUpvotedOn;
+            point.ReplyDownvotedBy = pointDto.ReplyDownvotedBy;
+            point.ReplyDownvotedOn = pointDto.ReplyDownvotedOn;
+            point.RemoveReplyUpvoteBy = pointDto.RemoveReplyUpvoteBy;
+            point.RemoveReplyUpvoteOn = pointDto.RemoveReplyUpvoteOn;
+            point.RemoveReplyDownvoteBy = pointDto.RemoveReplyDownvoteBy;
+            point.RemoveReplyDownvoteOn = pointDto.RemoveReplyDownvoteOn;
+
+
+            await _context.SaveChangesAsync();
+
+            return "Scores updated successfully.";
         }
         public async Task ThreadCreated(Guid createdBy)
         {

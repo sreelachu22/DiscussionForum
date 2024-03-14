@@ -946,5 +946,55 @@ namespace DiscussionForum.Services
             return _duplicatedThread;
         }
 
+        public async Task<DuplicateThreads> EditDuplicateThreadAsync(long duplicateThreadId, long originalThreadId, Guid modifiedBy)
+        {
+            DuplicateThreads _duplicatedThread = await _context.DuplicateThreads.Where(dt => dt.DuplicateThreadId == duplicateThreadId && dt.IsDeleted == false).FirstOrDefaultAsync();
+            Threads _originalThread = await _context.Threads.FindAsync(originalThreadId);
+            User _modifier = await _context.Users.FindAsync(modifiedBy);
+
+            if (_originalThread == null)
+            {
+                throw new CustomException(446, "Thread not found");
+            }
+            else if (_duplicatedThread == null)
+            {
+                throw new CustomException(444, "Duplicate entry not found");
+            }
+            else if (_modifier == null)
+            {
+                throw new CustomException(445, "User not found");
+            }
+
+            _duplicatedThread.OriginalThreadId = originalThreadId;
+            _duplicatedThread.ModifiedBy = modifiedBy;
+            _duplicatedThread.ModifiedAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return _duplicatedThread;
+        }
+
+        public async Task<DuplicateThreads> UnmarkDuplicateThreadAsync(long duplicateThreadId, Guid modifiedBy)
+        {
+            DuplicateThreads _duplicatedThread = await _context.DuplicateThreads.Where(dt => dt.DuplicateThreadId == duplicateThreadId && dt.IsDeleted == false).FirstOrDefaultAsync();
+            User _modifier = await _context.Users.FindAsync(modifiedBy);
+
+            if (_duplicatedThread == null)
+            {
+                throw new CustomException(444, "Duplicate entry not found");
+            }
+            else if (_modifier == null)
+            {
+                throw new CustomException(445, "User not found");
+            }
+
+            _duplicatedThread.IsDeleted = true;
+            _duplicatedThread.ModifiedBy = modifiedBy;
+            _duplicatedThread.ModifiedAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return _duplicatedThread;
+        }
     }
 }

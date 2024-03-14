@@ -569,5 +569,28 @@ namespace DiscussionForum.Services
             return _bestAnswer;
         }
 
+        public async Task<BestAnswer> UnmarkReplyAsBestAnswerAsync(long replyId, Guid modifiedBy)
+        {
+            BestAnswer _bestAnswer = await _context.BestAnswers.Where(ba => ba.ReplyID == replyId && ba.IsDeleted == false).FirstOrDefaultAsync();
+            User _modifier = await _context.Users.FindAsync(modifiedBy);
+
+            if(_bestAnswer == null)
+            {
+                throw new CustomException(440, "Reply not marked as best answer");
+            }
+            else if(_modifier == null)
+            {
+                throw new CustomException(445, "User not found");
+            }
+
+            _bestAnswer.IsDeleted = true;
+            _bestAnswer.ModifiedBy = modifiedBy;
+            _bestAnswer.ModifiedAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return _bestAnswer;
+        }
+
     }
 }
