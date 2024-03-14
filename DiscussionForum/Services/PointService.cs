@@ -52,13 +52,13 @@ namespace DiscussionForum.Services
                 RemoveReplyDownvoteOn = point.RemoveReplyDownvoteOn,
         };
     }
-        public async Task<string> UpdatePoint(int communityID, PointDto pointDto)
+        public async Task<PointDto> UpdatePoint(int communityID, PointDto pointDto)
         {
             var point = await _context.Points.FirstOrDefaultAsync(p => p.CommunityID == communityID);
 
             if (point == null)
             {
-                return "No record found for the specified community.";
+                return null;
             }
 
             point.ThreadCreated = pointDto.ThreadCreated;
@@ -87,7 +87,7 @@ namespace DiscussionForum.Services
 
             await _context.SaveChangesAsync();
 
-            return "Scores updated successfully.";
+            return pointDto;
         }
         public async Task ThreadCreated(Guid createdBy)
         {
