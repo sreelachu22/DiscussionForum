@@ -23,7 +23,7 @@ namespace DiscussionForum.Controllers
         public async Task<IActionResult> UpdatePoint(int communityID, [FromBody] PointDto pointDto)
         {
             var result = await _pointService.UpdatePoint(communityID, pointDto);
-            if (result == "No record found for the specified community ID.")
+            if (result == null)
             {
                 return NotFound(result);
             }

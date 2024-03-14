@@ -4,7 +4,7 @@ namespace DiscussionForum.Services
 {
     public interface IPointService
     {
-        Task<string> UpdatePoint(int communityID, PointDto pointDto);
+        Task<PointDto> UpdatePoint(int communityID, PointDto pointDto);
         Task<PointDto> GetPointsByCommunityId(int communityId);
         Task ThreadCreated(Guid createdBy);
         Task ThreadUpdated(Guid updatedBy);
