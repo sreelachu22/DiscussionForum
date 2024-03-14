@@ -477,5 +477,47 @@ namespace DiscussionForum.Controllers
             }
             return Ok(_duplicateThread);
         }
+
+        [CustomAuth("User")]
+        [HttpPut("EditDuplicate/{duplicateThreadId}/{originalThreadId}")]
+        public async Task<IActionResult> EditDuplicateThread(long duplicateThreadId, long originalThreadId, Guid modifiedBy)
+        {
+            if (duplicateThreadId < 0 || originalThreadId < 0)
+            {
+                throw new CustomException(449, "Invalid thread ID");
+            }
+            else if (modifiedBy == Guid.Empty)
+            {
+                throw new CustomException(448, "Invalid modifier ID");
+            }
+
+            DuplicateThreads _duplicateThread = await _threadService.EditDuplicateThreadAsync(duplicateThreadId, originalThreadId, modifiedBy);
+            if (_duplicateThread == null)
+            {
+                throw new CustomException(447, $"Could not edit thread with ID : {duplicateThreadId} as duplicate of thread with ID : {originalThreadId}");
+            }
+            return Ok(_duplicateThread);
+        }
+
+        [CustomAuth("User")]
+        [HttpDelete("UnmarkDuplicate/{duplicateThreadId}")]
+        public async Task<IActionResult> UnmarkDuplicateThread(long duplicateThreadId, Guid modifiedBy)
+        {
+            if (duplicateThreadId < 0)
+            {
+                throw new CustomException(449, "Invalid thread ID");
+            }
+            else if (modifiedBy == Guid.Empty)
+            {
+                throw new CustomException(448, "Invalid modifier ID");
+            }
+
+            DuplicateThreads _duplicateThread = await _threadService.UnmarkDuplicateThreadAsync(duplicateThreadId, modifiedBy);
+            if (_duplicateThread == null)
+            {
+                throw new CustomException(447, $"Could not unmark thread with ID : {duplicateThreadId} as duplicate");
+            }
+            return Ok(_duplicateThread);
+        }
     }
 }

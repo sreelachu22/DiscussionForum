@@ -52,6 +52,8 @@ namespace DiscussionForum.Services
         Task<(IEnumerable<CategoryThreadDto> Threads, int TotalCount, string CategoryName, string CategoryDescription)> GetMyThreads(Guid userId, int pageNumber, int pageSize, int filterOption, int sortOption);
         Task<long> GetOriginalThreadIdAsync(long threadId);
         Task<DuplicateThreads> MarkDuplicateThreadAsync(long duplicateThreadId, long originalThreadId, Guid createdBy);
+        Task<DuplicateThreads> EditDuplicateThreadAsync(long duplicateThreadId, long originalThreadId, Guid modifiedBy);
+        Task<DuplicateThreads> UnmarkDuplicateThreadAsync(long duplicateThreadId, Guid modifiedBy);
     }
 }
 
