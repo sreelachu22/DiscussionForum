@@ -62,5 +62,7 @@ namespace DiscussionForum.Services
         Task<bool> UpdateAllHasViewedAsync(long[] replyIDs);
         Task<long> GetBestAnswerIdAsync(long threadId);
         Task<BestAnswer> MarkReplyAsBestAnswerAsync(long replyId, Guid createdBy);
+        Task<BestAnswer> UnmarkReplyAsBestAnswerAsync(long replyId, Guid modifiedBy);
+
     }
 }

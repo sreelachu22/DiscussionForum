@@ -444,5 +444,26 @@ namespace DiscussionForum.Controllers
             return Ok(_bestAnswer);
         }
 
+        [CustomAuth("User")]
+        [HttpPost("UnmarkBestAnswer/{replyId}")]
+        public async Task<IActionResult> UnmarkReplyAsBestAnswer(long replyId, Guid modifiedBy)
+        {
+            if (replyId < 0)
+            {
+                throw new CustomException(444, "Invalid Reply ID");
+            }
+            else if (modifiedBy == Guid.Empty)
+            {
+                throw new CustomException(448, "Invalid modifier ID");
+            }
+
+            BestAnswer _bestAnswer = await _replyService.UnmarkReplyAsBestAnswerAsync(replyId, modifiedBy);
+            if (_bestAnswer == null)
+            {
+                throw new CustomException(443, $"Could not unmark reply with ID: {replyId} as best answer");
+            }
+            return Ok(_bestAnswer);
+        }
+
     }
 }
