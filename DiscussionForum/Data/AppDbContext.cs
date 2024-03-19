@@ -20,6 +20,7 @@ namespace DiscussionForum.Data
         public DbSet<ReplyVote> ReplyVotes { get; set; }
         public DbSet<Community> Communities { get; set; }
         public DbSet<Point> Points { get; set; }
+        public DbSet<Badge> Badges { get; set; }
         public DbSet<CommunityCategoryMapping> CommunityCategoryMapping { get; set; }
         public DbSet<Notice> Notices { get; set; }
         public DbSet<Reply> Replies { get; set; }
