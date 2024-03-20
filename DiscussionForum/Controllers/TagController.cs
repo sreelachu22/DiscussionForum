@@ -35,7 +35,7 @@ namespace DiscussionForum.Controllers
             }
         }
 
-        //[CustomAuth("User")]
+        [CustomAuth("User")]
         [HttpGet("PaginatedTagsWithSearchAndSort")]
         public async Task<IActionResult> GetAllTags(bool isdel, string? sortOrder = "asc", string? searchKeyword = "", int pageNumber = 1, int pageSize = 15)
         {
@@ -51,7 +51,7 @@ namespace DiscussionForum.Controllers
         }
 
 
-        [CustomAuth("Admin")]
+        [CustomAuth("User")]
         [HttpGet("Search")]
 
         public async Task<IActionResult> SearchTags(string keyword)
@@ -77,7 +77,7 @@ namespace DiscussionForum.Controllers
         }
 
 
-        [CustomAuth("Admin")]
+        [CustomAuth("User")]
         [HttpPost]
         public async Task<IActionResult> CreateTag([FromBody] string tagname, Guid createdby)
         {
