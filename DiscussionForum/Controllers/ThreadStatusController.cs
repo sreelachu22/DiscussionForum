@@ -1,12 +1,40 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DiscussionForum.Authorization;
+using DiscussionForum.Services;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DiscussionForum.Controllers
 {
-    public class ThreadStatusController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    [EnableCors("AllowAngularDev")]
+    public class ThreadStatusController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IThreadStatusService _threadStatusService;
+
+        public ThreadStatusController(IThreadStatusService ThreadStatusService)
         {
-            return View();
+            _threadStatusService = ThreadStatusService;
+        }
+
+        [CustomAuth("Admin")]
+        [HttpGet]
+        public async Task<IActionResult> GetThreadStatus()
+        {
+            var threadStatus = await _threadStatusService.GetThreadStatusAsync();
+            return Ok(threadStatus);
+        }
+
+        [CustomAuth("Admin")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetThreadStatusById(int id)
+        {
+            var ThreadStatus = await _threadStatusService.GetThreadStatusByIdAsync(id);
+            if (ThreadStatus == null)
+            {
+                return NotFound(); // If the retrieved thread status is null, return an HTTP 404 Not Found response.
+            }
+            return Ok(ThreadStatus);
         }
     }
 }

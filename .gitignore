@@ -10,6 +10,15 @@
 *.userosscache
 *.sln.docstates
 
+#DotNetEnv file
+.env
+
+#Request logs
+/DiscussionForum/Middleware/RequestLogging/RequestLog*.txt
+
+#Exception logs
+/DiscussionForum/Middleware/ExceptionLogging/ExceptionLog*.txt
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
